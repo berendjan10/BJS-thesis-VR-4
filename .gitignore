@@ -72,6 +72,8 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Zelf toegevoegd!
-# /[Aa]ssets/Oculus/*
-/[Aa]ssets/Plugins/*
-/[Aa]ssets/Ready Player Me/*
+# /[Aa]ssets/Oculus/* # 1.32 GB
+/[Aa]ssets/Plugins/* # 105 MB
+# /[Aa]ssets/Ready Player Me/* # 0.99 MB
+# /[Aa]ssets/Samples/* # 4.65 MB
+# /[Aa]ssets/Simple garage/* # 118 MB
