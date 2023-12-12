@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+    <ui:Toggle label="Toggle" style="height: 113px;" />
+    <ui:Toggle label="Toggle" style="height: 113px;" />
+    <ui:RadioButton label="Radio Button" />
+</ui:UXML>
