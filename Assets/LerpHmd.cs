@@ -28,8 +28,8 @@ public class LerpHmd : MonoBehaviour
     {
         if (!switchOnOff) 
         {
-            transform.position = hmdTarget.position; // make sure that if simulation is not playing that avatar follows HMD. SELF = HMD
-            transform.rotation = hmdTarget.rotation; // make sure that if simulation is not playing that avatar follows HMD.
+            transform.position = goal.position; // make sure that if simulation is not playing that avatar follows HMD. SELF = HMD
+            transform.rotation = goal.rotation; // make sure that if simulation is not playing that avatar follows HMD.
         }
         else if (switchOnOff)
         {
