@@ -7,6 +7,7 @@ using UnityEngine;
 public class LerpHmd : MonoBehaviour
 {
     public Transform hmdTarget;
+    public Transform goal;
     private float lerpValue = 0;
     private float currentTime = 0; // clock
 
@@ -18,8 +19,8 @@ public class LerpHmd : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _goalPosition = transform.position; // reference to object script is attached to. Save the target position
-        _goalRotation = transform.rotation; // reference to object script is attached to
+        _goalPosition = goal.position; // reference to object script is attached to. Save the target position
+        _goalRotation = goal.rotation; // reference to object script is attached to
     }
 
     // Update is called once per frame
