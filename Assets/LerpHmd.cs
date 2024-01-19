@@ -13,8 +13,9 @@ public class LerpHmd : MonoBehaviour
 
     private Vector3 _goalPosition;
     private Quaternion _goalRotation;
-    private bool _isPlaying = true;
-    public bool switchOnOff = false;
+    private bool _isPlaying = false;
+    public bool deviate = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -26,12 +27,12 @@ public class LerpHmd : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!switchOnOff) 
+        if (!deviate) 
         {
-            transform.position = goal.position; // make sure that if simulation is not playing that avatar follows HMD. SELF = HMD
-            transform.rotation = goal.rotation; // make sure that if simulation is not playing that avatar follows HMD.
+            transform.position = hmdTarget.position;
+            transform.rotation = hmdTarget.rotation;
         }
-        else if (switchOnOff)
+        else
         {
             currentTime += Time.deltaTime; // add the time since last frame to the total duration
 
@@ -59,11 +60,14 @@ public class LerpHmd : MonoBehaviour
 
             if (_isPlaying) // je wil in 2 seconden 1 hele sinus doorlopen
             {
-                transform.position = Vector3.Lerp(_goalPosition, hmdTarget.position, lerpValue); // position linear interpolation between HMD & target
-                transform.rotation = Quaternion.Slerp(transform.rotation, hmdTarget.rotation, lerpValue); // rotation linear interpolation between HMD & target
-                float amplitude = 0.5f; // Set the amplitude to 0.5 to make the cosine function go from 1 to 0 to 1
-                lerpValue = 0.5f + amplitude * Mathf.Cos(Mathf.PI * (currentTime - 2)); // Update the lerpValue calculation with the new amplitude. FROM 1 TO 0 TO 1!
-                lerpValue = Mathf.Cos(Mathf.PI * (currentTime - 2)); // calc lerpValue used in 2 lines above. a sinus of the time, one full cycle in 2s.
+                float A = 0.5f; // amplitude
+                float period = 2 ; // period of the sine wave (how many seconds for 1 full cycle)
+                float B = Mathf.PI / Mathf.Abs(period); // frequency
+                float C = 2f; // phase shift of sine wave (horizontal shift)
+                float D = 0.5f; // vertical shift of the sine wave
+                lerpValue = A * Mathf.Sin(B * (currentTime - C)) + D; // Update the lerpValue calculation with the new amplitude. FROM 1 TO 0 TO 1! a sinus of the time, one full cycle in 2s.
+                transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition,lerpValue); // position linear interpolation between HMD & target
+                // transform.rotation = Quaternion.Slerp(transform.rotation, hmdTarget.rotation, lerpValue); // rotation linear interpolation between HMD & target
             }
         }
     }
