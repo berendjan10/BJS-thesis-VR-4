@@ -8,6 +8,7 @@ TagManager:
   - RightGameTarget
   - gameInstructions
   - GameTarget
+  - GameTargetTop
   layers:
   - Default
   - TransparentFX

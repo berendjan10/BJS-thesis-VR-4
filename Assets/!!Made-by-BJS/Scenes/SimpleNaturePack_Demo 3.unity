@@ -24677,7 +24677,7 @@ PrefabInstance:
     - target: {fileID: 4089370140828067082, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
       propertyPath: m_TagString
-      value: GameTarget
+      value: GameTargetTop
       objectReference: {fileID: 0}
     - target: {fileID: 6501909310391953463, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
