@@ -9357,6 +9357,7 @@ MonoBehaviour:
   hmdTarget: {fileID: 1744460106}
   goal: {fileID: 243520606}
   deviate: 0
+  duration: 2
 --- !u!4 &595502765
 Transform:
   m_ObjectHideFlags: 0
@@ -24672,7 +24673,7 @@ PrefabInstance:
     - target: {fileID: 4089370140828067082, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4089370140828067082, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
