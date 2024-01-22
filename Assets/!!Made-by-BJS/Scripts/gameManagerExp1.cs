@@ -45,11 +45,12 @@ public class GameManagerExp1 : MonoBehaviour
             // Call the function to handle the logic after touching a sphere
             HandleSphereTouched();
 
-            // Call the function to generate a new random game instruction
-            SetRandomGameInstruction();
+            // // Call the function to generate a new random game instruction
+            // SetRandomGameInstruction();
         }
         else if (other.gameObject.CompareTag("GameTargetTop"))
         {
+            print("top sphere touched");
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
 
@@ -65,6 +66,7 @@ public class GameManagerExp1 : MonoBehaviour
     {
         // Add logic here to handle anything specific when a sphere is touched
         // For example, updating the score or triggering other events.
+        print("Go to middle");
         textScript.ChangeTextFcn("Good job! Please sit straight up now.");
         topSphere.SetActive(true);
     }
