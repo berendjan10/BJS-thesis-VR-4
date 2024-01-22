@@ -40,19 +40,14 @@ public class GameManagerExp1 : MonoBehaviour
         // Check if the collided object has the tag "GameTarget"
         if (other.gameObject.CompareTag("GameTarget"))
         {
-            // Check if the touched sphere is the correct one
-            if (spheres.Contains(other.gameObject))
-            {
-                print("correct one");
-                // Disable the entire GameObject
-                other.gameObject.SetActive(false);
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
 
-                // Call the function to handle the logic after touching a sphere
-                HandleSphereTouched();
+            // Call the function to handle the logic after touching a sphere
+            HandleSphereTouched();
 
-                // Call the function to generate a new random game instruction
-                SetRandomGameInstruction();
-            }
+            // Call the function to generate a new random game instruction
+            SetRandomGameInstruction();
         }
     }
 
