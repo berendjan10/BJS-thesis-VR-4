@@ -17,7 +17,7 @@ public class GameManagerExp1 : MonoBehaviour
     void Start()
     {
         // Initialize the list with all sphere game objects
-        spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere, topSphere };
+        spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere };
 
         // Find the game object with the ChangeText script
         GameObject textGameObject = GameObject.FindWithTag("gameInstructions");
@@ -25,15 +25,14 @@ public class GameManagerExp1 : MonoBehaviour
 
         // // Call the function to set up the initial game instructions
         // SetGameInstructions();
-        // spheres[0].GetComponent<MeshRenderer>().enabled = true;
         SetRandomGameInstruction();
     }
 
-    void SetGameInstructions()
-    {
-        // Set the initial game instruction
-        textScript.ChangeTextFcn("INITIAL Lean to the right - touch the golden sphere with your head");
-    }
+    // void SetGameInstructions()
+    // {
+    //     // Set the initial game instruction
+    //     textScript.ChangeTextFcn("INITIAL Lean to the right - touch the golden sphere with your head");
+    // }
 
     void OnTriggerEnter(Collider other)
     {
@@ -49,13 +48,25 @@ public class GameManagerExp1 : MonoBehaviour
             // Call the function to generate a new random game instruction
             SetRandomGameInstruction();
         }
+        else if (other.gameObject.CompareTag("GameTargetTop"))
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
+
+            // Wait for 1 - 5 seconds (random)
+            
+
+            // Call the function to generate a new random game instruction
+            SetRandomGameInstruction();
+        }
     }
 
     void HandleSphereTouched()
     {
         // Add logic here to handle anything specific when a sphere is touched
         // For example, updating the score or triggering other events.
-        textScript.ChangeTextFcn("yaayyy success!");
+        textScript.ChangeTextFcn("Good job! Please sit straight up now.");
+        topSphere.SetActive(true);
     }
 
     void SetRandomGameInstruction()
@@ -70,19 +81,16 @@ public class GameManagerExp1 : MonoBehaviour
         switch (randomIndex)
         {
             case 0:
-                textScript.ChangeTextFcn("Lean to the right - touch the golden sphere with your head");
+                textScript.ChangeTextFcn("Please lean to the right - touch the golden sphere with your head");
                 break;
             case 1:
-                textScript.ChangeTextFcn("Lean to the left - touch the golden sphere with your head");
+                textScript.ChangeTextFcn("Please lean to the left - touch the golden sphere with your head");
                 break;
             case 2:
-                textScript.ChangeTextFcn("Lean forward - touch the golden sphere with your head");
+                textScript.ChangeTextFcn("Please lean forward - touch the golden sphere with your head");
                 break;
             case 3:
-                textScript.ChangeTextFcn("Lean backward - touch the golden sphere with your head");
-                break;
-            case 4:
-                textScript.ChangeTextFcn("Sit straight up - touch the golden sphere with your head");
+                textScript.ChangeTextFcn("Please lean backward - touch the golden sphere with your head");
                 break;
             default:
                 break;
