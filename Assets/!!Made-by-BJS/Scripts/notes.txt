@@ -23,18 +23,20 @@ public class AvatarHeadMovement : MonoBehaviour
     public Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3(0.0f, 0.0f, -0.5f);
     public Vector3 thirdPersonPerspectiveOffsetRotation = new Vector3(0.0f, 0.0f, 0.0f);
 
-    //public GameObject leftHandTarget;
-    //private Vector3 standardLeftHandTargetPosition = new Vector3(-0.04640315845608711f, 1.0701793432235718f, -0.10970229655504227f);
-    //private Vector3 standardLeftHandTargetRotation = new Vector3(8.446f, 92.798f, 94.415f);
-    //public GameObject rightHandTarget;
-    //private Vector3 standardRightHandTargetPosition = new Vector3(0.0521f, -0.0642f, -0.0851f);
-    //private Vector3 standardRightHandTargetRotation = new Vector3(-9.95f, -104.846f, -85.265f);
+    public GameObject leftHandTarget;
+    private Vector3 standardLeftHandTargetPosition = new Vector3(-0.04640315845608711f, 1.0701793432235718f, -0.10970229655504227f);
+    private Vector3 standardLeftHandTargetRotation = new Vector3(8.446f, 92.798f, 94.415f);
+    public GameObject rightHandTarget;
+    private Vector3 standardRightHandTargetPosition = new Vector3(0.0521f, -0.0642f, -0.0851f);
+    private Vector3 standardRightHandTargetRotation = new Vector3(-9.95f, -104.846f, -85.265f);
 
     // Start is called before the first frame update
     void Start()
     {
         _goalPosition = goal.position; // reference to object script is attached to. Save the target position
         _goalRotation = goal.rotation; // reference to object script is attached to
+
+
     }
 
     // Update is called once per frame
@@ -60,11 +62,11 @@ public class AvatarHeadMovement : MonoBehaviour
             cameraOffset.transform.position = standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition;
             cameraOffset.transform.rotation = Quaternion.Euler(standardCameraOffsetRotation) * Quaternion.Euler(thirdPersonPerspectiveOffsetRotation);
 
-            //leftHandTarget.transform.position -= thirdPersonPerspectiveOffsetPosition;
-            //leftHandTarget.transform.rotation = leftHandTarget.transform.rotation * Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
+            leftHandTarget.transform.position -= thirdPersonPerspectiveOffsetPosition;
+            leftHandTarget.transform.rotation = leftHandTarget.transform.rotation * Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
 
-            //rightHandTarget.transform.position -= thirdPersonPerspectiveOffsetPosition;
-            //rightHandTarget.transform.rotation = rightHandTarget.transform.rotation * Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
+            rightHandTarget.transform.position -= thirdPersonPerspectiveOffsetPosition;
+            rightHandTarget.transform.rotation = rightHandTarget.transform.rotation * Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
         }
 
         if (!deviate)
@@ -116,14 +118,16 @@ public class AvatarHeadMovement : MonoBehaviour
                 lerpValue = A * Mathf.Sin(B * (currentTime - C)) + D; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
                 if (!thirdPersonPerspective)
                 {
+
                     transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition, lerpValue); // position linear interpolation between HMD & target
+                    // transform.rotation = Quaternion.Slerp(transform.rotation, hmdTarget.rotation, lerpValue); // rotation linear interpolation between HMD & target
                 }
                 else if (thirdPersonPerspective)
                 {
                     transform.position = Vector3.Lerp(hmdTarget.position - thirdPersonPerspectiveOffsetPosition, _goalPosition, lerpValue); // position linear interpolation between HMD & target
+                    // transform.rotation = Quaternion.Slerp(transform.rotation, hmdTarget.rotation, lerpValue); // rotation linear interpolation between HMD & target
                 }
-                     transform.rotation = Quaternion.Slerp(hmdTarget.rotation, _goalRotation, lerpValue); // rotation linear interpolation between HMD & target
-           }
+            }
         }
     }
 
