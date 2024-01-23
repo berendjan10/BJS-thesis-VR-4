@@ -9358,10 +9358,6 @@ MonoBehaviour:
   goal: {fileID: 243520606}
   deviate: 0
   duration: 2
-  thirdPersonPerspective: 0
-  cameraOffset: {fileID: 1378044564}
-  thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0, z: -0.5}
-  thirdPersonPerspectiveOffsetRotation: {x: 0, y: 0, z: 0}
 --- !u!4 &595502765
 Transform:
   m_ObjectHideFlags: 0

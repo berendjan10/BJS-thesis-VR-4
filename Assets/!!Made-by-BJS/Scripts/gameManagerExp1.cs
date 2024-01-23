@@ -6,36 +6,27 @@ using Random = UnityEngine.Random;
 
 public class GameManagerExp1 : MonoBehaviour
 {
-
-    // ========== Hyperparameters: ==========
-
-    // wait time to sit straight between instructions
-    private float wait_time_lower_limit = 1.0f;
-    private float wait_time_upper_limit = 2.0f; // TODO: change waittime back to 2-5s
-
-    // amount of instructions in phase 1 (no deviation)
-    private int phase1_instructions = 1;
-
-    // amount of instructions in phase 2 (with deviation)
-    private int phase2_instructions = 6; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]
-
-    // percentage that deviates in phase 2
-    private int deviate_percentage = 33; // [%]
-
-    // ========== Variables: ==========
-
     public GameObject rightSphere;
     public GameObject leftSphere;
     public GameObject frontSphere;
     public GameObject backSphere;
     public GameObject topSphere;
+
+
+    public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
+    public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
+    public int phaseOneInstructions = 1;    // amount of instructions in phase 1 (no deviation)
+    public int phaseTwoInstructions = 6; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
+    public int deviatePercentage = 33; // [%]    // percentage that deviates in phase 2
+
     private List<GameObject> spheres; // List to store all the sphere game objects
     private ChangeText textScript; // Reference to the ChangeText script
     private float currentTime = 0f;
     private float waitTime;
     private int instructionCounter = 0; // Counter to keep track of the number of instructions given
     private bool deviate = false;
-    private List<int> deviatingTrials = new List<int> { 2, 4, 6 }; // The trials in which avatar deviates from user
+    private List<int> deviatingTrials;
+    //private List<int> deviatingTrials = new List<int> { 2, 4, 6 }; // The trials in which avatar deviates from user
 
     void Start()
     {
@@ -52,11 +43,11 @@ public class GameManagerExp1 : MonoBehaviour
             sphere.SetActive(false);
         }
 
-        //// Calculate the number of trials that should deviate based on deviate_percentage
-        //int deviatingTrialsCount = Mathf.RoundToInt((float)(deviate_percentage * phase2_instructions) / 100);
+        // Calculate the number of trials that should deviate based on deviate_percentage
+        int deviatingTrialsCount = Mathf.RoundToInt((float)(deviatePercentage * phaseTwoInstructions) / 100);
 
-        //// Generate a collection of instruction counters for deviating trials
-        //GenerateDeviatingTrials(deviatingTrialsCount);
+        // Generate a collection of instruction counters for deviating trials
+        GenerateDeviatingTrials(deviatingTrialsCount);
 
         // Call the function to set up the initial game instructions
         SetRandomGameInstruction();
@@ -80,7 +71,7 @@ public class GameManagerExp1 : MonoBehaviour
             textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
 
             // Set a random wait time between 1s and 2s
-            waitTime = Random.Range(wait_time_lower_limit, wait_time_upper_limit);
+            waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
 
             // Call the function to generate a new random game instruction after the wait period
             StartCoroutine(WaitAndSetRandomInstruction());
@@ -127,7 +118,7 @@ public class GameManagerExp1 : MonoBehaviour
 
     void HandleSphereTouched()
     {
-        if (instructionCounter > (phase1_instructions + phase2_instructions))
+        if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
             textScript.ChangeTextFcn("Thanks for playing!");
         }
@@ -148,9 +139,9 @@ public class GameManagerExp1 : MonoBehaviour
         deviate = deviatingTrials.Contains(instructionCounter);
         if (deviate)
         {
-            LerpHmd lerpHmdInstance = GetComponent<LerpHmd>(); // Get a reference to the LerpHmd instance
-            lerpHmdInstance.TriggerAnimation(); // Call the TriggerAnimation() function
-            waitTime = lerpHmdInstance.duration;
+            AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>(); // Get a reference to the LerpHmd instance
+            AvatarHeadMovementInstance.TriggerAnimation(); // Call the TriggerAnimation() function
+            waitTime = AvatarHeadMovementInstance.duration;
             StartCoroutine(WaitAndHandleSphereTouched());
 
             // now. there is no golden sphere to activate a trigger.
@@ -197,7 +188,7 @@ public class GameManagerExp1 : MonoBehaviour
         // Generate 'count' unique random instruction counters in the range [11, 20]
         while (deviatingTrials.Count < count)
         {
-            int trial = Random.Range((phase1_instructions + 1), (phase1_instructions + phase2_instructions + 1));
+            int trial = Random.Range((phaseOneInstructions + 1), (phaseOneInstructions + phaseTwoInstructions + 1));
             if (!deviatingTrials.Contains(trial))
             {
                 deviatingTrials.Add(trial);
