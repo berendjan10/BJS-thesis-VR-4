@@ -1917,8 +1917,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 47, y: -128.1593}
-  m_SizeDelta: {x: 941.1, y: 165.7}
+  m_AnchoredPosition: {x: -0.002243, y: -0.000059128}
+  m_SizeDelta: {x: 717.02, y: 602.12}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &87465471
 MonoBehaviour:
@@ -1967,8 +1967,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31.95
-  m_fontSizeBase: 31.95
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2003,7 +2003,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 37.02661, y: -129.15538, z: 97.29373, w: 178.49197}
+  m_margin: {x: 175.32695, y: 111.469666, z: 171.54768, w: 117.3616}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7796,8 +7796,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.8612557}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00579834, y: -326.72}
-  m_SizeDelta: {x: -0.011597, y: 39.1}
+  m_AnchoredPosition: {x: 0.00579834, y: -149.27}
+  m_SizeDelta: {x: -0.011597, y: 298.54}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &491639365
 MonoBehaviour:
@@ -7812,7 +7812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.8156863}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.9607843}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10163,37 +10163,37 @@ PrefabInstance:
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.027643986
+      value: 0.445
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.1409919
+      value: 1.15
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.067992
+      value: 1.048
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.69571394
+      value: 0.6931146
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7182309
+      value: -0.71677244
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.008027707
+      value: 0.046446685
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.007877023
+      value: 0.060598567
       objectReference: {fileID: 0}
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
@@ -10208,7 +10208,7 @@ PrefabInstance:
     - target: {fileID: 2532522443961419676, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -35.240997
+      value: -26.54602
       objectReference: {fileID: 0}
     - target: {fileID: 4759930916735469766, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
@@ -29856,8 +29856,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.012368001, y: 1.5785}
-  m_SizeDelta: {x: 1280, y: 720}
+  m_AnchoredPosition: {x: -0.0872, y: 1.2822}
+  m_SizeDelta: {x: 658.8365, y: 346.6295}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2118945581
 MonoBehaviour:
