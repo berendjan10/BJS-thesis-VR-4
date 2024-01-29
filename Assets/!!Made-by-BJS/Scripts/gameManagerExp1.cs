@@ -68,13 +68,7 @@ public class GameManagerExp1 : MonoBehaviour
         {
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
-            textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
-
-            // Set a random wait time between 1s and 2s
-            waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
-
-            // Call the function to generate a new random game instruction after the wait period
-            StartCoroutine(WaitAndSetRandomInstruction());
+            HandleTopSphereTouched();
         }
     }
 
@@ -116,7 +110,7 @@ public class GameManagerExp1 : MonoBehaviour
         HandleSphereTouched();
     }
 
-    void HandleSphereTouched()
+    public void HandleSphereTouched()
     {
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
@@ -127,6 +121,18 @@ public class GameManagerExp1 : MonoBehaviour
             textScript.ChangeTextFcn("Good job! Please sit straight up now.");
             topSphere.SetActive(true);
         }
+
+    }
+
+    public void HandleTopSphereTouched()
+    {
+        textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
+
+        // Set a random wait time between 1s and 2s
+        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+
+        // Call the function to generate a new random game instruction after the wait period
+        StartCoroutine(WaitAndSetRandomInstruction());
 
     }
 
