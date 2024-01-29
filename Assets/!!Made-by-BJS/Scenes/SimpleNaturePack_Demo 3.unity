@@ -3412,10 +3412,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6062957040624609817, guid: 3c94a574020d3de429d0c295b3a83db4,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5135730702076148396}
-    - targetCorrespondingSourceObject: {fileID: 6062957040624609817, guid: 3c94a574020d3de429d0c295b3a83db4,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1945961679085137512}
     - targetCorrespondingSourceObject: {fileID: 6062957040624609817, guid: 3c94a574020d3de429d0c295b3a83db4,
         type: 3}
@@ -9426,7 +9422,7 @@ MonoBehaviour:
   goal: {fileID: 1945961679085137512}
   deviate: 0
   duration: 2
-  thirdPersonPerspective: 1
+  thirdPersonPerspective: 0
   cameraOffset: {fileID: 1378044564}
   mirror: {fileID: 1106041135}
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.4, z: -1.1}
@@ -25809,8 +25805,8 @@ MonoBehaviour:
         sqrMag: 0
         axis: {x: 0, y: 0, z: 0}
       target: {fileID: 586590419}
-      positionWeight: 0
-      rotationWeight: 0
+      positionWeight: 1
+      rotationWeight: 1
       shoulderRotationWeight: 1
       shoulderRotationMode: 0
       shoulderTwistWeight: 1
@@ -25859,8 +25855,8 @@ MonoBehaviour:
         sqrMag: 0
         axis: {x: 0, y: 0, z: 0}
       target: {fileID: 731271491}
-      positionWeight: 0
-      rotationWeight: 0
+      positionWeight: 1
+      rotationWeight: 1
       shoulderRotationWeight: 1
       shoulderRotationMode: 0
       shoulderTwistWeight: 1
@@ -30392,7 +30388,8 @@ Transform:
   m_LocalPosition: {x: 0.23, y: 0.989, z: -0.049999997}
   m_LocalScale: {x: 0.9090909, y: 0.9090909, z: 0.9090909}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 5135730702076148396}
   m_Father: {fileID: 1993012075}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -28.16}
 --- !u!23 &2582286552068397154
@@ -30567,12 +30564,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8789409906881373013}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.19156079, w: 0.9814808}
-  m_LocalPosition: {x: 0.3143529, y: 1.1839371, z: -0.049999997}
-  m_LocalScale: {x: 0.04545454, y: 0.04545454, z: 0.04545454}
+  m_LocalRotation: {x: -0, y: -0, z: 0.052967444, w: 0.9985963}
+  m_LocalPosition: {x: -0.01939326, y: 0.23283924, z: 0}
+  m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1993012075}
+  m_Father: {fileID: 1945961679085137512}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &6074205422179159181
 SphereCollider:
