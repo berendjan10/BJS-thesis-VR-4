@@ -30,6 +30,7 @@ public class GameManagerExp1 : MonoBehaviour
     private bool deviate = false;
     private List<int> deviatingTrials;
     private string reach;
+    private GameObject previousSphere;
 
     //private List<int> deviatingTrials = new List<int> { 2, 4, 6 }; // The trials in which avatar deviates from user
 
@@ -169,7 +170,7 @@ public class GameManagerExp1 : MonoBehaviour
         {
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>(); // Get a reference to the LerpHmd instance
             AvatarHeadMovementInstance.TriggerAnimation(); // Call the TriggerAnimation() function
-            waitTime = AvatarHeadMovementInstance.duration;
+            waitTime = AvatarHeadMovementInstance.deviationDuration;
             StartCoroutine(WaitAndHandleDiskTouched());
 
             // now. there is no golden sphere to activate a trigger.
@@ -177,7 +178,13 @@ public class GameManagerExp1 : MonoBehaviour
         else
         {
             // Generate a random index to choose the next sphere
-            int randomIndex = Random.Range(0, spheres.Count);
+            int randomIndex;
+            do
+            {
+                randomIndex = Random.Range(0, spheres.Count);
+            } while (spheres[randomIndex] == previousSphere);
+
+            previousSphere = spheres[randomIndex];
 
             // Enable the selected sphere
             spheres[randomIndex].SetActive(true);
@@ -222,10 +229,6 @@ public class GameManagerExp1 : MonoBehaviour
             }
 
         }
-        
-        
-        
-
     }
 
     // Function to generate a collection of instruction counters for deviating trials
