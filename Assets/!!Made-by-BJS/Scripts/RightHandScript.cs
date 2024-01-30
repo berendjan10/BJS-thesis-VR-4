@@ -26,7 +26,7 @@ public class Righthandscript : MonoBehaviour
                 other.gameObject.SetActive(false);
 
                 // Call the function to handle the logic after touching a sphere
-                gameManagerExp1.HandleDiskTouched();
+                gameManagerExp1.HandleSphereTouched();
             }
         }
     }

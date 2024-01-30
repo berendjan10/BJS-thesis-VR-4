@@ -69,17 +69,7 @@ public class AvatarHeadMovement : MonoBehaviour
 
         if (!deviate)
         {
-            if (!thirdPersonPerspective)
-            {
-                transform.position = hmdTarget.position;
-                transform.rotation = hmdTarget.rotation;
-            }
-            else if (thirdPersonPerspective)
-            {
-                // subtract offset so avatar stayus in place
-                transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
-                transform.rotation = hmdTarget.rotation; //* Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
-            }
+            noDeviation();
         }
         else if (deviate)
         {
@@ -94,18 +84,7 @@ public class AvatarHeadMovement : MonoBehaviour
             {
                 _isPlaying = false;
 
-                // make sure that if simulation is not playing that avatar follows HMD. SELF = HMD
-                if (!thirdPersonPerspective)
-                {
-                    transform.position = hmdTarget.position;
-                    transform.rotation = hmdTarget.rotation;
-                }
-                else if (thirdPersonPerspective)
-                {
-                    // subtract offset so avatar stayus in place
-                    transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
-                    transform.rotation = hmdTarget.rotation; //* Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
-                }
+                noDeviation();
             }
 
             if (_isPlaying) // je wil in 2 seconden 1 hele sinus doorlopen
@@ -126,7 +105,7 @@ public class AvatarHeadMovement : MonoBehaviour
 
     public void TriggerAnimation()
     {
-        deviationCurrentTime = 0; // reset clock
+        deviationCurrentTime = 0; // reset deviation clock
         deviate = true;
         _isPlaying = true;
     }
@@ -140,5 +119,19 @@ public class AvatarHeadMovement : MonoBehaviour
         float D = 0.5f; // vertical shift of the sine wave (0 to 1)
         lerpValue = A * Mathf.Sin(B * (localCurrentTime - C)) + D; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
         return lerpValue;
+    }
+    private void noDeviation()
+    {
+        if (!thirdPersonPerspective)
+        {
+            transform.position = hmdTarget.position;
+            transform.rotation = hmdTarget.rotation;
+        }
+        else if (thirdPersonPerspective)
+        {
+            // subtract offset so avatar stayus in place
+            transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
+            transform.rotation = hmdTarget.rotation; //* Quaternion.Euler(-thirdPersonPerspectiveOffsetRotation);
+        }
     }
 }

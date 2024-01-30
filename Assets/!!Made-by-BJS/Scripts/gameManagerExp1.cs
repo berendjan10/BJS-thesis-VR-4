@@ -122,25 +122,6 @@ public class GameManagerExp1 : MonoBehaviour
         HandleDiskTouched();
     }
 
-    // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
-    IEnumerator WaitAndHandleSphereTouched()
-    {
-        float elapsedTime = 0f;
-
-        // Continue waiting until the elapsed time reaches the randomly chosen wait time
-        while (elapsedTime < waitTime)
-        {
-            // Increment the elapsed time using Time.deltaTime
-            elapsedTime += Time.deltaTime;
-
-            // Wait for the next frame
-            yield return null;
-        }
-
-        // Call the function to handle the logic after touching a sphere
-        HandleSphereTouched();
-    }
-
     public void HandleDiskTouched()
     {
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
