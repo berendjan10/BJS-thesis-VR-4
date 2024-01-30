@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -26,12 +27,15 @@ public class GameManagerExp1 : MonoBehaviour
     private int instructionCounter = 0; // Counter to keep track of the number of instructions given
     private bool deviate = false;
     private List<int> deviatingTrials;
+    private string reach;
+
     //private List<int> deviatingTrials = new List<int> { 2, 4, 6 }; // The trials in which avatar deviates from user
 
     void Start()
     {
         // Initialize the list with all sphere game objects
         spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere };
+        
 
         // Find the game object with the ChangeText script
         GameObject textGameObject = GameObject.FindWithTag("gameInstructions");
@@ -56,7 +60,7 @@ public class GameManagerExp1 : MonoBehaviour
     void OnTriggerEnter(Collider other) // when the head touches a sphere
     {
         // Check if the collided object has the tag "GameTarget"
-        if (other.gameObject.CompareTag("GameTarget"))
+        if (other.gameObject.CompareTag("GameTarget") && reach == "head")
         {
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
@@ -70,6 +74,7 @@ public class GameManagerExp1 : MonoBehaviour
             other.gameObject.SetActive(false);
             HandleTopSphereTouched();
         }
+
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
@@ -157,6 +162,22 @@ public class GameManagerExp1 : MonoBehaviour
             // Generate a random index to choose the next sphere
             int randomIndex = Random.Range(0, spheres.Count);
 
+            reach = "head";
+
+            //int id = Random.Range(0, 3);
+            //switch (id)
+            //{
+            //    case 0:
+            //        reach = "head";
+            //        break;
+            //    case 1:
+            //        reach = "left";
+            //        break;
+            //    case 2:
+            //        reach = "right";
+            //        break;
+            //};
+
             // Enable the selected sphere
             spheres[randomIndex].SetActive(true);
 
@@ -164,16 +185,16 @@ public class GameManagerExp1 : MonoBehaviour
             switch (randomIndex)
             {
                 case 0:
-                    textScript.ChangeTextFcn("Please lean to the right - touch the golden sphere with your head");
+                    textScript.ChangeTextFcn("Please lean to the right - touch the golden sphere with your "+ reach);
                     break;
                 case 1:
-                    textScript.ChangeTextFcn("Please lean to the left - touch the golden sphere with your head");
+                    textScript.ChangeTextFcn("Please lean to the left - touch the golden sphere with your " + reach);
                     break;
                 case 2:
-                    textScript.ChangeTextFcn("Please lean forward - touch the golden sphere with your head");
+                    textScript.ChangeTextFcn("Please lean forward - touch the golden sphere with your " + reach);
                     break;
                 case 3:
-                    textScript.ChangeTextFcn("Please lean backward - touch the golden sphere with your head");
+                    textScript.ChangeTextFcn("Please lean backward - touch the golden sphere with your " + reach);
                     break;
                 default:
                     break;
@@ -205,4 +226,10 @@ public class GameManagerExp1 : MonoBehaviour
             print(item);
         }
     }
+    public string GetReach()
+    {
+        return reach;
+    }
+
+
 }

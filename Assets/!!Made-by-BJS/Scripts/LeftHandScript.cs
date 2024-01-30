@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Righthandscript : MonoBehaviour
+public class Lefthandscript : MonoBehaviour
 {
     [SerializeField] private GameObject gameManagerOwner;
     private GameManagerExp1 gameManagerExp1; // Reference to the GameManagerExp1 script
+
     void Start()
     {
         gameManagerExp1 = gameManagerOwner.GetComponent<GameManagerExp1>();
@@ -14,7 +15,7 @@ public class Righthandscript : MonoBehaviour
 
     void OnTriggerEnter(Collider other) // when the hand touches a sphere
     {
-        if (gameManagerExp1 != null && gameManagerExp1.GetReach() == "right")
+        if (gameManagerExp1.GetReach() == "left")
         {
             // Check if the collided object has the tag "GameTarget"
             if (other.gameObject.CompareTag("GameTarget"))

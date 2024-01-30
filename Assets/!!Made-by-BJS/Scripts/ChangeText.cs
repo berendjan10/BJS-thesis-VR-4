@@ -7,8 +7,6 @@ public class ChangeText : MonoBehaviour
 {
     public GameObject rightSphere;
     public TextMeshProUGUI textMeshPro;
-
-
     
     public void ChangeTextFcn(string newText)
     {
