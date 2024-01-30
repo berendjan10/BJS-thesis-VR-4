@@ -8,7 +8,7 @@ public class AvatarHeadMovement : MonoBehaviour
     public Transform hmdTarget;
     public Transform goal;
     private float lerpValue = 0;
-    private float currentTime = 0; // clock
+    private float deviationCurrentTime = 0; // clock
 
     private Vector3 _goalPosition;
     private Quaternion _goalRotation;
@@ -16,6 +16,7 @@ public class AvatarHeadMovement : MonoBehaviour
     public bool deviate = false;
     public float duration = 2.0f; // duration of deviation
     public bool thirdPersonPerspective = false;
+    public bool smoothTransition = false;
     public GameObject cameraOffset;
     public GameObject mirror;
     private Vector3 standardCameraOffsetPosition = new Vector3();
@@ -82,14 +83,14 @@ public class AvatarHeadMovement : MonoBehaviour
         }
         else if (deviate)
         {
-            currentTime += Time.deltaTime; // add the time since last frame to the total duration
+            deviationCurrentTime += Time.deltaTime; // add the time since last frame to the total duration
 
-            if (currentTime >= 0 && currentTime <= 2)  // Simulation
+            if (deviationCurrentTime >= 0 && deviationCurrentTime <= 2)  // Simulation
             {
                 _isPlaying = true;
             }
 
-            else if (currentTime < 0 || currentTime > 2) // no deviation
+            else if (deviationCurrentTime < 0 || deviationCurrentTime > 2) // no deviation
             {
                 _isPlaying = false;
 
@@ -109,12 +110,7 @@ public class AvatarHeadMovement : MonoBehaviour
 
             if (_isPlaying) // je wil in 2 seconden 1 hele sinus doorlopen
             {
-                float A = 0.5f; // amplitude
-                float period = duration; // period of the sine wave (how many seconds for 1 full cycle)
-                float B = 2 * Mathf.PI / Mathf.Abs(period); // frequency
-                float C = duration / 4; // phase shift of sine wave (horizontal shift)
-                float D = 0.5f; // vertical shift of the sine wave (0 to 1)
-                lerpValue = A * Mathf.Sin(B * (currentTime - C)) + D; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
+                lerpValue = sinusoidLerp(deviationCurrentTime);
                 if (!thirdPersonPerspective)
                 {
                     transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition, lerpValue); // position linear interpolation between HMD & target
@@ -130,9 +126,19 @@ public class AvatarHeadMovement : MonoBehaviour
 
     public void TriggerAnimation()
     {
-        currentTime = 0; // reset clock
+        deviationCurrentTime = 0; // reset clock
         deviate = true;
         _isPlaying = true;
     }
 
+    private float sinusoidLerp(float localCurrentTime)
+    {
+        float A = 0.5f; // amplitude
+        float period = duration; // period of the sine wave (how many seconds for 1 full cycle)
+        float B = 2 * Mathf.PI / Mathf.Abs(period); // frequency
+        float C = duration / 4; // phase shift of sine wave (horizontal shift)
+        float D = 0.5f; // vertical shift of the sine wave (0 to 1)
+        lerpValue = A * Mathf.Sin(B * (localCurrentTime - C)) + D; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
+        return lerpValue;
+    }
 }

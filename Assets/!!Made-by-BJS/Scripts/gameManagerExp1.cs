@@ -12,7 +12,9 @@ public class GameManagerExp1 : MonoBehaviour
     public GameObject frontSphere;
     public GameObject backSphere;
     public GameObject topSphere;
-
+    public GameObject leftHandSphere;
+    public GameObject middleHandSphere;
+    public GameObject rightHandSphere;
 
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
@@ -34,7 +36,7 @@ public class GameManagerExp1 : MonoBehaviour
     void Start()
     {
         // Initialize the list with all sphere game objects
-        spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere };
+        spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
         
 
         // Find the game object with the ChangeText script
@@ -57,6 +59,11 @@ public class GameManagerExp1 : MonoBehaviour
         SetRandomGameInstruction();
     }
 
+    //void Update()
+    //{
+    //    print(Random.Range(0, spheres.Count));
+    //}
+
     void OnTriggerEnter(Collider other) // when the head touches a sphere
     {
         // Check if the collided object has the tag "GameTarget"
@@ -66,7 +73,7 @@ public class GameManagerExp1 : MonoBehaviour
             other.gameObject.SetActive(false);
 
             // Call the function to handle the logic after touching a sphere
-            HandleSphereTouched();
+            HandleDiskTouched();
         }
         else if (other.gameObject.CompareTag("GameTargetTop"))
         {
@@ -97,6 +104,25 @@ public class GameManagerExp1 : MonoBehaviour
     }
 
     // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
+    IEnumerator WaitAndHandleDiskTouched()
+    {
+        float elapsedTime = 0f;
+
+        // Continue waiting until the elapsed time reaches the randomly chosen wait time
+        while (elapsedTime < waitTime)
+        {
+            // Increment the elapsed time using Time.deltaTime
+            elapsedTime += Time.deltaTime;
+
+            // Wait for the next frame
+            yield return null;
+        }
+
+        // Call the function to handle the logic after touching a sphere
+        HandleDiskTouched();
+    }
+
+    // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
     IEnumerator WaitAndHandleSphereTouched()
     {
         float elapsedTime = 0f;
@@ -115,7 +141,7 @@ public class GameManagerExp1 : MonoBehaviour
         HandleSphereTouched();
     }
 
-    public void HandleSphereTouched()
+    public void HandleDiskTouched()
     {
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
@@ -126,7 +152,17 @@ public class GameManagerExp1 : MonoBehaviour
             textScript.ChangeTextFcn("Good job! Please sit straight up now.");
             topSphere.SetActive(true);
         }
-
+    }
+    public void HandleSphereTouched()
+    {
+        if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
+        {
+            textScript.ChangeTextFcn("Thanks for playing!");
+        }
+        else
+        {
+            HandleTopSphereTouched(); // because I skip the "sit up straight now" part
+        }
     }
 
     public void HandleTopSphereTouched()
@@ -153,7 +189,7 @@ public class GameManagerExp1 : MonoBehaviour
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>(); // Get a reference to the LerpHmd instance
             AvatarHeadMovementInstance.TriggerAnimation(); // Call the TriggerAnimation() function
             waitTime = AvatarHeadMovementInstance.duration;
-            StartCoroutine(WaitAndHandleSphereTouched());
+            StartCoroutine(WaitAndHandleDiskTouched());
 
             // now. there is no golden sphere to activate a trigger.
         }
@@ -162,22 +198,6 @@ public class GameManagerExp1 : MonoBehaviour
             // Generate a random index to choose the next sphere
             int randomIndex = Random.Range(0, spheres.Count);
 
-            reach = "head";
-
-            //int id = Random.Range(0, 3);
-            //switch (id)
-            //{
-            //    case 0:
-            //        reach = "head";
-            //        break;
-            //    case 1:
-            //        reach = "left";
-            //        break;
-            //    case 2:
-            //        reach = "right";
-            //        break;
-            //};
-
             // Enable the selected sphere
             spheres[randomIndex].SetActive(true);
 
@@ -185,16 +205,36 @@ public class GameManagerExp1 : MonoBehaviour
             switch (randomIndex)
             {
                 case 0:
-                    textScript.ChangeTextFcn("Please lean to the right - touch the golden sphere with your "+ reach);
+                    reach = "head";
+                    textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
                     break;
                 case 1:
-                    textScript.ChangeTextFcn("Please lean to the left - touch the golden sphere with your " + reach);
+                    reach = "head";
+                    textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
                     break;
                 case 2:
-                    textScript.ChangeTextFcn("Please lean forward - touch the golden sphere with your " + reach);
+                    reach = "head";
+                    textScript.ChangeTextFcn("Please lean forward - touch the blue disk with your head");
                     break;
                 case 3:
-                    textScript.ChangeTextFcn("Please lean backward - touch the golden sphere with your " + reach);
+                    reach = "head";
+                    textScript.ChangeTextFcn("Please lean backward - touch the blue disk with your head");
+                    break;
+                case 4:
+                    reach = "left";
+                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+                    break;
+                case 5:
+                    reach = "left";
+                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+                    break;
+                case 6:
+                    reach = "right";
+                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+                    break;
+                case 7:
+                    reach = "right";
+                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
                     break;
                 default:
                     break;
