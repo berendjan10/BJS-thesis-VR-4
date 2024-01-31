@@ -9688,8 +9688,8 @@ MonoBehaviour:
   goal: {fileID: 1945961679085137512}
   thirdPersonPerspective: 1
   smoothTransition: 1
-  transitionStart: 3
-  transitionDuration: 3
+  transitionStart: 10
+  transitionDuration: 4
   deviationDuration: 2
   cameraOffset: {fileID: 1378044564}
   mirror: {fileID: 1106041135}
@@ -31026,7 +31026,7 @@ PrefabInstance:
     - target: {fileID: 4089370140828067082, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4089370140828067082, guid: c72a36cd068c8bc448cb2b5c376ce994,
         type: 3}
@@ -31379,7 +31379,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

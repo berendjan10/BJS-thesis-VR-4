@@ -11,7 +11,8 @@ public class AvatarHeadMovement : MonoBehaviour
     [SerializeField] private Transform goal;
     private float transitionLerpValue;
     private float deviationLerpValue = 0;
-    private float currentTime = 0; // clock
+    private float currentTime; // clock
+    private float transitionTime = 0; // clock
     private float deviationCurrentTime = 3600;
 
     private Vector3 _goalPosition;
@@ -19,8 +20,8 @@ public class AvatarHeadMovement : MonoBehaviour
     private bool _isPlaying = false;
     [SerializeField] private bool thirdPersonPerspective = false;
     [SerializeField] private bool smoothTransition = false;
-    [SerializeField] private float transitionStart = 1.0f;
-    [SerializeField] private float transitionDuration = 2.0f; // duration of transition
+    [SerializeField] private float transitionStart;
+    [SerializeField] private float transitionDuration; // duration of transition
     public float deviationDuration = 2.0f; // duration of deviation
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
@@ -40,6 +41,7 @@ public class AvatarHeadMovement : MonoBehaviour
         // Save the target position
         _goalPosition = goal.position;
         _goalRotation = goal.rotation;
+        currentTime = 0.0f;
     }
 
     // Update is called once per frame
@@ -56,7 +58,7 @@ public class AvatarHeadMovement : MonoBehaviour
         // First Person Perspective
         if (!thirdPersonPerspective)
         {
-            firstPersonPerspectiveCameraAndHands();
+            firstPersonPerspective();
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
@@ -67,29 +69,30 @@ public class AvatarHeadMovement : MonoBehaviour
         {
             if (!smoothTransition)
             {
-                thirdPersonPerspectiveCameraAndHands();
+                thirdPersonPerspectiveFcn();
             }
             else if (smoothTransition)
             {
                 if (currentTime < transitionStart)
                 {
-                    firstPersonPerspectiveCameraAndHands();
+                    firstPersonPerspective();
                 }
                 else if (currentTime >= transitionStart && currentTime <= (transitionStart + transitionDuration))
                 {
-                    transitionLerpValue = sinusoidLerp(currentTime);
+                    transitionTime += Time.deltaTime;
+                    transitionLerpValue = sinusoidLerp(transitionTime);
                     // transition camera view
-                    cameraOffset.transform.position = Vector3.Lerp((standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition), standardCameraOffsetPosition, transitionLerpValue);
+                    cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, (standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
                     // transition avatar head & hands positions, compensate for camera offset
-                    transform.position = Vector3.Lerp((hmdTarget.position - thirdPersonPerspectiveOffsetPosition), hmdTarget.position, transitionLerpValue);
-                    leftHandTargetFollow.transform.position = Vector3.Lerp((leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), leftHandTarget.transform.position, transitionLerpValue);
-                    rightHandTargetFollow.transform.position = Vector3.Lerp((rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), rightHandTarget.transform.position, transitionLerpValue);
+                    transform.position = Vector3.Lerp(hmdTarget.position, (hmdTarget.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
+                    leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, (leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
+                    rightHandTargetFollow.transform.position = Vector3.Lerp(rightHandTarget.transform.position, (rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
 
 
                 }
                 else if (currentTime > (transitionStart + transitionDuration))
                 {
-                    thirdPersonPerspectiveCameraAndHands();
+                    thirdPersonPerspectiveFcn();
                 }
             }
 
@@ -132,7 +135,7 @@ public class AvatarHeadMovement : MonoBehaviour
         }
     }
 
-    private void firstPersonPerspectiveCameraAndHands()
+    private void firstPersonPerspective()
     {
         // 1PP camera view
         cameraOffset.transform.position = standardCameraOffsetPosition;
@@ -145,7 +148,7 @@ public class AvatarHeadMovement : MonoBehaviour
         transform.position = hmdTarget.position;
     }
 
-    private void thirdPersonPerspectiveCameraAndHands()
+    private void thirdPersonPerspectiveFcn()
     {
         // 3PP camera view
         cameraOffset.transform.position = standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition;
