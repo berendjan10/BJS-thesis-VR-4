@@ -9686,8 +9686,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hmdTarget: {fileID: 1744460106}
   goal: {fileID: 1945961679085137512}
-  thirdPersonPerspective: 1
-  smoothTransition: 1
+  thirdPersonPerspective: 0
+  smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
   deviationDuration: 2
@@ -9758,8 +9758,8 @@ MonoBehaviour:
   rightHandSphere: {fileID: 506624732}
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 0
-  phaseOneInstructions: 200
-  phaseTwoInstructions: 10
+  phaseOneInstructions: 0
+  phaseTwoInstructions: 100
   deviatePercentage: 50
 --- !u!1001 &600760679
 PrefabInstance:
