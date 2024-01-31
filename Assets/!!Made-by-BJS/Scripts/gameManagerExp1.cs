@@ -44,11 +44,11 @@ public class GameManagerExp1 : MonoBehaviour
         GameObject textGameObject = GameObject.FindWithTag("gameInstructions");
         textScript = textGameObject.GetComponent<ChangeText>();
 
-        //// Disable all spheres (just to be sure)
-        //foreach (GameObject sphere in spheres)
-        //{
-        //    sphere.SetActive(false);
-        //}
+        // Disable all spheres (just to be sure)
+        foreach (GameObject sphere in spheres)
+        {
+            sphere.SetActive(false);
+        }
 
         // Calculate the number of trials that should deviate based on deviate_percentage
         int deviatingTrialsCount = Mathf.RoundToInt((float)(deviatePercentage * phaseTwoInstructions) / 100);
@@ -56,8 +56,8 @@ public class GameManagerExp1 : MonoBehaviour
         // Generate a collection of instruction counters for deviating trials
         GenerateDeviatingTrials(deviatingTrialsCount);
 
-        //// Call the function to set up the initial game instructions
-        //SetRandomGameInstruction();
+        // Call the function to set up the initial game instructions
+        SetRandomGameInstruction();
     }
 
     //void Update()
