@@ -50,6 +50,16 @@ public class GameManagerExp1 : MonoBehaviour
             sphere.SetActive(false);
         }
 
+        if (deviatePercentage < 0)
+        {
+            deviatePercentage = 0;
+            print("Deviate Percentage cannot be lower than 0. It is set to 0");
+        }
+        else if (deviatePercentage > 100)
+        {
+            deviatePercentage = 100;
+            print("Deviate Percentage cannot be greater than 100. It is set to 100");
+        }
         // Calculate the number of trials that should deviate based on deviate_percentage
         int deviatingTrialsCount = Mathf.RoundToInt((float)(deviatePercentage * phaseTwoInstructions) / 100);
 
@@ -172,7 +182,7 @@ public class GameManagerExp1 : MonoBehaviour
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>();
 
             // random direction generator 
-            int randomDirection = 0;// Random.Range(0, 4);
+            int randomDirection = Random.Range(0, 4);
             AvatarHeadMovementInstance.TriggerAnimation(randomDirection);
             waitTime = AvatarHeadMovementInstance.deviationDuration;
             StartCoroutine(WaitAndHandleDiskTouched());
@@ -185,7 +195,7 @@ public class GameManagerExp1 : MonoBehaviour
             int randomIndex;
             do
             {
-                randomIndex = Random.Range(0, spheres.Count);
+                randomIndex = Random.Range(0, spheres.Count); /////////////////////////////////////////////////////////////////////////
             } while (spheres[randomIndex] == previousSphere);
 
             previousSphere = spheres[randomIndex];
@@ -240,18 +250,22 @@ public class GameManagerExp1 : MonoBehaviour
     {
         deviatingTrials = new List<int>();
 
-        // Generate 'count' unique random instruction counters in the range [11, 20]
         while (deviatingTrials.Count < count)
         {
             int trial = Random.Range((phaseOneInstructions + 1), (phaseOneInstructions + phaseTwoInstructions + 1));
-            if (!deviatingTrials.Contains(trial))
+            if (0 <= deviatePercentage && deviatePercentage <= 50)
             {
-                deviatingTrials.Add(trial);
+                if (!deviatingTrials.Contains(trial) && !deviatingTrials.Contains(trial - 1)) // second argument avoids 2 consecutive deviating trials
+                {
+                    deviatingTrials.Add(trial);
+                }
+            } else
+            {
+                if (!deviatingTrials.Contains(trial))
+                {
+                    deviatingTrials.Add(trial);
+                }
             }
-        }
-        foreach (var item in deviatingTrials)
-        {
-            print(item);
         }
     }
     public string GetReach()

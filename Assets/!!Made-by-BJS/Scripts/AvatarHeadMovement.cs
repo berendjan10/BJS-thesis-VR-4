@@ -123,15 +123,13 @@ public class AvatarHeadMovement : MonoBehaviour
             if (!thirdPersonPerspective)
             {
                 // The center of the arc
-                Vector3 center = hipAnchor.transform.position;
+                Vector3 center = hipAnchor.transform.position; // hip pivot point
 
                 // Interpolate over the arc relative to center
                 Vector3 start = hmdTarget.position - center;
-                Vector3 end = _goalPosition - center;
+                Vector3 end = goalPosition - center;
 
                 transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center;
-
-                //transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
             }
 
             // third person perspective
