@@ -12,6 +12,7 @@ public class AvatarHeadMovement : MonoBehaviour
     [SerializeField] private Transform goalRight;
     [SerializeField] private Transform goalFront;
     [SerializeField] private Transform goalBack;
+    [SerializeField] private GameObject hipAnchor;
     private float transitionLerpValue;
     private float deviationLerpValue = 0;
     private float currentTime; // clock
@@ -80,7 +81,7 @@ public class AvatarHeadMovement : MonoBehaviour
                 else if (currentTime >= transitionStart && currentTime <= (transitionStart + transitionDuration))
                 {
                     transitionTime += Time.deltaTime;
-                    transitionLerpValue = sinusoidLerp(transitionTime);
+                    transitionLerpValue = lerpTransition(transitionTime);
                     // transition camera view
                     cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, (standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
                     // transition avatar head & hands positions, compensate for camera offset
@@ -116,12 +117,21 @@ public class AvatarHeadMovement : MonoBehaviour
 
         if (_isPlaying) // je wil in 2 seconden 1 hele sinus doorlopen
         {
-            deviationLerpValue = sinusoidLerp2(deviationCurrentTime);
+            deviationLerpValue = lerpDeviate(deviationCurrentTime);
 
             // first person perspective
             if (!thirdPersonPerspective)
             {
-                transform.position = Vector3.Lerp(hmdTarget.position, goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
+                // The center of the arc
+                Vector3 center = hipAnchor.transform.position;
+
+                // Interpolate over the arc relative to center
+                Vector3 start = hmdTarget.position - center;
+                Vector3 end = _goalPosition - center;
+
+                transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center;
+
+                //transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
             }
 
             // third person perspective
@@ -189,7 +199,7 @@ public class AvatarHeadMovement : MonoBehaviour
     }
 
     // one direction
-    private float sinusoidLerp(float localCurrentTime)
+    private float lerpTransition(float localCurrentTime)
     {
         float period = transitionDuration * 2; // period of the sine wave (how many seconds for 1 full cycle)
         float B = 2 * Mathf.PI / Mathf.Abs(period); // frequency
@@ -199,12 +209,15 @@ public class AvatarHeadMovement : MonoBehaviour
     }
 
     // forth & back
-    private float sinusoidLerp2(float localCurrentTime)
+    private float lerpDeviate(float localCurrentTime)
     {
         float B = 2 * Mathf.PI / Mathf.Abs(deviationDuration); // frequency
         float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
         deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
         return deviationLerpValue;
     }
+
+
+
 }
 
