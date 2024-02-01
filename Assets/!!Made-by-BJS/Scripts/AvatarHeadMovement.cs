@@ -8,15 +8,18 @@ using UnityEngine.UIElements;
 public class AvatarHeadMovement : MonoBehaviour
 {
     [SerializeField] private Transform hmdTarget;
-    [SerializeField] private Transform goal;
+    [SerializeField] private Transform goalLeft;
+    [SerializeField] private Transform goalRight;
+    [SerializeField] private Transform goalFront;
+    [SerializeField] private Transform goalBack;
     private float transitionLerpValue;
     private float deviationLerpValue = 0;
     private float currentTime; // clock
     private float transitionTime = 0; // clock
     private float deviationCurrentTime = 3600;
 
-    private Vector3 _goalPosition;
-    private Quaternion _goalRotation;
+    private Vector3 goalPosition;
+    private Quaternion goalRotation;
     private bool _isPlaying = false;
     [SerializeField] private bool thirdPersonPerspective = false;
     [SerializeField] private bool smoothTransition = false;
@@ -38,12 +41,9 @@ public class AvatarHeadMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Save the target position
-        _goalPosition = goal.position;
-        _goalRotation = goal.rotation;
-        currentTime = 0.0f;
-    }
 
+    }
+     
     // Update is called once per frame
     void Update()
     {
@@ -121,17 +121,17 @@ public class AvatarHeadMovement : MonoBehaviour
             // first person perspective
             if (!thirdPersonPerspective)
             {
-                transform.position = Vector3.Lerp(hmdTarget.position, _goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
+                transform.position = Vector3.Lerp(hmdTarget.position, goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
             }
 
             // third person perspective
             else if (thirdPersonPerspective)
             {
-                transform.position = Vector3.Lerp(hmdTarget.position - thirdPersonPerspectiveOffsetPosition, _goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
+                transform.position = Vector3.Lerp(hmdTarget.position - thirdPersonPerspectiveOffsetPosition, goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
             }
 
             // both perspectives
-            transform.rotation = Quaternion.Slerp(hmdTarget.rotation, _goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
+            transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
         }
     }
 
@@ -161,9 +161,30 @@ public class AvatarHeadMovement : MonoBehaviour
         transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
     }
 
-    public void TriggerAnimation()
+    public void TriggerAnimation(int randomDirection)
     {
-        deviationCurrentTime = 0; // reset deviation clock
+        switch (randomDirection)
+        {
+            case 0:
+                goalPosition = goalLeft.position;
+                goalRotation = goalLeft.rotation;
+                break;
+            case 1:
+                goalPosition = goalRight.position;
+                goalRotation = goalRight.rotation;
+                break;
+            case 2:
+                goalPosition = goalFront.position;
+                goalRotation = goalFront.rotation;
+                break;
+            case 3:
+                goalPosition = goalBack.position;
+                goalRotation = goalBack.rotation;
+                break;
+            default:
+                break;
+            }
+            deviationCurrentTime = 0; // reset deviation clock
         _isPlaying = true;
     }
 

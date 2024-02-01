@@ -168,8 +168,12 @@ public class GameManagerExp1 : MonoBehaviour
         deviate = deviatingTrials.Contains(instructionCounter);
         if (deviate)
         {
-            AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>(); // Get a reference to the LerpHmd instance
-            AvatarHeadMovementInstance.TriggerAnimation(); // Call the TriggerAnimation() function
+            // Get a reference to the LerpHmd instance
+            AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>();
+
+            // random direction generator 
+            int randomDirection = 0;// Random.Range(0, 4);
+            AvatarHeadMovementInstance.TriggerAnimation(randomDirection);
             waitTime = AvatarHeadMovementInstance.deviationDuration;
             StartCoroutine(WaitAndHandleDiskTouched());
 
