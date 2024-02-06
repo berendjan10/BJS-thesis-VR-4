@@ -10085,13 +10085,13 @@ MonoBehaviour:
   hipAnchor: {fileID: 126323088}
   thirdPersonPerspective: 1
   smoothTransition: 0
-  transitionStart: 5
+  transitionStart: 10
   transitionDuration: 4
-  deviationDuration: 2
+  deviationDuration: 4
   cameraOffset: {fileID: 1378044564}
   mirror: {fileID: 1106041135}
   gameInstructions: {fileID: 2118945579}
-  thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.3, z: -1.5}
+  thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
   leftHandTarget: {fileID: 586590418}
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
@@ -10154,11 +10154,11 @@ MonoBehaviour:
   leftHandSphere: {fileID: 1339173378}
   middleHandSphere: {fileID: 330770350}
   rightHandSphere: {fileID: 506624732}
-  waitTimeLowerLimit: 0.5
+  waitTimeLowerLimit: 2
   waitTimeUpperLimit: 3
-  phaseOneInstructions: 10
-  phaseTwoInstructions: 10
-  deviatePercentage: 33
+  phaseOneInstructions: 0
+  phaseTwoInstructions: 20
+  deviatePercentage: 40
 --- !u!1001 &600760679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27318,7 +27318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f29b6b59ec7d13e428344a1449f28caf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _height: 185
+  _height: 181
   topDisk: {fileID: 4089370142580552823}
 --- !u!4 &1801892780 stripped
 Transform:
