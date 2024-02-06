@@ -10085,12 +10085,13 @@ MonoBehaviour:
   hipAnchor: {fileID: 126323088}
   thirdPersonPerspective: 1
   smoothTransition: 0
-  transitionStart: 10
+  transitionStart: 5
   transitionDuration: 4
   deviationDuration: 2
   cameraOffset: {fileID: 1378044564}
   mirror: {fileID: 1106041135}
-  thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.2, z: -1.5}
+  gameInstructions: {fileID: 2118945579}
+  thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.3, z: -1.5}
   leftHandTarget: {fileID: 586590418}
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
@@ -10153,11 +10154,11 @@ MonoBehaviour:
   leftHandSphere: {fileID: 1339173378}
   middleHandSphere: {fileID: 330770350}
   rightHandSphere: {fileID: 506624732}
-  waitTimeLowerLimit: 0
-  waitTimeUpperLimit: 0
-  phaseOneInstructions: 0
-  phaseTwoInstructions: 100
-  deviatePercentage: 100
+  waitTimeLowerLimit: 0.5
+  waitTimeUpperLimit: 3
+  phaseOneInstructions: 10
+  phaseTwoInstructions: 10
+  deviatePercentage: 33
 --- !u!1001 &600760679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27318,6 +27319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _height: 185
+  topDisk: {fileID: 4089370142580552823}
 --- !u!4 &1801892780 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953,
@@ -31539,7 +31541,7 @@ Transform:
   m_GameObject: {fileID: 4089370142580552823}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 1.41, z: -0.089}
+  m_LocalPosition: {x: 0, y: 1.4, z: -0.089}
   m_LocalScale: {x: 0.050000016, y: 0.33000007, z: 0.33}
   m_ConstrainProportionsScale: 0
   m_Children: []

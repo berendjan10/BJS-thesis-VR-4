@@ -29,6 +29,7 @@ public class AvatarHeadMovement : MonoBehaviour
     public float deviationDuration = 2.0f; // duration of deviation
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
+    [SerializeField] private GameObject gameInstructions;
     private Vector3 standardCameraOffsetPosition = new Vector3();
     private Vector3 standardCameraOffsetRotation = new Vector3();
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
@@ -42,7 +43,14 @@ public class AvatarHeadMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //if (!thirdPersonPerspective)
+        //{
+        //    UnityEditor.TransformWorldPlacementJSON:{ "position":{ "x":0.0,"y":1.1890000104904175,"z":1.042199969291687},"rotation":{ "x":0.0,"y":0.0,"z":0.0,"w":1.0},"scale":{ "x":0.0006437415140680969,"y":0.0015871304785832763,"z":0.0015871304785832763} }
+        //}
+        //else if (thirdPersonPerspective)
+        //{
 
+        //}
     }
      
     // Update is called once per frame
@@ -63,6 +71,8 @@ public class AvatarHeadMovement : MonoBehaviour
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
+            gameInstructions.transform.localPosition = new Vector3(0f, 1.189f, 1.042f);
+
         }
 
         // Third Person Perspective
@@ -99,6 +109,7 @@ public class AvatarHeadMovement : MonoBehaviour
 
             // mirror is not needed in 1PP
             mirror.SetActive(false);
+            gameInstructions.transform.localPosition = new Vector3(0f, 1.442f, 0.394f);
 
         }
 
