@@ -26,12 +26,13 @@ public class AvatarHeadMovement : MonoBehaviour
 
     private Vector3 goalPosition;
     private Quaternion goalRotation;
-    private bool _isPlaying = false;
+    // private bool _isPlaying = false;
     [SerializeField] private bool thirdPersonPerspective = false;
     [SerializeField] private bool smoothTransition = false;
     [SerializeField] private float transitionStart;
     [SerializeField] private float transitionDuration; // duration of transition
-    public float deviationDuration = 2.0f; // duration of deviation
+    public float deviationDuration; // duration of deviation
+    public float pauseAtGoal;
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
     [SerializeField] private GameObject gameInstructions;
@@ -44,6 +45,11 @@ public class AvatarHeadMovement : MonoBehaviour
     public GameObject leftHandTargetFollow;
     public GameObject rightHandTarget;
     public GameObject rightHandTargetFollow;
+
+    // dropdown
+    public enum devType { sineWave, forthPauseBack, waitForUser }
+    [SerializeField] private devType deviationType;
+
 
     // Start is called before the first frame update
     void Start()
@@ -116,45 +122,83 @@ public class AvatarHeadMovement : MonoBehaviour
 
         }
 
-        // deviation
+        //////////////////////////////////// DEVIATION ////////////////////////////////////
+        // deviation timing
         deviationCurrentTime += Time.deltaTime;
 
-        if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
+        if (deviationType == devType.sineWave)
         {
-            _isPlaying = true;
-        }
 
-        else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
-        {
-            _isPlaying = false;
-        }
-
-        if (_isPlaying) // je wil in 2 seconden 1 hele sinus doorlopen
-        {
-            deviationLerpValue = lerpDeviate(deviationCurrentTime);
-
-            // first person perspective
-            if (!thirdPersonPerspective)
+            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
             {
-                // The center of the arc
-                Vector3 center = hipAnchor.transform.position; // hip pivot point
-
-                // Interpolate over the arc relative to center
-                Vector3 start = hmdTarget.position - center;
-                Vector3 end = goalPosition - center;
-
-                transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center;
+                _isPlaying = true;
             }
 
-            // third person perspective
-            else if (thirdPersonPerspective)
+            else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
             {
-                transform.position = Vector3.Lerp(hmdTarget.position - thirdPersonPerspectiveOffsetPosition, goalPosition, deviationLerpValue); // position linear interpolation between HMD & target
+                _isPlaying = false;
             }
+            
+            if (_isPlaying) 
+            {
+                // movement speed function
+                deviationLerpValue = sineForthBack(deviationCurrentTime);
+            }
+        // } else if (deviationType == devType.forthPauseBack)
+        // {
+        //     if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration/2)  // Simulation
+        //     {
+        //         _isPlaying = true;
+        //     }
 
-            // both perspectives
-            transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
+        //     else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration/2 && deviationCurrentTime < (deviationDuration/2 + pauseAtGoal) || deviationCurrentTime > (deviationDuration + pauseAtGoal)) // no deviation
+        //     {
+        //         _isPlaying = false;
+        //     }
+            
+        //     if (_isPlaying) 
+        //     {
+        //         // movement speed function
+        //         deviationLerpValue = sineForthBack(deviationCurrentTime);
+        //     }
+        // } else if (deviationType == devType.waitForUser)
+        // {
+        //     if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
+        //     {
+        //         _isPlaying = true;
+        //     }
+
+        //     else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
+        //     {
+        //         _isPlaying = false;
+        //     }
+            
+        //     if (_isPlaying) 
+        //     {
+        //         // movement speed function
+        //         deviationLerpValue = sineForthBack(deviationCurrentTime);
+        //     }
         }
+
+        // calculate position current frame
+        Vector3 center = hipAnchor.transform.position; // hip pivot point
+        Vector3 end = goalPosition - center;
+        Vector3 start = new Vector3();
+        // first person perspective
+        if (!thirdPersonPerspective)
+        {
+            start = hmdTarget.position - center;
+        }
+        // third person perspective
+        else if (thirdPersonPerspective)
+        {
+            start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
+        }
+        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center;
+
+        // both perspectives
+        transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
+            
     }
 
     private void firstPersonPerspective()
@@ -221,7 +265,7 @@ public class AvatarHeadMovement : MonoBehaviour
     }
 
     // forth & back
-    private float lerpDeviate(float localCurrentTime)
+    private float sineForthBack(float localCurrentTime)
     {
         float B = 2 * Mathf.PI / Mathf.Abs(deviationDuration); // frequency
         float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
@@ -229,6 +273,22 @@ public class AvatarHeadMovement : MonoBehaviour
         return deviationLerpValue;
     }
 
+    // forth
+    private float sineForth(float localCurrentTime)
+    {
+        float B = Mathf.PI / Mathf.Abs(deviationDuration); // frequency
+        float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
+        deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
+        return deviationLerpValue;
+    }
+    // // back
+    // private float lerpDeviateBack(float localCurrentTime)
+    // {
+    //     float B = 2 * Mathf.PI / Mathf.Abs(deviationDuration); // frequency
+    //     float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
+    //     deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
+    //     return deviationLerpValue;
+    // }
 
 
 }
