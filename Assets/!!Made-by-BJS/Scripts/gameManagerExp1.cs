@@ -15,7 +15,9 @@ public class GameManagerExp1 : MonoBehaviour
     public GameObject leftHandSphere;
     public GameObject middleHandSphere;
     public GameObject rightHandSphere;
+    [SerializeField] private GameObject avatar;
 
+    [SerializeField] private float _height; // [cm]
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
     public int phaseOneInstructions = 1;    // amount of instructions in phase 1 (no deviation)
@@ -36,6 +38,16 @@ public class GameManagerExp1 : MonoBehaviour
 
     void Start()
     {
+        // scale down avatar & targets based on participant height
+        float scale = _height / 185;
+
+        avatar.transform.localScale = new Vector3(scale, scale, scale);
+        moveDown(topSphere, scale);
+        moveDown(leftSphere, scale);
+        moveDown(rightSphere, scale);
+        moveDown(frontSphere, scale);
+        moveDown(backSphere, scale);
+        
         // Initialize the list with all sphere game objects
         spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
         
@@ -68,6 +80,13 @@ public class GameManagerExp1 : MonoBehaviour
 
         // Call the function to set up the initial game instructions
         SetRandomGameInstruction();
+    }
+
+    void moveDown(GameObject moveThis, float scale)
+    {
+        Vector3 newPosition = moveThis.transform.localPosition;
+        newPosition.y *= scale;
+        moveThis.transform.localPosition = newPosition;
     }
 
     //void Update()
@@ -182,7 +201,7 @@ public class GameManagerExp1 : MonoBehaviour
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>();
 
             // random direction generator 
-            int randomDirection = Random.Range(0, 4);
+            int randomDirection = Random.Range(0, 2); // only left and right!!!
             AvatarHeadMovementInstance.TriggerAnimation(randomDirection);
             waitTime = AvatarHeadMovementInstance.deviationDuration;
             StartCoroutine(WaitAndHandleDiskTouched());
