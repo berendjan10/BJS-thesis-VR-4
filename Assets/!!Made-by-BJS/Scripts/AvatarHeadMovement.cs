@@ -12,6 +12,11 @@ public class AvatarHeadMovement : MonoBehaviour
     [SerializeField] private Transform goalRight;
     [SerializeField] private Transform goalFront;
     [SerializeField] private Transform goalBack;
+    [SerializeField] private GameObject goalLeftG; // to do: change later (merge with 4 above wgen merging scripts)
+    [SerializeField] private GameObject goalRightG;
+    [SerializeField] private GameObject goalFrontG;
+    [SerializeField] private GameObject goalBackG;
+
     [SerializeField] private GameObject hipAnchor;
     private float transitionLerpValue;
     private float deviationLerpValue = 0;
@@ -43,14 +48,12 @@ public class AvatarHeadMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //if (!thirdPersonPerspective)
-        //{
-        //    UnityEditor.TransformWorldPlacementJSON:{ "position":{ "x":0.0,"y":1.1890000104904175,"z":1.042199969291687},"rotation":{ "x":0.0,"y":0.0,"z":0.0,"w":1.0},"scale":{ "x":0.0006437415140680969,"y":0.0015871304785832763,"z":0.0015871304785832763} }
-        //}
-        //else if (thirdPersonPerspective)
-        //{
-
-        //}
+        // Get a reference to the GameManager instance
+        GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
+        GameManager.MoveDown(goalLeftG);
+        GameManager.MoveDown(goalRightG);
+        GameManager.MoveDown(goalFrontG);
+        GameManager.MoveDown(goalBackG);
     }
      
     // Update is called once per frame
@@ -116,12 +119,12 @@ public class AvatarHeadMovement : MonoBehaviour
         // deviation
         deviationCurrentTime += Time.deltaTime;
 
-        if (deviationCurrentTime >= 0 && deviationCurrentTime <= 2)  // Simulation
+        if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
         {
             _isPlaying = true;
         }
 
-        else if (deviationCurrentTime < 0 || deviationCurrentTime > 2) // no deviation
+        else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
         {
             _isPlaying = false;
         }

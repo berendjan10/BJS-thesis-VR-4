@@ -5,6 +5,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+// to do: merge scripts
+
 public class GameManagerExp1 : MonoBehaviour
 {
     public GameObject rightSphere;
@@ -42,11 +44,11 @@ public class GameManagerExp1 : MonoBehaviour
         float scale = _height / 185;
 
         avatar.transform.localScale = new Vector3(scale, scale, scale);
-        moveDown(topSphere, scale);
-        moveDown(leftSphere, scale);
-        moveDown(rightSphere, scale);
-        moveDown(frontSphere, scale);
-        moveDown(backSphere, scale);
+        MoveDown(topSphere);
+        MoveDown(leftSphere);
+        MoveDown(rightSphere);
+        MoveDown(frontSphere);
+        MoveDown(backSphere);
         
         // Initialize the list with all sphere game objects
         spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
@@ -82,9 +84,10 @@ public class GameManagerExp1 : MonoBehaviour
         SetRandomGameInstruction();
     }
 
-    void moveDown(GameObject moveThis, float scale)
+    public void MoveDown(GameObject moveThis)
     {
         Vector3 newPosition = moveThis.transform.localPosition;
+        float scale = _height / 185;
         newPosition.y *= scale;
         moveThis.transform.localPosition = newPosition;
     }
@@ -197,7 +200,7 @@ public class GameManagerExp1 : MonoBehaviour
         deviate = deviatingTrials.Contains(instructionCounter);
         if (deviate)
         {
-            // Get a reference to the LerpHmd instance
+            // Get a reference to the AvatarHeadMovement instance
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>();
 
             // random direction generator 
