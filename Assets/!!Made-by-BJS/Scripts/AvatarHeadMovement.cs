@@ -183,11 +183,13 @@ public class AvatarHeadMovement : MonoBehaviour
 
                 // set next loop timer to timestamp top of sine wave
                 deviationTimer2 = deviationDuration/2;
-            } else if (deviationCurrentTime > (deviationDuration/2 + pauseAtGoal))
+            } else if (deviationCurrentTime == (deviationDuration/2 + pauseAtGoal) && deviationCurrentTime < (deviationDuration / 2 + pauseAtGoal + 0.2)) // werkt niet
             {
+                // if nog niet touched
                 deviationLerpValue = 1;
                 GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
-                GameManager.ActivateDisk(deviationDirection); //activate goal disk (check out fcn TriggerAnimation())
+                GameManager.ActivateDisk(deviationDirection); //activate goal disk (check out fcn TriggerAnimation()) JUST ONCE
+                // zodra touched klaar
             }
 
         }

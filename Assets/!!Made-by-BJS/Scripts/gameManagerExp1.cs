@@ -87,34 +87,10 @@ public class GameManagerExp1 : MonoBehaviour
     public void MoveDown(GameObject moveThis)
     {
         Vector3 newPosition = moveThis.transform.localPosition;
-        float scale = _height / 185;
+        float px = 1.03f; // % =1 scale exactly, <1 scale more, >1 scale less
+        float scale = _height / 185 * px;
         newPosition.y *= scale;
         moveThis.transform.localPosition = newPosition;
-    }
-
-    void Update()
-    {
-        print(Random.Range(0, spheres.Count));
-    }
-
-    void OnTriggerEnter(Collider other) // when the head touches a sphere
-    {
-        // Check if the collided object has the tag "GameTarget"
-        if (other.gameObject.CompareTag("GameTarget") && reach == "head")
-        {
-            // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
-
-            // Call the function to handle the logic after touching a sphere
-            HandleDiskTouched();
-        }
-        else if (other.gameObject.CompareTag("GameTargetTop"))
-        {
-            // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
-            HandleTopSphereTouched();
-        }
-
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
