@@ -50,7 +50,8 @@ public class AvatarHeadMovement : MonoBehaviour
 
     // dropdown
     public enum devType { sineWave, forthPauseBack, waitForUser }
-    [SerializeField] private devType deviationType;
+    public devType deviationType;
+    public int deviationTypeInt; // TO DO: remove (merge scripts)
 
 
     // Start is called before the first frame update
@@ -67,6 +68,18 @@ public class AvatarHeadMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (deviationType == devType.sineWave)
+        {
+            deviationTypeInt = 0;
+        } else if (deviationType == devType.forthPauseBack)
+        {
+            deviationTypeInt = 1;
+        } else if (deviationType == devType.waitForUser)
+        {
+            deviationTypeInt = 2;
+        }
+
+
         currentTime += Time.deltaTime;
 
         // Match head & hand target rotations with controllers (same for 1PP & 3PP)

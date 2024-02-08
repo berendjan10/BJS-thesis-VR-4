@@ -206,11 +206,11 @@ public class GameManagerExp1 : MonoBehaviour
             // random direction generator 
             int randomDirection = Random.Range(0, 2); // only left and right!!!
             AvatarHeadMovementInstance.TriggerAnimation(randomDirection);
-            if (AvatarHeadMovementInstance.deviationType == AvatarHeadMovementInstance.devType.sineWave)
+            if (AvatarHeadMovementInstance.deviationTypeInt == 0)
             {
                 waitTime = AvatarHeadMovementInstance.deviationDuration;
                 StartCoroutine(WaitAndHandleDiskTouched());
-            } else if (AvatarHeadMovementInstance.deviationType == AvatarHeadMovementInstance.devType.forthPauseBack)
+            } else if (AvatarHeadMovementInstance.deviationTypeInt == 1)
             {
                 waitTime = AvatarHeadMovementInstance.deviationDuration + AvatarHeadMovementInstance.pauseAtGoal;
                 StartCoroutine(WaitAndHandleDiskTouched());
