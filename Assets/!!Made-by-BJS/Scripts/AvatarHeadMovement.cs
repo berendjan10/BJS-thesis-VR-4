@@ -23,10 +23,10 @@ public class AvatarHeadMovement : MonoBehaviour
     private float currentTime; // clock
     private float transitionTime = 0; // clock
     private float deviationCurrentTime = 3600;
+    private float deviationTimer2;
 
     private Vector3 goalPosition;
     private Quaternion goalRotation;
-    // private bool _isPlaying = false;
     [SerializeField] private bool thirdPersonPerspective = false;
     [SerializeField] private bool smoothTransition = false;
     [SerializeField] private float transitionStart;
@@ -74,9 +74,9 @@ public class AvatarHeadMovement : MonoBehaviour
 
 
         // First Person Perspective
-        if (!thirdPersonPerspective)
+        if (!thirdPersonPerspective) //////////// FOLLOW HMD
         {
-            firstPersonPerspective();
+            firstPersonPerspective(); /////////////////////////////////////////////////////////////////////////////////// HMD
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
@@ -85,17 +85,17 @@ public class AvatarHeadMovement : MonoBehaviour
         }
 
         // Third Person Perspective
-        else if (thirdPersonPerspective)
+        else if (thirdPersonPerspective) //////////// FOLLOW HMD
         {
             if (!smoothTransition)
             {
-                thirdPersonPerspectiveFcn();
+                thirdPersonPerspectiveFcn(); /////////////////////////////////////////////////////////////////////////////////// HMD
             }
             else if (smoothTransition)
             {
                 if (currentTime < transitionStart)
                 {
-                    firstPersonPerspective();
+                    firstPersonPerspective(); /////////////////////////////////////////////////////////////////////////////////// HMD
                 }
                 else if (currentTime >= transitionStart && currentTime <= (transitionStart + transitionDuration))
                 {
@@ -104,7 +104,7 @@ public class AvatarHeadMovement : MonoBehaviour
                     // transition camera view
                     cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, (standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
                     // transition avatar head & hands positions, compensate for camera offset
-                    transform.position = Vector3.Lerp(hmdTarget.position, (hmdTarget.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
+                    transform.position = Vector3.Lerp(hmdTarget.position, (hmdTarget.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue); //// HMD
                     leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, (leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
                     rightHandTargetFollow.transform.position = Vector3.Lerp(rightHandTarget.transform.position, (rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
 
@@ -112,7 +112,7 @@ public class AvatarHeadMovement : MonoBehaviour
                 }
                 else if (currentTime > (transitionStart + transitionDuration))
                 {
-                    thirdPersonPerspectiveFcn();
+                    thirdPersonPerspectiveFcn(); /////////////////////////////////////////////////////////////////////////////////// HMD
                 }
             }
 
@@ -128,56 +128,32 @@ public class AvatarHeadMovement : MonoBehaviour
 
         if (deviationType == devType.sineWave)
         {
-
-            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
-            {
-                _isPlaying = true;
-            }
-
-            else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
-            {
-                _isPlaying = false;
-            }
-            
-            if (_isPlaying) 
+            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)
             {
                 // movement speed function
                 deviationLerpValue = sineForthBack(deviationCurrentTime);
             }
-        // } else if (deviationType == devType.forthPauseBack)
-        // {
-        //     if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration/2)  // Simulation
-        //     {
-        //         _isPlaying = true;
-        //     }
+        } else if (deviationType == devType.forthPauseBack)
+        {
+            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration/2)
+            {
+                // movement speed function
+                deviationLerpValue = sineForthBack(deviationCurrentTime);
+            }
+            else if (deviationCurrentTime > deviationDuration/2 && deviationCurrentTime <= (deviationDuration/2 + pauseAtGoal)) // pause at goal
+            {
+                // movement speed function
+                deviationLerpValue = 1;
 
-        //     else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration/2 && deviationCurrentTime < (deviationDuration/2 + pauseAtGoal) || deviationCurrentTime > (deviationDuration + pauseAtGoal)) // no deviation
-        //     {
-        //         _isPlaying = false;
-        //     }
-            
-        //     if (_isPlaying) 
-        //     {
-        //         // movement speed function
-        //         deviationLerpValue = sineForthBack(deviationCurrentTime);
-        //     }
-        // } else if (deviationType == devType.waitForUser)
-        // {
-        //     if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)  // Simulation
-        //     {
-        //         _isPlaying = true;
-        //     }
-
-        //     else if (deviationCurrentTime < 0 || deviationCurrentTime > deviationDuration) // no deviation
-        //     {
-        //         _isPlaying = false;
-        //     }
-            
-        //     if (_isPlaying) 
-        //     {
-        //         // movement speed function
-        //         deviationLerpValue = sineForthBack(deviationCurrentTime);
-        //     }
+                // set next loop timer to timestamp top of sine wave
+                deviationTimer2 = deviationDuration/2;
+            }
+            else if (deviationCurrentTime > (deviationDuration/2 + pauseAtGoal) && deviationCurrentTime <= (deviationDuration + pauseAtGoal))
+            {
+                deviationTimer2 += Time.deltaTime;
+                // movement speed function
+                deviationLerpValue = sineForthBack(deviationTimer2);
+            }
         }
 
         // calculate position current frame
@@ -194,7 +170,8 @@ public class AvatarHeadMovement : MonoBehaviour
         {
             start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
         }
-        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center;
+
+        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center; /////////////////////////////////////////////////// slerp overwrites position? 
 
         // both perspectives
         transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
@@ -211,7 +188,7 @@ public class AvatarHeadMovement : MonoBehaviour
         rightHandTargetFollow.transform.position = rightHandTarget.transform.position;
 
         // 1PP avatar head no deviation
-        transform.position = hmdTarget.position;
+        transform.position = hmdTarget.position; ////////////////////////////////////////////////////////////////////////////////////// HMD
     }
 
     private void thirdPersonPerspectiveFcn()
@@ -224,7 +201,7 @@ public class AvatarHeadMovement : MonoBehaviour
         rightHandTargetFollow.transform.position = rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition;
 
         // 3PP avatar head no deviation
-        transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
+        transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition; ///////////////////////////////////////////////////// HMD
     }
 
     public void TriggerAnimation(int randomDirection)
@@ -251,7 +228,7 @@ public class AvatarHeadMovement : MonoBehaviour
                 break;
             }
             deviationCurrentTime = 0; // reset deviation clock
-        _isPlaying = true;
+        // _isPlaying = true;
     }
 
     // one direction

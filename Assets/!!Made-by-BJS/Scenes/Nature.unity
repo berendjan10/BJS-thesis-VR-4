@@ -3563,6 +3563,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1980012862}
+    - targetCorrespondingSourceObject: {fileID: 6062957040624609817, guid: 3c94a574020d3de429d0c295b3a83db4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927682712}
+    - targetCorrespondingSourceObject: {fileID: 6062957040624609817, guid: 3c94a574020d3de429d0c295b3a83db4,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 353128386}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c94a574020d3de429d0c295b3a83db4, type: 3}
 --- !u!4 &146312529 stripped
@@ -6400,6 +6408,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 341425587}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &353128385
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 353128386}
+  m_Layer: 0
+  m_Name: Knee Goal Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &353128386
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 353128385}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.144, y: 0.564, z: 0.5729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1993012075}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &363291728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10082,12 +10121,17 @@ MonoBehaviour:
   goalRight: {fileID: 1945961679085137512}
   goalFront: {fileID: 6501909310749615599}
   goalBack: {fileID: 6501909311525190191}
+  goalLeftG: {fileID: 7452633444094188097}
+  goalRightG: {fileID: 2762693828118659795}
+  goalFrontG: {fileID: 7452633444040837460}
+  goalBackG: {fileID: 7452633443332675220}
   hipAnchor: {fileID: 126323088}
   thirdPersonPerspective: 1
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  deviationDuration: 4
+  deviationDuration: 5
+  pauseAtGoal: 3
   cameraOffset: {fileID: 1378044564}
   mirror: {fileID: 1106041135}
   gameInstructions: {fileID: 2118945579}
@@ -10096,6 +10140,7 @@ MonoBehaviour:
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
   rightHandTargetFollow: {fileID: 1941498719}
+  deviationType: 1
 --- !u!4 &595502765
 Transform:
   m_ObjectHideFlags: 0
@@ -10154,11 +10199,13 @@ MonoBehaviour:
   leftHandSphere: {fileID: 1339173378}
   middleHandSphere: {fileID: 330770350}
   rightHandSphere: {fileID: 506624732}
-  waitTimeLowerLimit: 2
-  waitTimeUpperLimit: 3
+  avatar: {fileID: 1800788683}
+  _height: 185
+  waitTimeLowerLimit: 0
+  waitTimeUpperLimit: 0
   phaseOneInstructions: 0
-  phaseTwoInstructions: 20
-  deviatePercentage: 40
+  phaseTwoInstructions: 10
+  deviatePercentage: 100
 --- !u!1001 &600760679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26989,8 +27036,8 @@ MonoBehaviour:
       target: {fileID: 514946467}
       positionWeight: 1
       rotationWeight: 0
-      bendGoal: {fileID: 0}
-      bendGoalWeight: 0
+      bendGoal: {fileID: 1927682712}
+      bendGoalWeight: 0.9
       swivelOffset: 0
       bendToTargetWeight: 0.5
       legLengthMlp: 1
@@ -27034,8 +27081,8 @@ MonoBehaviour:
       target: {fileID: 1461185040}
       positionWeight: 1
       rotationWeight: 0
-      bendGoal: {fileID: 0}
-      bendGoalWeight: 0
+      bendGoal: {fileID: 353128386}
+      bendGoalWeight: 0.9
       swivelOffset: 0
       bendToTargetWeight: 0.5
       legLengthMlp: 1
@@ -27306,20 +27353,6 @@ MonoBehaviour:
   - {fileID: 207160327}
   - {fileID: 1982306831}
   - {fileID: 1899703650}
---- !u!114 &1800788692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1800788683}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f29b6b59ec7d13e428344a1449f28caf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _height: 181
-  topDisk: {fileID: 4089370142580552823}
 --- !u!4 &1801892780 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953,
@@ -28615,6 +28648,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1771883729}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1927682711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1927682712}
+  m_Layer: 0
+  m_Name: Knee Goal Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1927682712
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927682711}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.089, y: 0.564, z: 0.5729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1993012075}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1931690517 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 38335279662569219, guid: 34d3f526198dae440bb2ce6005d86055,
@@ -31878,10 +31942,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6070482321239056212, guid: 1834c3646cce29947ad4ef4c24f24996,
-        type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 1800788692}
     - targetCorrespondingSourceObject: {fileID: 6070482321239056212, guid: 1834c3646cce29947ad4ef4c24f24996,
         type: 3}
       insertIndex: -1
