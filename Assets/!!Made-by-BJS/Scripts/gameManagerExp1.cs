@@ -51,7 +51,7 @@ public class GameManagerExp1 : MonoBehaviour
         MoveDown(backSphere);
         
         // Initialize the list with all sphere game objects
-        spheres = new List<GameObject> { rightSphere, leftSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
+        spheres = new List<GameObject> { leftSphere, rightSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
         
 
         // Find the game object with the ChangeText script
@@ -97,25 +97,25 @@ public class GameManagerExp1 : MonoBehaviour
     //    print(Random.Range(0, spheres.Count));
     //}
 
-    void OnTriggerEnter(Collider other) // when the head touches a sphere
-    {
-        // Check if the collided object has the tag "GameTarget"
-        if (other.gameObject.CompareTag("GameTarget") && reach == "head")
-        {
-            // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
+    // void OnTriggerEnter(Collider other) // when the head touches a sphere
+    // {
+    //     // Check if the collided object has the tag "GameTarget"
+    //     if (other.gameObject.CompareTag("GameTarget") && reach == "head")
+    //     {
+    //         // Disable the sphere that was touched
+    //         other.gameObject.SetActive(false);
 
-            // Call the function to handle the logic after touching a sphere
-            HandleDiskTouched();
-        }
-        else if (other.gameObject.CompareTag("GameTargetTop"))
-        {
-            // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
-            HandleTopSphereTouched();
-        }
+    //         // Call the function to handle the logic after touching a sphere
+    //         HandleDiskTouched();
+    //     }
+    //     else if (other.gameObject.CompareTag("GameTargetTop"))
+    //     {
+    //         // Disable the sphere that was touched
+    //         other.gameObject.SetActive(false);
+    //         HandleTopSphereTouched();
+    //     }
 
-    }
+    // }
 
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomInstruction()
@@ -206,8 +206,15 @@ public class GameManagerExp1 : MonoBehaviour
             // random direction generator 
             int randomDirection = Random.Range(0, 2); // only left and right!!!
             AvatarHeadMovementInstance.TriggerAnimation(randomDirection);
-            waitTime = AvatarHeadMovementInstance.deviationDuration;
-            StartCoroutine(WaitAndHandleDiskTouched());
+            if (AvatarHeadMovementInstance.deviationType == AvatarHeadMovementInstance.devType.sineWave)
+            {
+                waitTime = AvatarHeadMovementInstance.deviationDuration;
+                StartCoroutine(WaitAndHandleDiskTouched());
+            } else if (AvatarHeadMovementInstance.deviationType == AvatarHeadMovementInstance.devType.forthPauseBack)
+            {
+                waitTime = AvatarHeadMovementInstance.deviationDuration + AvatarHeadMovementInstance.pauseAtGoal;
+                StartCoroutine(WaitAndHandleDiskTouched());
+            }
 
             // now. there is no golden sphere to activate a trigger.
         }
@@ -230,11 +237,11 @@ public class GameManagerExp1 : MonoBehaviour
             {
                 case 0:
                     reach = "head";
-                    textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
+                    textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
                     break;
                 case 1:
                     reach = "head";
-                    textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
+                    textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
                     break;
                 case 2:
                     reach = "head";
@@ -293,6 +300,22 @@ public class GameManagerExp1 : MonoBehaviour
     public string GetReach()
     {
         return reach;
+    }
+
+    public void ActivateDisk(int nr)
+    {
+        spheres[nr].SetActive(true);
+        switch (nr)
+        {
+            case 0:
+                reach = "head";
+                textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
+                break;
+            case 1:
+                reach = "head";
+                textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
+                break;
+        }
     }
 
 

@@ -7,6 +7,7 @@ public class Righthandscript : MonoBehaviour
 {
     [SerializeField] private GameObject gameManagerOwner;
     private GameManagerExp1 gameManagerExp1; // Reference to the GameManagerExp1 script
+    
     void Start()
     {
         gameManagerExp1 = gameManagerOwner.GetComponent<GameManagerExp1>();
@@ -14,10 +15,7 @@ public class Righthandscript : MonoBehaviour
 
     void OnTriggerEnter(Collider other) // when the hand touches a sphere
     {
-        print("Left trigger!");
-        print("Reach = " + gameManagerExp1.GetReach());
-        print("Other tag = " + other.gameObject.tag);
-        if (gameManagerExp1 != null && gameManagerExp1.GetReach() == "right")
+        if (gameManagerExp1.GetReach() == "right")
         {
             // Check if the collided object has the tag "GameTarget"
             if (other.gameObject.CompareTag("GameTarget"))

@@ -46,6 +46,8 @@ public class AvatarHeadMovement : MonoBehaviour
     public GameObject rightHandTarget;
     public GameObject rightHandTargetFollow;
 
+    private int deviationDirection;
+
     // dropdown
     public enum devType { sineWave, forthPauseBack, waitForUser }
     [SerializeField] private devType deviationType;
@@ -131,14 +133,14 @@ public class AvatarHeadMovement : MonoBehaviour
             if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)
             {
                 // movement speed function
-                deviationLerpValue = sineForthBack(deviationCurrentTime);
+                deviationLerpValue = sineWave(deviationCurrentTime);
             }
         } else if (deviationType == devType.forthPauseBack)
         {
             if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration/2)
             {
                 // movement speed function
-                deviationLerpValue = sineForthBack(deviationCurrentTime);
+                deviationLerpValue = sineWave(deviationCurrentTime);
             }
             else if (deviationCurrentTime > deviationDuration/2 && deviationCurrentTime <= (deviationDuration/2 + pauseAtGoal)) // pause at goal
             {
@@ -152,8 +154,29 @@ public class AvatarHeadMovement : MonoBehaviour
             {
                 deviationTimer2 += Time.deltaTime;
                 // movement speed function
-                deviationLerpValue = sineForthBack(deviationTimer2);
+                deviationLerpValue = sineWave(deviationTimer2);
             }
+        } else if (deviationType == devType.waitForUser)
+        {
+            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration/2)
+            {
+                // movement speed function
+                deviationLerpValue = sineWave(deviationCurrentTime);
+            }
+            else if (deviationCurrentTime > deviationDuration/2 && deviationCurrentTime <= (deviationDuration/2 + pauseAtGoal)) // pause at goal
+            {
+                // movement speed function
+                deviationLerpValue = 1;
+
+                // set next loop timer to timestamp top of sine wave
+                deviationTimer2 = deviationDuration/2;
+            } else if (deviationCurrentTime > (deviationDuration/2 + pauseAtGoal))
+            {
+                deviationLerpValue = 1;
+                GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
+                GameManager.ActivateDisk(deviationDirection); //activate goal disk (check out fcn TriggerAnimation())
+            }
+
         }
 
         // calculate position current frame
@@ -211,18 +234,22 @@ public class AvatarHeadMovement : MonoBehaviour
             case 0:
                 goalPosition = goalLeft.position;
                 goalRotation = goalLeft.rotation;
+                deviationDirection = randomDirection;
                 break;
             case 1:
                 goalPosition = goalRight.position;
                 goalRotation = goalRight.rotation;
+                deviationDirection = randomDirection;
                 break;
             case 2:
                 goalPosition = goalFront.position;
                 goalRotation = goalFront.rotation;
+                deviationDirection = randomDirection;
                 break;
             case 3:
                 goalPosition = goalBack.position;
                 goalRotation = goalBack.rotation;
+                deviationDirection = randomDirection;
                 break;
             default:
                 break;
@@ -242,7 +269,7 @@ public class AvatarHeadMovement : MonoBehaviour
     }
 
     // forth & back
-    private float sineForthBack(float localCurrentTime)
+    private float sineWave(float localCurrentTime)
     {
         float B = 2 * Mathf.PI / Mathf.Abs(deviationDuration); // frequency
         float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
