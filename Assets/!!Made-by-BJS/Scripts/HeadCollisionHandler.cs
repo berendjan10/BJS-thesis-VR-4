@@ -16,13 +16,19 @@ public class HeadCollisionHandler : MonoBehaviour
     void OnTriggerEnter(Collider other) // when the hand touches a sphere
     {
         // Check if the collided object has the tag "GameTarget"
-        if (other.gameObject.CompareTag("GameTarget") && gameManagerExp1.GetReach() == "head")
+        if (other.gameObject.CompareTag("GameTarget")) // && gameManagerExp1.GetReach() == "head")
         {
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
 
             // Call the function to handle the logic after touching a sphere
-            gameManagerExp1.HandleSphereTouched();
+            gameManagerExp1.HandleDiskTouched();
+        }
+        else if (other.gameObject.CompareTag("GameTargetTop"))
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
+            gameManagerExp1.HandleTopSphereTouched();
         }
     }
 }

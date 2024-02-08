@@ -92,30 +92,30 @@ public class GameManagerExp1 : MonoBehaviour
         moveThis.transform.localPosition = newPosition;
     }
 
-    //void Update()
-    //{
-    //    print(Random.Range(0, spheres.Count));
-    //}
+    void Update()
+    {
+        print(Random.Range(0, spheres.Count));
+    }
 
-    // void OnTriggerEnter(Collider other) // when the head touches a sphere
-    // {
-    //     // Check if the collided object has the tag "GameTarget"
-    //     if (other.gameObject.CompareTag("GameTarget") && reach == "head")
-    //     {
-    //         // Disable the sphere that was touched
-    //         other.gameObject.SetActive(false);
+    void OnTriggerEnter(Collider other) // when the head touches a sphere
+    {
+        // Check if the collided object has the tag "GameTarget"
+        if (other.gameObject.CompareTag("GameTarget") && reach == "head")
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
 
-    //         // Call the function to handle the logic after touching a sphere
-    //         HandleDiskTouched();
-    //     }
-    //     else if (other.gameObject.CompareTag("GameTargetTop"))
-    //     {
-    //         // Disable the sphere that was touched
-    //         other.gameObject.SetActive(false);
-    //         HandleTopSphereTouched();
-    //     }
+            // Call the function to handle the logic after touching a sphere
+            HandleDiskTouched();
+        }
+        else if (other.gameObject.CompareTag("GameTargetTop"))
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
+            HandleTopSphereTouched();
+        }
 
-    // }
+    }
 
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomInstruction()

@@ -8820,7 +8820,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &510945437
 Transform:
   m_ObjectHideFlags: 0
@@ -10126,7 +10126,7 @@ MonoBehaviour:
   goalFrontG: {fileID: 7452633444040837460}
   goalBackG: {fileID: 7452633443332675220}
   hipAnchor: {fileID: 126323088}
-  thirdPersonPerspective: 1
+  thirdPersonPerspective: 0
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
@@ -10140,7 +10140,8 @@ MonoBehaviour:
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
   rightHandTargetFollow: {fileID: 1941498719}
-  deviationType: 1
+  deviationType: 0
+  deviationTypeInt: 1
 --- !u!4 &595502765
 Transform:
   m_ObjectHideFlags: 0
@@ -10203,9 +10204,9 @@ MonoBehaviour:
   _height: 185
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 0
-  phaseOneInstructions: 0
-  phaseTwoInstructions: 10
-  deviatePercentage: 100
+  phaseOneInstructions: 5
+  phaseTwoInstructions: 20
+  deviatePercentage: 50
 --- !u!1001 &600760679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10764,7 +10765,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &647164417
 Transform:
   m_ObjectHideFlags: 0
@@ -21723,8 +21724,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -27614,7 +27615,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.53333336}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
