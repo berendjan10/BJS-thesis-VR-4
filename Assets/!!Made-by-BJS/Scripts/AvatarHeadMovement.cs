@@ -59,10 +59,10 @@ public class AvatarHeadMovement : MonoBehaviour
     {
         // Get a reference to the GameManager instance
         GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
-        GameManager.MoveDown(goalLeftG);
-        GameManager.MoveDown(goalRightG);
-        GameManager.MoveDown(goalFrontG);
-        GameManager.MoveDown(goalBackG);
+        GameManager.MoveDown(goalLeftG, GameManager.scale);
+        GameManager.MoveDown(goalRightG, GameManager.scale);
+        GameManager.MoveDown(goalFrontG, GameManager.scale);
+        GameManager.MoveDown(goalBackG, GameManager.scale);
     }
      
     // Update is called once per frame

@@ -19,7 +19,11 @@ public class GameManagerExp1 : MonoBehaviour
     public GameObject rightHandSphere;
     [SerializeField] private GameObject avatar;
 
+    public enum gendr { male, female }
+    public gendr gender;
     [SerializeField] private float _height; // [cm]
+    public float scalingIntensity = 1.03f; // % =1 scale exactly, <1 scale more, >1 scale less
+    public float scale;
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
     public int phaseOneInstructions = 1;    // amount of instructions in phase 1 (no deviation)
@@ -41,14 +45,22 @@ public class GameManagerExp1 : MonoBehaviour
     void Start()
     {
         // scale down avatar & targets based on participant height
-        float scale = _height / 185;
+        if (gender == gendr.male)
+        {
+            scale = _height / 185f * scalingIntensity;
+        }
+        else if (gender == gendr.female)
+        {
+            scale = _height / 1.736281f * scalingIntensity;
+        }
+
 
         avatar.transform.localScale = new Vector3(scale, scale, scale);
-        MoveDown(topSphere);
-        MoveDown(leftSphere);
-        MoveDown(rightSphere);
-        MoveDown(frontSphere);
-        MoveDown(backSphere);
+        MoveDown(topSphere, scale);
+        MoveDown(leftSphere, scale);
+        MoveDown(rightSphere, scale);
+        MoveDown(frontSphere, scale);
+        MoveDown(backSphere, scale);
         
         // Initialize the list with all sphere game objects
         spheres = new List<GameObject> { leftSphere, rightSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
@@ -84,11 +96,9 @@ public class GameManagerExp1 : MonoBehaviour
         SetRandomGameInstruction();
     }
 
-    public void MoveDown(GameObject moveThis)
+    public void MoveDown(GameObject moveThis, float scale)
     {
         Vector3 newPosition = moveThis.transform.localPosition;
-        float px = 1.03f; // % =1 scale exactly, <1 scale more, >1 scale less
-        float scale = _height / 185 * px;
         newPosition.y *= scale;
         moveThis.transform.localPosition = newPosition;
     }
