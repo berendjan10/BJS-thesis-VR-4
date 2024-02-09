@@ -10212,11 +10212,11 @@ MonoBehaviour:
   _height: 185
   scalingIntensity: 1.03
   scale: 0
-  waitTimeLowerLimit: 0
-  waitTimeUpperLimit: 0
-  phaseOneInstructions: 1
-  phaseTwoInstructions: 20
-  deviatePercentage: 50
+  waitTimeLowerLimit: 3
+  waitTimeUpperLimit: 10
+  phaseOneInstructions: 30
+  phaseTwoInstructions: 30
+  deviatePercentage: 40
 --- !u!1001 &600760679
 PrefabInstance:
   m_ObjectHideFlags: 0
