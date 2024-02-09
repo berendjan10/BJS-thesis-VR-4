@@ -51,16 +51,16 @@ public class GameManagerExp1 : MonoBehaviour
         }
         else if (gender == gendr.female)
         {
-            scale = _height / 1.736281f * scalingIntensity;
+            scale = _height / 173.6281f * scalingIntensity;
         }
 
 
         avatar.transform.localScale = new Vector3(scale, scale, scale);
-        MoveDown(topSphere, scale);
-        MoveDown(leftSphere, scale);
-        MoveDown(rightSphere, scale);
-        MoveDown(frontSphere, scale);
-        MoveDown(backSphere, scale);
+        MoveDown(topSphere);
+        MoveDown(leftSphere);
+        MoveDown(rightSphere);
+        MoveDown(frontSphere);
+        MoveDown(backSphere);
         
         // Initialize the list with all sphere game objects
         spheres = new List<GameObject> { leftSphere, rightSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
@@ -96,10 +96,11 @@ public class GameManagerExp1 : MonoBehaviour
         SetRandomGameInstruction();
     }
 
-    public void MoveDown(GameObject moveThis, float scale)
+    public void MoveDown(GameObject moveThis)
     {
+        float scale1 = _height / 185 * scalingIntensity;
         Vector3 newPosition = moveThis.transform.localPosition;
-        newPosition.y *= scale;
+        newPosition.y *= scale1;
         moveThis.transform.localPosition = newPosition;
     }
 
