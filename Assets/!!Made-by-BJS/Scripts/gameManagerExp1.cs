@@ -96,7 +96,27 @@ public class GameManagerExp1 : MonoBehaviour
         SetRandomGameInstruction();
     }
 
-    public void MoveDown(GameObject moveThis)
+    void OnTriggerEnter(Collider other) // when the hand touches a sphere   
+    { 
+        // Check if the collided object has the tag "GameTarget"
+        if (other.gameObject.CompareTag("GameTarget")) //  && gameManagerExp1.GetReach() == "head")
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
+
+            // Call the function to handle the logic after touching a sphere
+            HandleDiskTouched();
+        }
+        else if (other.gameObject.CompareTag("GameTargetTop"))
+        {
+            // Disable the sphere that was touched
+            other.gameObject.SetActive(false);
+            HandleTopSphereTouched();
+
+        }
+    }
+
+        public void MoveDown(GameObject moveThis)
     {
         float scale1 = _height / 185 * scalingIntensity;
         Vector3 newPosition = moveThis.transform.localPosition;

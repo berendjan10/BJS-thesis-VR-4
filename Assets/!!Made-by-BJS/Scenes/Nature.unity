@@ -8846,12 +8846,12 @@ GameObject:
   m_Component:
   - component: {fileID: 510945437}
   m_Layer: 0
-  m_Name: experiment 1 big mirror front
+  m_Name: experiment 1 big mirror front 1PP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &510945437
 Transform:
   m_ObjectHideFlags: 0
@@ -10170,7 +10170,7 @@ MonoBehaviour:
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
   rightHandTargetFollow: {fileID: 1941498719}
-  deviationType: 2
+  deviationType: 0
   deviationTypeInt: 1
 --- !u!4 &595502765
 Transform:
@@ -10208,13 +10208,13 @@ MonoBehaviour:
   middleHandSphere: {fileID: 330770350}
   rightHandSphere: {fileID: 506624732}
   avatar: {fileID: 1800788683}
-  gender: 0
-  _height: 185
+  gender: 1
+  _height: 176
   scalingIntensity: 1.03
   scale: 0
-  waitTimeLowerLimit: 3
-  waitTimeUpperLimit: 10
-  phaseOneInstructions: 30
+  waitTimeLowerLimit: 2
+  waitTimeUpperLimit: 4
+  phaseOneInstructions: 20
   phaseTwoInstructions: 30
   deviatePercentage: 40
 --- !u!1001 &600760679
@@ -10770,12 +10770,12 @@ GameObject:
   m_Component:
   - component: {fileID: 647164417}
   m_Layer: 0
-  m_Name: experiment 1 mirror side
+  m_Name: experiment 1 mirror side 3PP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &647164417
 Transform:
   m_ObjectHideFlags: 0
