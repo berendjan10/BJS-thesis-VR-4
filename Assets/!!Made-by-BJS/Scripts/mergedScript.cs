@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
 
-// to do: merge scripts SEARCH FOR 
 
 public class mergedScript : MonoBehaviour
 {
@@ -82,6 +82,11 @@ public class mergedScript : MonoBehaviour
 
     private int deviationDirection;
 
+    public InputActionProperty thumbButtonA;
+
+
+
+
 
 
 
@@ -151,6 +156,10 @@ public class mergedScript : MonoBehaviour
     void Update()
     {
 
+
+        float triggerValue = thumbButtonA.action.ReadValue<float>();
+        print("triggerValue: " + triggerValue);
+        // yaaayyy right index finger trigger value will be 0 or 1
 
 
         currentTime += Time.deltaTime;
