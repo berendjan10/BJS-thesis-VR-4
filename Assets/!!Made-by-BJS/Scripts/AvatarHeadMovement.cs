@@ -39,6 +39,7 @@ public class AvatarHeadMovement : MonoBehaviour
     private Vector3 standardCameraOffsetPosition = new Vector3();
     private Vector3 standardCameraOffsetRotation = new Vector3();
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
+    [SerializeField] private GameObject alienAntenna;
     //public Vector3 thirdPersonPerspectiveOffsetRotation = new Vector3(15.0f, 0.0f, 0.0f);
 
     public GameObject leftHandTarget;
