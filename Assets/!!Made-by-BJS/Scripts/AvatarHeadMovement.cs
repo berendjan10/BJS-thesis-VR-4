@@ -58,12 +58,12 @@ public class AvatarHeadMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Get a reference to the GameManager instance
+        // Get a reference to the GameManager instance/////////////////////////////////////////////////////////////////////////////////////////
         GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
         GameManager.MoveDown(goalLeftG);
         GameManager.MoveDown(goalRightG);
         GameManager.MoveDown(goalFrontG);
-        GameManager.MoveDown(goalBackG);
+        GameManager.MoveDown(goalBackG);////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
      
     // Update is called once per frame
@@ -188,9 +188,9 @@ public class AvatarHeadMovement : MonoBehaviour
             {
                 // if nog niet touched
                 deviationLerpValue = 1;
-                GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();
+                GameManagerExp1 GameManager = GetComponent<GameManagerExp1>();//////////////////////////////////////////////////////////////////////
                 GameManager.ActivateDisk(deviationDirection); //activate goal disk (check out fcn TriggerAnimation()) JUST ONCE
-                // zodra touched klaar
+                // zodra touched klaar ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             }
 
         }
@@ -293,14 +293,14 @@ public class AvatarHeadMovement : MonoBehaviour
         return deviationLerpValue;
     }
 
-    // forth
-    private float sineForth(float localCurrentTime)
-    {
-        float B = Mathf.PI / Mathf.Abs(deviationDuration); // frequency
-        float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
-        deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
-        return deviationLerpValue;
-    }
+    //// forth
+    //private float sineForth(float localCurrentTime)
+    //{
+    //    float B = Mathf.PI / Mathf.Abs(deviationDuration); // frequency
+    //    float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
+    //    deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
+    //    return deviationLerpValue;
+    //}
     // // back
     // private float lerpDeviateBack(float localCurrentTime)
     // {

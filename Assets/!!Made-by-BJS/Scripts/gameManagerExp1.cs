@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-// to do: merge scripts
+// to do: merge scripts SEARCH FOR 
 
 public class GameManagerExp1 : MonoBehaviour
 {
@@ -207,7 +207,7 @@ public class GameManagerExp1 : MonoBehaviour
         deviate = deviatingTrials.Contains(instructionCounter);
         if (deviate)
         {
-            // Get a reference to the AvatarHeadMovement instance
+            // Get a reference to the AvatarHeadMovement instance////////////////////////////////////////////////////////////////////////
             AvatarHeadMovement AvatarHeadMovementInstance = GetComponent<AvatarHeadMovement>();
 
             // random direction generator 
@@ -221,7 +221,7 @@ public class GameManagerExp1 : MonoBehaviour
             {
                 waitTime = AvatarHeadMovementInstance.deviationDuration + AvatarHeadMovementInstance.pauseAtGoal;
                 StartCoroutine(WaitAndHandleDiskTouched());
-            }
+            } ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // now. there is no golden sphere to activate a trigger.
         }
