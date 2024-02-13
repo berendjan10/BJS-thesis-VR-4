@@ -25,13 +25,13 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Glossiness: 0
+    - _Glossiness: 41.4
     - _Opacity: 1
     - _Smoothness: 0
     - _WorkflowMode: 0
     m_Colors:
     - _BaseColor: {r: 0.40000004, g: 0.5019608, b: 0.30980393, a: 1}
-    - _Color: {r: 0.4, g: 0.5019608, b: 0.3098039, a: 1}
+    - _Color: {r: 0.40654346, g: 0.5566038, b: 0.33343717, a: 1}
     - _SpecColor: {r: 0.40000004, g: 0.5019608, b: 0.30980393, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &8503899104512836301

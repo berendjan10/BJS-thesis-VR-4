@@ -124,10 +124,10 @@ Material:
     m_Ints: []
     m_Floats:
     - Vector1_111B5DAF: 0.58
-    - Vector1_192ABB: 0.5
+    - Vector1_192ABB: 0
     - Vector1_33603BC3: 10
     - Vector1_447CA7CF: 0.85
-    - Vector1_49200990: 0.5
+    - Vector1_49200990: 0
     - Vector1_500326A0: 0
     - Vector1_5BF1F5FA: 1
     - Vector1_60FF7735: 107.19
@@ -145,7 +145,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - Color_61BC06DD: {r: 1, g: 1, b: 1, a: 0}
+    - Color_61BC06DD: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 0}
     - Color_B65C5706: {r: 1, g: 1, b: 1, a: 0}
     - Color_FFD3CE6B: {r: 1, g: 1, b: 1, a: 1}
     - Vector2_66CCC9D1: {r: 0.3, g: 0.2, b: 0, a: 0}
