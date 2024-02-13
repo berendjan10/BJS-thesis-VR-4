@@ -88,6 +88,8 @@ public class GameScript : MonoBehaviour
 
     private int deviationDirection;
 
+    private bool scoreSaved;
+
     public InputActionProperty thumbButtonA;
 
     void Start()
@@ -109,7 +111,8 @@ public class GameScript : MonoBehaviour
         avatar.transform.localScale = new Vector3(scale, scale, scale);
 
         // Initialize the list with all sphere game objects
-        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goal5, goal6 };
+        // goals = new List<GameObject> { goal1, goal2, goal3, goal4, goal5, goal6 };
+        goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
@@ -119,6 +122,7 @@ public class GameScript : MonoBehaviour
         {
             sphere.SetActive(false);
         }
+        scoreText.SetActive(false);
         topGoal.SetActive(false);
 
         if (deviatePercentage < 0)
@@ -150,13 +154,19 @@ public class GameScript : MonoBehaviour
 
         scoreScript = scoreText.GetComponent<ChangeText>();
 
-        if (triggerValue == 1)
+        if (triggerValue == 1 || Input.GetKeyDown("space")) // press trigger button or spacebar to save score
         {
-            // check currentgoal feedback to scoreScript.ChangeTextFcn(
-            float errordistance = Vector3.Distance(alienAntenna.transform.position, currentGoal.transform.position);
-            Debug.Log("Position antenna: " + errordistance);
-            topGoal.SetActive(true);
-            scoreScript.ChangeTextFcn(errordistance.ToString());
+            // check currentgoal feedback to scoreScript.ChangeTextFcn()
+            while (scoreSaved == false)
+            {
+                float errordistance = Vector3.Distance(alienAntenna.transform.position, currentGoal.transform.position);
+                Debug.Log("Position antenna: " + errordistance);
+                topGoal.SetActive(true);
+                currentGoal.SetActive(false);
+                scoreScript.ChangeTextFcn(errordistance.ToString());
+                StartCoroutine(ShowScore());
+                scoreSaved = true;
+            }
         }
 
         /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
@@ -274,6 +284,20 @@ public class GameScript : MonoBehaviour
 
     } /////////////////////////////////////////////////////////////////////////////////// end of DEVIATION ///////////////////////////////////////////////////////////////////////////////////
 
+    IEnumerator ShowScore()
+    {
+        float localTime = 0f;
+        scoreText.SetActive(true);
+        
+        while (localTime < 1)
+        {
+            localTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        scoreText.SetActive(false);
+    }
+
     // Collision
     void OnTriggerEnter(Collider other) // when the hand touches a sphere   
     {
@@ -281,7 +305,12 @@ public class GameScript : MonoBehaviour
         {
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
-            HandleTopSphereTouched();
+
+            // Set a random wait time between 1s and 2s
+            waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+
+            // Call the function to generate a new random game instruction after the wait period
+            StartCoroutine(WaitAndSetRandomGoal());
         }
     }
 
@@ -364,40 +393,15 @@ public class GameScript : MonoBehaviour
             //textScript.ChangeTextFcn("Good job! Please sit straight up now.");
         }
     }
-    public void HandleSphereTouched()
-    {
-        if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
-        {
-            gameInstructions.SetActive(true);
-            textScript.ChangeTextFcn("Thanks for playing!");
-        }
-        else
-        {
-            HandleTopSphereTouched(); // because I skip the "sit up straight now" part
-        }
-    }
-
-    public void HandleTopSphereTouched()
-    {
-        //textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
-
-        // Set a random wait time between 1s and 2s
-        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
-
-        // Call the function to generate a new random game instruction after the wait period
-        StartCoroutine(WaitAndSetRandomGoal());
-
-    }
 
     void SetRandomGoal()
     {
-        print("inside function SetRandomGoal");
         // Increment the instruction counter
         instructionCounter++;
         print("instructionCounter: " + instructionCounter);
+        scoreSaved = false;
 
         deviate = deviatingTrials.Contains(instructionCounter);
-        print("deviate (should be false): " +  deviate);
         if (deviate) // TODO: nog aanpassen.
         {
             // Get a reference to the AvatarHeadMovement instance
@@ -425,11 +429,8 @@ public class GameScript : MonoBehaviour
             {
                 randomIndex = Random.Range(0, goals.Count); 
             } while (goals[randomIndex] == previousGoal);
-            print("random index = " + randomIndex);
             previousGoal = goals[randomIndex];
             currentGoal = goals[randomIndex];
-            print("Current Goal = "+ currentGoal);
-            print("Calling FlashGoal co-routine...");
             // Enable the selected sphere
             StartCoroutine(FlashGoal(goals[randomIndex]));
 
@@ -439,7 +440,6 @@ public class GameScript : MonoBehaviour
     // Co-routine
     IEnumerator FlashGoal(GameObject goal)
     {
-        print("Inside FlashGoal co-routine");
         float elapsedTime = 0f;
         goal.SetActive(true);
 
