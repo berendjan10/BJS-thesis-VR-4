@@ -5,9 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
+//using static OVRTask<TResult>;
+using System.IO;
 
 
-public class mergedScript : MonoBehaviour
+
+public class GameScript : MonoBehaviour
 {
     public GameObject headReference;
     public enum gendr { male, female } // dropdown menu
@@ -26,37 +29,37 @@ public class mergedScript : MonoBehaviour
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
-    public enum devType { sineWave, forthPauseBack, waitForUser }
+    public enum devType { sineWave, forthPauseBack }
     public devType deviationType;
     public float instructionDuration = 10f;
+    public float flashTime = 0.2f; // [s]
 
-    public GameObject rightSphere;
-    public GameObject leftSphere;
-    public GameObject frontSphere;
-    public GameObject backSphere;
-    public GameObject topSphere;
-    public GameObject leftHandSphere;
-    public GameObject middleHandSphere;
-    public GameObject rightHandSphere;
+    public GameObject topGoal;
+    public GameObject goal1;
+    public GameObject goal2;
+    public GameObject goal3;
+    public GameObject goal4;
+    public GameObject goal5;
+    public GameObject goal6;
+
     [SerializeField] private GameObject avatar;
 
     private float scale;
 
-    private List<GameObject> spheres; // List to store all the sphere game objects
+    private List<GameObject> goals; // List to store all the sphere game objects
     private ChangeText textScript; // Reference to the ChangeText script
+    private ChangeText scoreScript;
     private float waitTime;
     private int instructionCounter = 0; // Counter to keep track of the number of instructions given
     private bool deviate = false;
     private List<int> deviatingTrials;
     private string reach;
-    private GameObject previousSphere;
+    private GameObject previousGoal;
+    private GameObject currentGoal;
 
 
     [SerializeField] private Transform hmdTarget;
-    [SerializeField] private GameObject goalLeft; // to do: change later (merge with 4 above wgen merging scripts)
-    [SerializeField] private GameObject goalRight;
-    [SerializeField] private GameObject goalFront;
-    [SerializeField] private GameObject goalBack;
+
 
     [SerializeField] private GameObject hipAnchor;
     private float transitionLerpValue;
@@ -81,72 +84,42 @@ public class mergedScript : MonoBehaviour
     public GameObject rightHandTarget;
     public GameObject rightHandTargetFollow;
 
+    public GameObject scoreText;
+
     private int deviationDirection;
 
     public InputActionProperty thumbButtonA;
 
-
-
-    bool isPaused = false;
-
-    void Pause()
-    {
-        Time.timeScale = 0.0f;
-        isPaused = true;
-        // Optionally, you can do other things when the game is paused
-    }
-
-    void ResumeGame()
-    {
-        Time.timeScale = 1.0f;
-        isPaused = false;
-        // Optionally, you can do other things when the game is resumed
-    }
-
-
     void Start()
     {
-        print("headReference" + headReference.transform.position); // SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
-        WaitAndRemoveInstruction();
+        // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
+        print("headReference" + headReference.transform.position); 
 
         // scale down avatar & targets based on participant height
         if (gender == gendr.male)
         {
-            scale = _height / 185f * scalingIntensity;
+            scale = Mathf.Pow(_height / 185f, scalingIntensity);
         }
         else if (gender == gendr.female)
         {
-            scale = _height / 173.6281f * scalingIntensity;
+            scale = Mathf.Pow(_height / 185f, scalingIntensity);
         }
 
-
+        // scale avatar
         avatar.transform.localScale = new Vector3(scale, scale, scale);
-        MoveDown(topSphere);
-        MoveDown(leftSphere);
-        MoveDown(rightSphere);
-        MoveDown(frontSphere);
-        MoveDown(backSphere);
-
-
-        MoveDown(goalLeft);
-        MoveDown(goalRight);
-        MoveDown(goalFront);
-        MoveDown(goalBack);
-
 
         // Initialize the list with all sphere game objects
-        spheres = new List<GameObject> { leftSphere, rightSphere, frontSphere, backSphere, leftHandSphere, middleHandSphere, middleHandSphere, rightHandSphere };
-
+        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goal5, goal6 };
 
         // Find the game object with the ChangeText script
-        GameObject textGameObject = GameObject.FindWithTag("gameInstructions");
-        textScript = textGameObject.GetComponent<ChangeText>();
+        textScript = gameInstructions.GetComponent<ChangeText>();
 
         // Disable all spheres (just to be sure)
-        foreach (GameObject sphere in spheres)
+        foreach (GameObject sphere in goals)
         {
             sphere.SetActive(false);
         }
+        topGoal.SetActive(false);
 
         if (deviatePercentage < 0)
         {
@@ -161,35 +134,32 @@ public class mergedScript : MonoBehaviour
         // Calculate the number of trials that should deviate based on deviate_percentage
         int deviatingTrialsCount = Mathf.RoundToInt((float)(deviatePercentage * phaseTwoInstructions) / 100);
 
-        // Generate a collection of instruction counters for deviating trials
+        // Choose which trials wil deviate
         GenerateDeviatingTrials(deviatingTrialsCount);
 
-        // Call the function to set up the initial game instructions
-        SetRandomGameInstruction();
+        // wait, remove text and SetRandomGoal
+        StartCoroutine(WaitAndStartGame());
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        // controller trigger button press
+        float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
 
+        scoreScript = scoreText.GetComponent<ChangeText>();
 
-        float triggerValue = thumbButtonA.action.ReadValue<float>();
-        //print("triggerValue: " + triggerValue);
-        // yaaayyy right index finger trigger value will be 0 or 1
-
-        if (Input.GetKeyDown(KeyCode.P))
+        if (triggerValue == 1)
         {
-            if (triggerValue == 1)
-            {
-                Pause();
-            }
-            else
-            {
-                ResumeGame();
-            }
+            // check currentgoal feedback to scoreScript.ChangeTextFcn(
+            float errordistance = Vector3.Distance(alienAntenna.transform.position, currentGoal.transform.position);
+            Debug.Log("Position antenna: " + errordistance);
+            topGoal.SetActive(true);
+            scoreScript.ChangeTextFcn(errordistance.ToString());
         }
 
-
+        /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
         currentTime += Time.deltaTime;
 
         // Match head & hand target rotations with controllers (same for 1PP & 3PP)
@@ -199,9 +169,9 @@ public class mergedScript : MonoBehaviour
 
 
         // First Person Perspective
-        if (!thirdPersonPerspective) //////////// FOLLOW HMD
+        if (!thirdPersonPerspective) // HMD
         {
-            firstPersonPerspective(); /////////////////////////////////////////////////////////////////////////////////// HMD
+            firstPersonPerspective(); // HMD
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
@@ -210,17 +180,17 @@ public class mergedScript : MonoBehaviour
         }
 
         // Third Person Perspective
-        else if (thirdPersonPerspective) //////////// FOLLOW HMD
+        else if (thirdPersonPerspective) // HMD
         {
             if (!smoothTransition)
             {
-                thirdPersonPerspectiveFcn(); /////////////////////////////////////////////////////////////////////////////////// HMD
+                thirdPersonPerspectiveFcn(); // HMD
             }
             else if (smoothTransition)
             {
                 if (currentTime < transitionStart)
                 {
-                    firstPersonPerspective(); /////////////////////////////////////////////////////////////////////////////////// HMD
+                    firstPersonPerspective(); // HMD
                 }
                 else if (currentTime >= transitionStart && currentTime <= (transitionStart + transitionDuration))
                 {
@@ -237,7 +207,7 @@ public class mergedScript : MonoBehaviour
                 }
                 else if (currentTime > (transitionStart + transitionDuration))
                 {
-                    thirdPersonPerspectiveFcn(); /////////////////////////////////////////////////////////////////////////////////// HMD
+                    thirdPersonPerspectiveFcn(); // HMD
                 }
             }
 
@@ -247,7 +217,7 @@ public class mergedScript : MonoBehaviour
 
         }
 
-        //////////////////////////////////// DEVIATION ////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////// DEVIATION ///////////////////////////////////////////////////////////////////////////////////
         // deviation timing
         deviationCurrentTime += Time.deltaTime;
 
@@ -281,30 +251,6 @@ public class mergedScript : MonoBehaviour
                 deviationLerpValue = sineWave(deviationTimer2);
             }
         }
-        else if (deviationType == devType.waitForUser)
-        {
-            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration / 2)
-            {
-                // movement speed function
-                deviationLerpValue = sineWave(deviationCurrentTime);
-            }
-            else if (deviationCurrentTime > deviationDuration / 2 && deviationCurrentTime <= (deviationDuration / 2 + pauseAtGoal)) // pause at goal
-            {
-                // movement speed function
-                deviationLerpValue = 1;
-
-                // set next loop timer to timestamp top of sine wave
-                deviationTimer2 = deviationDuration / 2;
-            }
-            else if (deviationCurrentTime == (deviationDuration / 2 + pauseAtGoal) && deviationCurrentTime < (deviationDuration / 2 + pauseAtGoal + 0.2)) // werkt niet
-            {
-                // if nog niet touched
-                deviationLerpValue = 1;
-                ActivateDisk(deviationDirection); //activate goal disk (check out fcn TriggerAnimation()) JUST ONCE
-                // zodra touched klaar
-            }
-
-        }
 
         // calculate position current frame
         Vector3 center = hipAnchor.transform.position; // hip pivot point
@@ -326,38 +272,29 @@ public class mergedScript : MonoBehaviour
         // both perspectives
         transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
 
-    }
+    } /////////////////////////////////////////////////////////////////////////////////// end of DEVIATION ///////////////////////////////////////////////////////////////////////////////////
 
+    // Collision
     void OnTriggerEnter(Collider other) // when the hand touches a sphere   
     {
-        // Check if the collided object has the tag "GameTarget"
-        if (other.gameObject.CompareTag("GameTarget")) //  && gameManagerExp1.GetReach() == "head")
-        {
-            // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
-
-            // Call the function to handle the logic after touching a sphere
-            HandleDiskTouched();
-        }
-        else if (other.gameObject.CompareTag("GameTargetTop"))
+        if (other.gameObject.CompareTag("GameTargetTop"))
         {
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
             HandleTopSphereTouched();
-
         }
     }
 
     public void MoveDown(GameObject moveThis)
     {
-        float scale1 = _height / 185 * scalingIntensity;
+        float scale1 = Mathf.Pow(_height / 185f, scalingIntensity);
         Vector3 newPosition = moveThis.transform.localPosition;
         newPosition.y *= scale1;
         moveThis.transform.localPosition = newPosition;
     }
 
-    // Coroutine to wait for a random period and then set a new random game instruction
-    IEnumerator WaitAndRemoveInstruction()
+    // Coroutine to wait for a random period and then remove instructions and let the first goal appear
+    IEnumerator WaitAndStartGame()
     {
         float elapsedTime = 0f;
 
@@ -366,17 +303,18 @@ public class mergedScript : MonoBehaviour
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
-
+            print("elapsed time: " + elapsedTime);
             // Wait for the next frame
             yield return null;
         }
 
         // Call the function to generate a new random game instruction
         gameInstructions.SetActive(false);
+        SetRandomGoal();
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
-    IEnumerator WaitAndSetRandomInstruction()
+    IEnumerator WaitAndSetRandomGoal()
     {
         float elapsedTime = 0f;
 
@@ -391,7 +329,7 @@ public class mergedScript : MonoBehaviour
         }
 
         // Call the function to generate a new random game instruction
-        SetRandomGameInstruction();
+        SetRandomGoal();
     }
 
     // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
@@ -422,8 +360,8 @@ public class mergedScript : MonoBehaviour
         }
         else
         {
+
             //textScript.ChangeTextFcn("Good job! Please sit straight up now.");
-            topSphere.SetActive(true);
         }
     }
     public void HandleSphereTouched()
@@ -447,24 +385,25 @@ public class mergedScript : MonoBehaviour
         waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
 
         // Call the function to generate a new random game instruction after the wait period
-        StartCoroutine(WaitAndSetRandomInstruction());
+        StartCoroutine(WaitAndSetRandomGoal());
 
     }
 
-    void SetRandomGameInstruction()
+    void SetRandomGoal()
     {
+        print("inside function SetRandomGoal");
         // Increment the instruction counter
         instructionCounter++;
         print("instructionCounter: " + instructionCounter);
 
         deviate = deviatingTrials.Contains(instructionCounter);
-        if (deviate)
+        print("deviate (should be false): " +  deviate);
+        if (deviate) // TODO: nog aanpassen.
         {
             // Get a reference to the AvatarHeadMovement instance
 
             // random direction generator 
             int randomDirection = Random.Range(0, 2); // only left and right!!!
-            TriggerAnimation(randomDirection);
             if (deviationType == devType.sineWave)
             {
                 waitTime = deviationDuration;
@@ -484,54 +423,38 @@ public class mergedScript : MonoBehaviour
             int randomIndex;
             do
             {
-                randomIndex = Random.Range(0, spheres.Count); 
-            } while (spheres[randomIndex] == previousSphere);
-
-            previousSphere = spheres[randomIndex];
-
+                randomIndex = Random.Range(0, goals.Count); 
+            } while (goals[randomIndex] == previousGoal);
+            print("random index = " + randomIndex);
+            previousGoal = goals[randomIndex];
+            currentGoal = goals[randomIndex];
+            print("Current Goal = "+ currentGoal);
+            print("Calling FlashGoal co-routine...");
             // Enable the selected sphere
-            spheres[randomIndex].SetActive(true);
-
-            // Set the game instruction based on the selected sphere
-            //switch (randomIndex)
-            //{
-            //    case 0:
-            //        reach = "head";
-            //        textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
-            //        break;
-            //    case 1:
-            //        reach = "head";
-            //        textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
-            //        break;
-            //    case 2:
-            //        reach = "head";
-            //        textScript.ChangeTextFcn("Please lean forward - touch the blue disk with your head");
-            //        break;
-            //    case 3:
-            //        reach = "head";
-            //        textScript.ChangeTextFcn("Please lean backward - touch the blue disk with your head");
-            //        break;
-            //    case 4:
-            //        reach = "left";
-            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-            //        break;
-            //    case 5:
-            //        reach = "left";
-            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-            //        break;
-            //    case 6:
-            //        reach = "right";
-            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-            //        break;
-            //    case 7:
-            //        reach = "right";
-            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-            //        break;
-            //    default:
-            //        break;
-            //}
+            StartCoroutine(FlashGoal(goals[randomIndex]));
 
         }
+    }
+
+    // Co-routine
+    IEnumerator FlashGoal(GameObject goal)
+    {
+        print("Inside FlashGoal co-routine");
+        float elapsedTime = 0f;
+        goal.SetActive(true);
+
+        // Wait
+        while (elapsedTime < flashTime)
+        {
+            // Increment the elapsed time using Time.deltaTime
+            elapsedTime += Time.deltaTime;
+
+            // Wait for the next frame
+            yield return null;
+        }
+
+        // Call the function to handle the logic after touching a sphere
+        goal.SetActive(false);
     }
 
     // Function to generate a collection of instruction counters for deviating trials
@@ -565,7 +488,7 @@ public class mergedScript : MonoBehaviour
 
     public void ActivateDisk(int nr)
     {
-        spheres[nr].SetActive(true);
+        goals[nr].SetActive(true);
         switch (nr)
         {
             case 0:
@@ -605,36 +528,7 @@ public class mergedScript : MonoBehaviour
         transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition; ///////////////////////////////////////////////////// HMD
     }
 
-    public void TriggerAnimation(int randomDirection)
-    {
-        switch (randomDirection)
-        {
-            case 0:
-                goalPosition = goalLeft.transform.position;
-                goalRotation = goalLeft.transform.rotation;
-                deviationDirection = randomDirection;
-                break;
-            case 1:
-                goalPosition = goalRight.transform.position;
-                goalRotation = goalRight.transform.rotation;
-                deviationDirection = randomDirection;
-                break;
-            case 2:
-                goalPosition = goalFront.transform.position;
-                goalRotation = goalFront.transform.rotation;
-                deviationDirection = randomDirection;
-                break;
-            case 3:
-                goalPosition = goalBack.transform.position;
-                goalRotation = goalBack.transform.rotation;
-                deviationDirection = randomDirection;
-                break;
-            default:
-                break;
-        }
-        deviationCurrentTime = 0; // reset deviation clock
-        // _isPlaying = true;
-    }
+
 
     // one direction
     private float lerpTransition(float localCurrentTime)
