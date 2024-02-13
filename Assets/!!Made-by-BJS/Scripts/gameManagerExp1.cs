@@ -47,15 +47,15 @@ public class GameManagerExp1 : MonoBehaviour
         // scale down avatar & targets based on participant height
         if (gender == gendr.male)
         {
-            scale = _height / 185f * scalingIntensity;
+            scale = Mathf.Pow(_height / 185f , scalingIntensity);
         }
         else if (gender == gendr.female)
         {
-            scale = _height / 173.6281f * scalingIntensity;
+            scale = Mathf.Pow(_height / 173.6281f , scalingIntensity);
         }
 
 
-        avatar.transform.localScale = new Vector3(scale, scale, scale);
+        //avatar.transform.localScale = new Vector3(scale, scale, scale);
         MoveDown(topSphere);
         MoveDown(leftSphere);
         MoveDown(rightSphere);
@@ -118,7 +118,7 @@ public class GameManagerExp1 : MonoBehaviour
 
         public void MoveDown(GameObject moveThis)
     {
-        float scale1 = _height / 185 * scalingIntensity;
+        float scale1 = Mathf.Pow(_height / 185f, scalingIntensity);
         Vector3 newPosition = moveThis.transform.localPosition;
         newPosition.y *= scale1;
         moveThis.transform.localPosition = newPosition;

@@ -145,7 +145,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - Color_61BC06DD: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 0}
+    - Color_61BC06DD: {r: 1.3041189, g: 1.3041189, b: 1.3041189, a: 0}
     - Color_B65C5706: {r: 1, g: 1, b: 1, a: 0}
     - Color_FFD3CE6B: {r: 1, g: 1, b: 1, a: 1}
     - Vector2_66CCC9D1: {r: 0.3, g: 0.2, b: 0, a: 0}

@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 
 public class mergedScript : MonoBehaviour
 {
+    public GameObject headReference;
     public enum gendr { male, female } // dropdown menu
     public gendr gender;
     [SerializeField] private float _height; // [cm]
@@ -17,9 +18,9 @@ public class mergedScript : MonoBehaviour
     [SerializeField] private bool smoothTransition = false;
     [SerializeField] private float transitionStart;
     [SerializeField] private float transitionDuration; // duration of transition
-    public int phaseOneInstructions = 1;    // amount of instructions in phase 1 (no deviation)
-    public int phaseTwoInstructions = 6; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
-    public int deviatePercentage = 33; // [%]    // percentage that deviates in phase 2
+    public int phaseOneInstructions = 10;    // amount of instructions in phase 1 (no deviation)
+    public int phaseTwoInstructions = 10; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
+    public int deviatePercentage = 40; // [%]    // percentage that deviates in phase 2
     public float deviationDuration; // duration of deviation
     public float pauseAtGoal;
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
@@ -27,7 +28,7 @@ public class mergedScript : MonoBehaviour
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
     public enum devType { sineWave, forthPauseBack, waitForUser }
     public devType deviationType;
-
+    public float instructionDuration = 10f;
 
     public GameObject rightSphere;
     public GameObject leftSphere;
@@ -86,13 +87,28 @@ public class mergedScript : MonoBehaviour
 
 
 
+    bool isPaused = false;
 
+    void Pause()
+    {
+        Time.timeScale = 0.0f;
+        isPaused = true;
+        // Optionally, you can do other things when the game is paused
+    }
 
-
+    void ResumeGame()
+    {
+        Time.timeScale = 1.0f;
+        isPaused = false;
+        // Optionally, you can do other things when the game is resumed
+    }
 
 
     void Start()
     {
+        print("headReference" + headReference.transform.position); // SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
+        WaitAndRemoveInstruction();
+
         // scale down avatar & targets based on participant height
         if (gender == gendr.male)
         {
@@ -158,8 +174,20 @@ public class mergedScript : MonoBehaviour
 
 
         float triggerValue = thumbButtonA.action.ReadValue<float>();
-        print("triggerValue: " + triggerValue);
+        //print("triggerValue: " + triggerValue);
         // yaaayyy right index finger trigger value will be 0 or 1
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if (triggerValue == 1)
+            {
+                Pause();
+            }
+            else
+            {
+                ResumeGame();
+            }
+        }
 
 
         currentTime += Time.deltaTime;
@@ -329,6 +357,25 @@ public class mergedScript : MonoBehaviour
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
+    IEnumerator WaitAndRemoveInstruction()
+    {
+        float elapsedTime = 0f;
+
+        // Continue waiting until the elapsed time reaches the randomly chosen wait time
+        while (elapsedTime < instructionDuration)
+        {
+            // Increment the elapsed time using Time.deltaTime
+            elapsedTime += Time.deltaTime;
+
+            // Wait for the next frame
+            yield return null;
+        }
+
+        // Call the function to generate a new random game instruction
+        gameInstructions.SetActive(false);
+    }
+
+    // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomInstruction()
     {
         float elapsedTime = 0f;
@@ -370,11 +417,12 @@ public class mergedScript : MonoBehaviour
     {
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
+            gameInstructions.SetActive(true);
             textScript.ChangeTextFcn("Thanks for playing!");
         }
         else
         {
-            textScript.ChangeTextFcn("Good job! Please sit straight up now.");
+            //textScript.ChangeTextFcn("Good job! Please sit straight up now.");
             topSphere.SetActive(true);
         }
     }
@@ -382,6 +430,7 @@ public class mergedScript : MonoBehaviour
     {
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
+            gameInstructions.SetActive(true);
             textScript.ChangeTextFcn("Thanks for playing!");
         }
         else
@@ -392,7 +441,7 @@ public class mergedScript : MonoBehaviour
 
     public void HandleTopSphereTouched()
     {
-        textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
+        //textScript.ChangeTextFcn("Good job! Please keep sitting straight until further instructions.");
 
         // Set a random wait time between 1s and 2s
         waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
@@ -444,43 +493,43 @@ public class mergedScript : MonoBehaviour
             spheres[randomIndex].SetActive(true);
 
             // Set the game instruction based on the selected sphere
-            switch (randomIndex)
-            {
-                case 0:
-                    reach = "head";
-                    textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
-                    break;
-                case 1:
-                    reach = "head";
-                    textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
-                    break;
-                case 2:
-                    reach = "head";
-                    textScript.ChangeTextFcn("Please lean forward - touch the blue disk with your head");
-                    break;
-                case 3:
-                    reach = "head";
-                    textScript.ChangeTextFcn("Please lean backward - touch the blue disk with your head");
-                    break;
-                case 4:
-                    reach = "left";
-                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-                    break;
-                case 5:
-                    reach = "left";
-                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-                    break;
-                case 6:
-                    reach = "right";
-                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-                    break;
-                case 7:
-                    reach = "right";
-                    textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
-                    break;
-                default:
-                    break;
-            }
+            //switch (randomIndex)
+            //{
+            //    case 0:
+            //        reach = "head";
+            //        textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
+            //        break;
+            //    case 1:
+            //        reach = "head";
+            //        textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
+            //        break;
+            //    case 2:
+            //        reach = "head";
+            //        textScript.ChangeTextFcn("Please lean forward - touch the blue disk with your head");
+            //        break;
+            //    case 3:
+            //        reach = "head";
+            //        textScript.ChangeTextFcn("Please lean backward - touch the blue disk with your head");
+            //        break;
+            //    case 4:
+            //        reach = "left";
+            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+            //        break;
+            //    case 5:
+            //        reach = "left";
+            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+            //        break;
+            //    case 6:
+            //        reach = "right";
+            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+            //        break;
+            //    case 7:
+            //        reach = "right";
+            //        textScript.ChangeTextFcn("Please touch the golden sphere with your " + reach + " hand");
+            //        break;
+            //    default:
+            //        break;
+            //}
 
         }
     }

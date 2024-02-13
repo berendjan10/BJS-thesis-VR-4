@@ -6,11 +6,11 @@ using UnityEngine;
 public class Lefthandscript : MonoBehaviour
 {
     [SerializeField] private GameObject gameManagerOwner;
-    private GameManagerExp1 gameManagerExp1; // Reference to the GameManagerExp1 script
+    private mergedScript gameManagerExp1; // Reference to the GameManagerExp1 script
     
     void Start()
     {
-        gameManagerExp1 = gameManagerOwner.GetComponent<GameManagerExp1>();
+        gameManagerExp1 = gameManagerOwner.GetComponent<mergedScript>();
     }
 
     void OnTriggerEnter(Collider other) // when the hand touches a sphere
