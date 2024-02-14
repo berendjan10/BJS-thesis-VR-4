@@ -7,8 +7,7 @@ using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 //using static OVRTask<TResult>;
 using System.IO;
-
-
+using UnityEditor.ShaderGraph.Drawing;
 
 public class GameScript : MonoBehaviour
 {
@@ -92,6 +91,9 @@ public class GameScript : MonoBehaviour
 
     public InputActionProperty thumbButtonA;
 
+    private int totalScore = 0;
+
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -160,10 +162,12 @@ public class GameScript : MonoBehaviour
             while (scoreSaved == false)
             {
                 float errordistance = Vector3.Distance(alienAntenna.transform.position, currentGoal.transform.position);
+                int score = Mathf.RoundToInt(500 - errordistance*1000);
+                totalScore += score;
                 Debug.Log("Position antenna: " + errordistance);
                 topGoal.SetActive(true);
                 currentGoal.SetActive(false);
-                scoreScript.ChangeTextFcn(errordistance.ToString());
+                scoreScript.ChangeTextFcn("+"+score.ToString()+"!");
                 StartCoroutine(ShowScore());
                 scoreSaved = true;
             }
@@ -185,7 +189,7 @@ public class GameScript : MonoBehaviour
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
-            gameInstructions.transform.localPosition = new Vector3(0f, 1.189f, 1.042f);
+            //gameInstructions.transform.localPosition = new Vector3(0f, 1.189f, 1.042f);
 
         }
 
@@ -223,7 +227,7 @@ public class GameScript : MonoBehaviour
 
             // mirror is not needed in 1PP
             mirror.SetActive(false);
-            gameInstructions.transform.localPosition = new Vector3(0f, 1.442f, 0.394f);
+            //gameInstructions.transform.localPosition = new Vector3(0f, 1.442f, 0.394f);
 
         }
 
@@ -289,7 +293,7 @@ public class GameScript : MonoBehaviour
         float localTime = 0f;
         scoreText.SetActive(true);
         
-        while (localTime < 1)
+        while (localTime < 2) // 2 seconds visible
         {
             localTime += Time.deltaTime;
             yield return null;
@@ -299,15 +303,17 @@ public class GameScript : MonoBehaviour
     }
 
     // Collision
-    void OnTriggerEnter(Collider other) // when the hand touches a sphere   
+    void OnTriggerEnter(Collider other) // when the hand touches a sphere
     {
+        print("inside trigger function, checking if top...");
         if (other.gameObject.CompareTag("GameTargetTop"))
         {
+            print("tag other object is GameTargetTop, if-loop entered");
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
+            print("gameobject successfully deactivated");
 
-            // Set a random wait time between 1s and 2s
-            waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+            //waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
 
             // Call the function to generate a new random game instruction after the wait period
             StartCoroutine(WaitAndSetRandomGoal());
@@ -345,25 +351,35 @@ public class GameScript : MonoBehaviour
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomGoal()
     {
+        print("inside coroutine WaitAndSetRandomGoal");
+        // Set a random wait time between 1s and 2s
+        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+        print("waitTime = " + waitTime);
         float elapsedTime = 0f;
+        print("elapsedTime = " + elapsedTime);
 
         // Continue waiting until the elapsed time reaches the randomly chosen wait time
         while (elapsedTime < waitTime)
         {
+            print("inside wait-while-loop");
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
-
+            print("elapsedTime = " + elapsedTime);
             // Wait for the next frame
             yield return null;
+            // INSIDE THIS LOOP UNITY CRASHES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
         }
+        print("coroutine wait successfully finished. Now calling SetRandomGoal...");
 
         // Call the function to generate a new random game instruction
-        SetRandomGoal();
+        SetRandomGoal(); // en deze heeft die eerder al succesvol gebruikt...
     }
 
     // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
     IEnumerator WaitAndHandleDiskTouched()
     {
+        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+        print("waitTime = " + waitTime);
         float elapsedTime = 0f;
 
         // Continue waiting until the elapsed time reaches the randomly chosen wait time
@@ -396,6 +412,7 @@ public class GameScript : MonoBehaviour
 
     void SetRandomGoal()
     {
+        print("inside SetRandomGoal");
         // Increment the instruction counter
         instructionCounter++;
         print("instructionCounter: " + instructionCounter);
@@ -425,12 +442,21 @@ public class GameScript : MonoBehaviour
         {
             // Generate a random index to choose the next sphere
             int randomIndex;
-            do
+
+            if (goals.Count >= 1)
             {
-                randomIndex = Random.Range(0, goals.Count); 
-            } while (goals[randomIndex] == previousGoal);
+                randomIndex = 0;
+            }
+            else
+            {
+                do
+                {
+                    randomIndex = Random.Range(0, goals.Count);
+                } while (goals[randomIndex] == previousGoal);
+            }
             previousGoal = goals[randomIndex];
             currentGoal = goals[randomIndex];
+
             // Enable the selected sphere
             StartCoroutine(FlashGoal(goals[randomIndex]));
 

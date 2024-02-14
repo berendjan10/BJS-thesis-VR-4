@@ -1944,7 +1944,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &77145752
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2052,7 +2052,7 @@ Transform:
   m_GameObject: {fileID: 77145751}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.187, y: 1.4109999, z: 0.0165}
+  m_LocalPosition: {x: -0.187, y: 1.4109999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2246,7 +2246,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: start
+  m_text: A sphere will appear shortly, pay close attention to its location. Move
+    your red antenna to that location and press the trigger button with your right
+    index finger. The closer you are to the real location of the sphere, the more
+    points you will earn. Speed does not matter.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3047,7 +3050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &121144747
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3155,7 +3158,7 @@ Transform:
   m_GameObject: {fileID: 121144746}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.362, y: 1.3289999, z: 0.0165}
+  m_LocalPosition: {x: -0.362, y: 1.3289999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -9983,7 +9986,7 @@ MonoBehaviour:
   waitTimeUpperLimit: 3
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
   deviationType: 0
-  instructionDuration: 10
+  instructionDuration: 0
   flashTime: 30
   topGoal: {fileID: 1650661896}
   goal1: {fileID: 1265573048}
@@ -12730,7 +12733,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &773340521
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -12838,7 +12841,7 @@ Transform:
   m_GameObject: {fileID: 773340520}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.36200002, y: 1.3289999, z: 0.0165}
+  m_LocalPosition: {x: 0.36200002, y: 1.3289999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -14213,7 +14216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0747732226707b84dbbb90b927fce639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManagerOwner: {fileID: 595502763}
 --- !u!1001 &848772500
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20370,7 +20372,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1265573049
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -20478,7 +20480,7 @@ Transform:
   m_GameObject: {fileID: 1265573048}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.187, y: 1.4109999, z: 0.0165}
+  m_LocalPosition: {x: 0.187, y: 1.4109999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -24970,7 +24972,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1638425134
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -25078,7 +25080,7 @@ Transform:
   m_GameObject: {fileID: 1638425133}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.284, y: 1.3809999, z: 0.0165}
+  m_LocalPosition: {x: 0.284, y: 1.3809999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -25455,7 +25457,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1650661897
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -25563,7 +25565,7 @@ Transform:
   m_GameObject: {fileID: 1650661896}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.435, z: 0.0165}
+  m_LocalPosition: {x: 0, y: 1.435, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -29840,7 +29842,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8f540065d21a44c91b0f0d7dd486e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManagerOwner: {fileID: 595502763}
 --- !u!4 &1949142077 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2222111361405018444, guid: 88f2fd29f58b9734683512546acec310,
@@ -31958,7 +31959,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &2072288558
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -32066,7 +32067,7 @@ Transform:
   m_GameObject: {fileID: 2072288557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.284, y: 1.3809999, z: 0.0165}
+  m_LocalPosition: {x: -0.284, y: 1.3809999, z: -0.1016}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
