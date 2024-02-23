@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 //using static OVRTask<TResult>;
 using System.IO;
 using UnityEditor.ShaderGraph.Drawing;
+using TMPro;
 
 public class GameScript : MonoBehaviour
 {
@@ -37,9 +38,9 @@ public class GameScript : MonoBehaviour
     public GameObject goal1;
     public GameObject goal2;
     public GameObject goal3;
-    public GameObject goal4;
-    public GameObject goal5;
-    public GameObject goal6;
+    public GameObject goalmin1;
+    public GameObject goalmin2;
+    public GameObject goalmin3;
 
     [SerializeField] private GameObject avatar;
 
@@ -93,6 +94,7 @@ public class GameScript : MonoBehaviour
 
     private int totalScore = 0;
 
+    public TextMeshProUGUI textMeshProToChange;
 
     void Start()
     {
@@ -113,19 +115,11 @@ public class GameScript : MonoBehaviour
         avatar.transform.localScale = new Vector3(scale, scale, scale);
 
         // Initialize the list with all sphere game objects
-        // goals = new List<GameObject> { goal1, goal2, goal3, goal4, goal5, goal6 };
-        goals = new List<GameObject> { goal1 };
+        goals = new List<GameObject> { goal1, goal2, goal3, goalmin1, goalmin2, goalmin3 };
+        // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
-
-        // Disable all spheres (just to be sure)
-        foreach (GameObject sphere in goals)
-        {
-            sphere.SetActive(false);
-        }
-        scoreText.SetActive(false);
-        topGoal.SetActive(false);
 
         if (deviatePercentage < 0)
         {
@@ -156,23 +150,6 @@ public class GameScript : MonoBehaviour
 
         scoreScript = scoreText.GetComponent<ChangeText>();
 
-        if (triggerValue == 1 || Input.GetKeyDown("space")) // press trigger button or spacebar to save score
-        {
-            // check currentgoal feedback to scoreScript.ChangeTextFcn()
-            while (scoreSaved == false)
-            {
-                float errordistance = Vector3.Distance(alienAntenna.transform.position, currentGoal.transform.position);
-                int score = Mathf.RoundToInt(500 - errordistance*1000);
-                totalScore += score;
-                Debug.Log("Position antenna: " + errordistance);
-                topGoal.SetActive(true);
-                currentGoal.SetActive(false);
-                scoreScript.ChangeTextFcn("+"+score.ToString()+"!");
-                StartCoroutine(ShowScore());
-                scoreSaved = true;
-            }
-        }
-
         /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
         currentTime += Time.deltaTime;
 
@@ -189,7 +166,7 @@ public class GameScript : MonoBehaviour
 
             // mirror is needed in 1PP
             mirror.SetActive(true);
-            //gameInstructions.transform.localPosition = new Vector3(0f, 1.189f, 1.042f);
+            //gameInstructions.transform.localPosition = new Vector3(0f, 1.189f, 1.042f); // move gameinstructions
 
         }
 
@@ -211,11 +188,11 @@ public class GameScript : MonoBehaviour
                     transitionTime += Time.deltaTime;
                     transitionLerpValue = lerpTransition(transitionTime);
                     // transition camera view
-                    cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, (standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
+                    cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
                     // transition avatar head & hands positions, compensate for camera offset
-                    transform.position = Vector3.Lerp(hmdTarget.position, (hmdTarget.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue); //// HMD
-                    leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, (leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
-                    rightHandTargetFollow.transform.position = Vector3.Lerp(rightHandTarget.transform.position, (rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition), transitionLerpValue);
+                    transform.position = Vector3.Lerp(hmdTarget.position, hmdTarget.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue); //// HMD
+                    leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
+                    rightHandTargetFollow.transform.position = Vector3.Lerp(rightHandTarget.transform.position, rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
 
 
                 }
@@ -227,7 +204,7 @@ public class GameScript : MonoBehaviour
 
             // mirror is not needed in 1PP
             mirror.SetActive(false);
-            //gameInstructions.transform.localPosition = new Vector3(0f, 1.442f, 0.394f);
+            //gameInstructions.transform.localPosition = new Vector3(0f, 1.442f, 0.394f); // move gameinstructions
 
         }
 
@@ -281,7 +258,7 @@ public class GameScript : MonoBehaviour
             start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
         }
 
-        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center; /////////////////////////////////////////////////// slerp overwrites position? 
+        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center; /////////////////////////////////////////////////// slerp overwrites position? Keertje met debug functie op de tu uitzoeken
 
         // both perspectives
         transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
@@ -303,15 +280,12 @@ public class GameScript : MonoBehaviour
     }
 
     // Collision
-    void OnTriggerEnter(Collider other) // when the hand touches a sphere
+    void OnTriggerEnter(Collider other) // when the head touches a goal
     {
-        print("inside trigger function, checking if top...");
         if (other.gameObject.CompareTag("GameTargetTop"))
         {
-            print("tag other object is GameTargetTop, if-loop entered");
             // Disable the sphere that was touched
             other.gameObject.SetActive(false);
-            print("gameobject successfully deactivated");
 
             //waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
 
@@ -338,7 +312,6 @@ public class GameScript : MonoBehaviour
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
-            print("elapsed time: " + elapsedTime);
             // Wait for the next frame
             yield return null;
         }
@@ -351,23 +324,17 @@ public class GameScript : MonoBehaviour
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomGoal()
     {
-        print("inside coroutine WaitAndSetRandomGoal");
         // Set a random wait time between 1s and 2s
         waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
-        print("waitTime = " + waitTime);
         float elapsedTime = 0f;
-        print("elapsedTime = " + elapsedTime);
 
         // Continue waiting until the elapsed time reaches the randomly chosen wait time
         while (elapsedTime < waitTime)
         {
-            print("inside wait-while-loop");
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
-            print("elapsedTime = " + elapsedTime);
             // Wait for the next frame
             yield return null;
-            // INSIDE THIS LOOP UNITY CRASHES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
         }
         print("coroutine wait successfully finished. Now calling SetRandomGoal...");
 
@@ -412,7 +379,6 @@ public class GameScript : MonoBehaviour
 
     void SetRandomGoal()
     {
-        print("inside SetRandomGoal");
         // Increment the instruction counter
         instructionCounter++;
         print("instructionCounter: " + instructionCounter);
@@ -443,7 +409,7 @@ public class GameScript : MonoBehaviour
             // Generate a random index to choose the next sphere
             int randomIndex;
 
-            if (goals.Count >= 1)
+            if (goals.Count <= 1)
             {
                 randomIndex = 0;
             }
@@ -457,31 +423,14 @@ public class GameScript : MonoBehaviour
             previousGoal = goals[randomIndex];
             currentGoal = goals[randomIndex];
 
-            // Enable the selected sphere
-            StartCoroutine(FlashGoal(goals[randomIndex]));
+            // Make selected number red
+            textMeshProToChange = currentGoal.GetComponentInChildren<TextMeshProUGUI>();
+            ChangeColor(textMeshProToChange, Color.red);
 
         }
     }
 
-    // Co-routine
-    IEnumerator FlashGoal(GameObject goal)
-    {
-        float elapsedTime = 0f;
-        goal.SetActive(true);
 
-        // Wait
-        while (elapsedTime < flashTime)
-        {
-            // Increment the elapsed time using Time.deltaTime
-            elapsedTime += Time.deltaTime;
-
-            // Wait for the next frame
-            yield return null;
-        }
-
-        // Call the function to handle the logic after touching a sphere
-        goal.SetActive(false);
-    }
 
     // Function to generate a collection of instruction counters for deviating trials
     void GenerateDeviatingTrials(int count)
@@ -490,7 +439,7 @@ public class GameScript : MonoBehaviour
 
         while (deviatingTrials.Count < count)
         {
-            int trial = Random.Range((phaseOneInstructions + 1), (phaseOneInstructions + phaseTwoInstructions + 1));
+            int trial = Random.Range(phaseOneInstructions + 1, phaseOneInstructions + phaseTwoInstructions + 1);
             if (0 <= deviatePercentage && deviatePercentage <= 50)
             {
                 if (!deviatingTrials.Contains(trial) && !deviatingTrials.Contains(trial - 1)) // second argument avoids 2 consecutive deviating trials
@@ -575,5 +524,38 @@ public class GameScript : MonoBehaviour
         return deviationLerpValue;
     }
 
+
+        // Co-routine
+    IEnumerator FlashGoal(GameObject goal)
+    {
+        float elapsedTime = 0f;
+        goal.SetActive(true);
+
+        // Wait
+        while (elapsedTime < flashTime)
+        {
+            // Increment the elapsed time using Time.deltaTime
+            elapsedTime += Time.deltaTime;
+
+            // Wait for the next frame
+            yield return null;
+        }
+
+        // Call the function to handle the logic after touching a sphere
+        goal.SetActive(false);
+    }
+
+    // Call this method to change the text color
+    public void ChangeColor(TextMeshProUGUI textMeshProToChange, Color newColor)
+    {
+        if(textMeshProToChange != null)
+        {
+            textMeshProToChange.color = newColor;
+        }
+        else
+        {
+            Debug.LogWarning("TextMeshPro reference is missing!");
+        }
+    }
 
 }
