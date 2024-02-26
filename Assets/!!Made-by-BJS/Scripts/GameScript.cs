@@ -98,6 +98,8 @@ public class GameScript : MonoBehaviour
 
     public TextMeshPro textMeshProToChange;
 
+    private string gameState; // "Waiting for user to touch goal" "Waiting for user to sit straight"
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -126,12 +128,12 @@ public class GameScript : MonoBehaviour
         if (deviatePercentage < 0)
         {
             deviatePercentage = 0;
-            print("Deviate Percentage cannot be lower than 0. It is set to 0");
+            Debug.LogWarning("Deviate Percentage cannot be lower than 0. It is set to 0");
         }
         else if (deviatePercentage > 100)
         {
             deviatePercentage = 100;
-            print("Deviate Percentage cannot be greater than 100. It is set to 100");
+            Debug.LogWarning("Deviate Percentage cannot be greater than 100. It is set to 100");
         }
         // Calculate the number of trials that should deviate based on deviate_percentage
         int deviatingTrialsCount = Mathf.RoundToInt((float)(deviatePercentage * phaseTwoInstructions) / 100);
@@ -284,21 +286,21 @@ public class GameScript : MonoBehaviour
     // Collision collider
     void OnTriggerEnter(Collider other) // when the head touches a goal
     {
-        print("collision with " + other.gameObject);
-        if (other.gameObject == currentGoal)
+        if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal)
         {
-            print("collision with currentGoal!");
-            ChangeTextColor(other.gameObject, Color.black);
+            print("yay goal touched!");
+            ChangeTextColor(currentGoal, Color.black);
             ChangeTextColor(topGoal, Color.red);
+            gameState = "Waiting for user to sit straight";
+            print(gameState);
         }
-        else if (other.gameObject == topGoal)
+        else if (gameState == "Waiting for user to sit straight" && other.gameObject == topGoal)
         {
-            // Disable the sphere that was touched
+            print("yay sitting straight!");
+
             ChangeTextColor(topGoal, Color.black);
 
             waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
-
-            // Call the function to generate a new random game instruction after the wait period
             StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
         }
     }
@@ -344,16 +346,14 @@ public class GameScript : MonoBehaviour
             // Wait for the next frame
             yield return null;
         }
-        print("coroutine wait successfully finished. Now calling SetRandomGoal...");
 
         // Call the function to generate a new random game instruction
-        SetRandomGoal(); // en deze heeft die eerder al succesvol gebruikt...
+        SetRandomGoal();
     }
 
     // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
     IEnumerator WaitAndHandleDiskTouched(float waitTime1)
     {
-        print("waitTime = " + waitTime1);
         float elapsedTime = 0f;
 
         // Continue waiting until the elapsed time reaches the wait time
@@ -428,9 +428,9 @@ public class GameScript : MonoBehaviour
             }
             previousGoal = goals[randomIndex];
             currentGoal = goals[randomIndex];
-            print("randomIndex: " + randomIndex);
-            print("previousGoal: " + previousGoal);
-            print("currectGoal: " + currentGoal);
+
+            gameState = "Waiting for user to touch goal";
+            print(gameState);
 
             // Make selected number red
             ChangeTextColor(currentGoal, Color.red);
@@ -558,7 +558,6 @@ public class GameScript : MonoBehaviour
     {
         textMeshProToChange = gameobjectt.GetComponentInChildren<TextMeshPro>();
 
-        print("textMeshProToChange: " + textMeshProToChange);
         if (textMeshProToChange != null)
         {
             textMeshProToChange.color = newColor;
