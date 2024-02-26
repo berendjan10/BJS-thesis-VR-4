@@ -13,7 +13,7 @@ public class HeadCollisionHandler : MonoBehaviour
         gameManagerExp1 = gameManagerOwner.GetComponent<GameManagerExp1>();
     }
 
-    void OnTriggerEnter(Collider other) // when the hand touches a sphere
+    void OnTriggerEnter(Collider other) // when the  touches a sphere
     {
         // Check if the collided object has the tag "GameTarget"
         if (other.gameObject.CompareTag("GameTarget")) //  && gameManagerExp1.GetReach() == "head")

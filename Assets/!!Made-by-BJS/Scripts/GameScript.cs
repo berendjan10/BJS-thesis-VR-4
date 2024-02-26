@@ -50,6 +50,8 @@ public class GameScript : MonoBehaviour
     private ChangeText textScript; // Reference to the ChangeText script
     private ChangeText scoreScript;
     private float waitTime;
+    private float waitBeforeNextInstruction;
+    private float waitDeviationDuration;
     private int instructionCounter = 0; // Counter to keep track of the number of instructions given
     private bool deviate = false;
     private List<int> deviatingTrials;
@@ -94,7 +96,7 @@ public class GameScript : MonoBehaviour
 
     private int totalScore = 0;
 
-    public TextMeshProUGUI textMeshProToChange;
+    public TextMeshPro textMeshProToChange;
 
     void Start()
     {
@@ -279,18 +281,25 @@ public class GameScript : MonoBehaviour
         scoreText.SetActive(false);
     }
 
-    // Collision
+    // Collision collider
     void OnTriggerEnter(Collider other) // when the head touches a goal
     {
-        if (other.gameObject.CompareTag("GameTargetTop"))
+        print("collision with " + other.gameObject);
+        if (other.gameObject == currentGoal)
+        {
+            print("collision with currentGoal!");
+            ChangeTextColor(other.gameObject, Color.black);
+            ChangeTextColor(topGoal, Color.red);
+        }
+        else if (other.gameObject == topGoal)
         {
             // Disable the sphere that was touched
-            other.gameObject.SetActive(false);
+            ChangeTextColor(topGoal, Color.black);
 
-            //waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+            waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
 
             // Call the function to generate a new random game instruction after the wait period
-            StartCoroutine(WaitAndSetRandomGoal());
+            StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
         }
     }
 
@@ -322,14 +331,13 @@ public class GameScript : MonoBehaviour
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
-    IEnumerator WaitAndSetRandomGoal()
+    IEnumerator WaitAndSetRandomGoal(float waitTime0)
     {
         // Set a random wait time between 1s and 2s
-        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
         float elapsedTime = 0f;
 
         // Continue waiting until the elapsed time reaches the randomly chosen wait time
-        while (elapsedTime < waitTime)
+        while (elapsedTime < waitTime0)
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
@@ -343,14 +351,13 @@ public class GameScript : MonoBehaviour
     }
 
     // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
-    IEnumerator WaitAndHandleDiskTouched()
+    IEnumerator WaitAndHandleDiskTouched(float waitTime1)
     {
-        waitTime = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
-        print("waitTime = " + waitTime);
+        print("waitTime = " + waitTime1);
         float elapsedTime = 0f;
 
-        // Continue waiting until the elapsed time reaches the randomly chosen wait time
-        while (elapsedTime < waitTime)
+        // Continue waiting until the elapsed time reaches the wait time
+        while (elapsedTime < waitTime1)
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
@@ -372,8 +379,7 @@ public class GameScript : MonoBehaviour
         }
         else
         {
-
-            //textScript.ChangeTextFcn("Good job! Please sit straight up now.");
+            ChangeTextColor(topGoal, Color.red);
         }
     }
 
@@ -390,16 +396,16 @@ public class GameScript : MonoBehaviour
             // Get a reference to the AvatarHeadMovement instance
 
             // random direction generator 
-            int randomDirection = Random.Range(0, 2); // only left and right!!!
+            int randomDirection = Random.Range(0, 2); // only left and right!!!??   TODO: change back
             if (deviationType == devType.sineWave)
             {
-                waitTime = deviationDuration;
-                StartCoroutine(WaitAndHandleDiskTouched());
+                waitDeviationDuration = deviationDuration;
+                StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
             }
             else if (deviationType == devType.forthPauseBack)
             {
-                waitTime = deviationDuration + pauseAtGoal;
-                StartCoroutine(WaitAndHandleDiskTouched());
+                waitDeviationDuration = deviationDuration + pauseAtGoal;
+                StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
             } 
 
             // now. there is no golden sphere to activate a trigger.
@@ -422,10 +428,12 @@ public class GameScript : MonoBehaviour
             }
             previousGoal = goals[randomIndex];
             currentGoal = goals[randomIndex];
+            print("randomIndex: " + randomIndex);
+            print("previousGoal: " + previousGoal);
+            print("currectGoal: " + currentGoal);
 
             // Make selected number red
-            textMeshProToChange = currentGoal.GetComponentInChildren<TextMeshProUGUI>();
-            ChangeColor(textMeshProToChange, Color.red);
+            ChangeTextColor(currentGoal, Color.red);
 
         }
     }
@@ -546,9 +554,12 @@ public class GameScript : MonoBehaviour
     }
 
     // Call this method to change the text color
-    public void ChangeColor(TextMeshProUGUI textMeshProToChange, Color newColor)
+    public void ChangeTextColor(GameObject gameobjectt, Color newColor)
     {
-        if(textMeshProToChange != null)
+        textMeshProToChange = gameobjectt.GetComponentInChildren<TextMeshPro>();
+
+        print("textMeshProToChange: " + textMeshProToChange);
+        if (textMeshProToChange != null)
         {
             textMeshProToChange.color = newColor;
         }
