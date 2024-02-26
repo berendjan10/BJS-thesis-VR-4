@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using System.IO;
 using UnityEditor.ShaderGraph.Drawing;
 using TMPro;
+using OVR.OpenVR;
 
 public class GameScript : MonoBehaviour
 {
@@ -38,9 +39,11 @@ public class GameScript : MonoBehaviour
     public GameObject goal1;
     public GameObject goal2;
     public GameObject goal3;
+    public GameObject goal4;
     public GameObject goalmin1;
     public GameObject goalmin2;
     public GameObject goalmin3;
+    public GameObject goalmin4;
 
     [SerializeField] private GameObject avatar;
 
@@ -53,7 +56,7 @@ public class GameScript : MonoBehaviour
     private float waitBeforeNextInstruction;
     private float waitDeviationDuration;
     private int instructionCounter = 0; // Counter to keep track of the number of instructions given
-    private bool deviate = false;
+    private bool thisTrialContainsDeviation = false;
     private List<int> deviatingTrials;
     private string reach;
     private GameObject previousGoal;
@@ -88,7 +91,7 @@ public class GameScript : MonoBehaviour
 
     public GameObject scoreText;
 
-    private int deviationDirection;
+    private int deviationDirection; // 0 = less far 1 = further
 
     private bool scoreSaved;
 
@@ -96,9 +99,11 @@ public class GameScript : MonoBehaviour
 
     private int totalScore = 0;
 
-    public TextMeshPro textMeshProToChange;
+    private TextMeshPro textMeshProToChange;
 
     private string gameState; // "Waiting for user to touch goal" "Waiting for user to sit straight"
+
+    public Transform myMeasuredPivotPoint;
 
     void Start()
     {
@@ -119,7 +124,7 @@ public class GameScript : MonoBehaviour
         avatar.transform.localScale = new Vector3(scale, scale, scale);
 
         // Initialize the list with all sphere game objects
-        goals = new List<GameObject> { goal1, goal2, goal3, goalmin1, goalmin2, goalmin3 };
+        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
@@ -149,6 +154,14 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if (thisTrialContainsDeviation)
+        //{
+        //}
+        float angler = Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y); // radians!!!
+        float angler_deg = (float)(angler * 360 / (2 * Math.PI));
+        print("angle HMD position:" + angler_deg);
+        // TODO: put in if-loop above, vergelijk met goalrotatie*(-1). zodra deze >= 80% van goalrotatie*(-1) dan begint de deviation/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         // controller trigger button press
         float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
 
@@ -290,8 +303,8 @@ public class GameScript : MonoBehaviour
         {
             print("yay goal touched!");
             ChangeTextColor(currentGoal, Color.black);
-            ChangeTextColor(topGoal, Color.red);
             gameState = "Waiting for user to sit straight";
+            ChangeTextColor(topGoal, Color.red);
             print(gameState);
         }
         else if (gameState == "Waiting for user to sit straight" && other.gameObject == topGoal)
@@ -301,6 +314,7 @@ public class GameScript : MonoBehaviour
             ChangeTextColor(topGoal, Color.black);
 
             waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+            gameState = "Waiting before next instruction is given";
             StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
         }
     }
@@ -351,37 +365,37 @@ public class GameScript : MonoBehaviour
         SetRandomGoal();
     }
 
-    // Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
-    IEnumerator WaitAndHandleDiskTouched(float waitTime1)
-    {
-        float elapsedTime = 0f;
+    //// Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
+    //IEnumerator WaitAndHandleDiskTouched(float waitTime1)
+    //{
+    //    float elapsedTime = 0f;
 
-        // Continue waiting until the elapsed time reaches the wait time
-        while (elapsedTime < waitTime1)
-        {
-            // Increment the elapsed time using Time.deltaTime
-            elapsedTime += Time.deltaTime;
+    //    // Continue waiting until the elapsed time reaches the wait time
+    //    while (elapsedTime < waitTime1)
+    //    {
+    //        // Increment the elapsed time using Time.deltaTime
+    //        elapsedTime += Time.deltaTime;
 
-            // Wait for the next frame
-            yield return null;
-        }
+    //        // Wait for the next frame
+    //        yield return null;
+    //    }
 
-        // Call the function to handle the logic after touching a sphere
-        HandleDiskTouched();
-    }
+    //    // Call the function to handle the logic after touching a sphere
+    //    HandleDiskTouched();
+    //}
 
-    public void HandleDiskTouched()
-    {
-        if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
-        {
-            gameInstructions.SetActive(true);
-            textScript.ChangeTextFcn("Thanks for playing!");
-        }
-        else
-        {
-            ChangeTextColor(topGoal, Color.red);
-        }
-    }
+    //public void HandleDiskTouched()
+    //{
+    //    if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
+    //    {
+    //        gameInstructions.SetActive(true);
+    //        textScript.ChangeTextFcn("Thanks for playing!");
+    //    }
+    //    else
+    //    {
+    //        ChangeTextColor(topGoal, Color.red);
+    //    }
+    //}
 
     void SetRandomGoal()
     {
@@ -390,25 +404,25 @@ public class GameScript : MonoBehaviour
         print("instructionCounter: " + instructionCounter);
         scoreSaved = false;
 
-        deviate = deviatingTrials.Contains(instructionCounter);
-        if (deviate) // TODO: nog aanpassen.
+        thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
+        if (thisTrialContainsDeviation) // TODO: nog aanpassen.
         {
-            // Get a reference to the AvatarHeadMovement instance
+            //// Get a reference to the AvatarHeadMovement instance
 
-            // random direction generator 
-            int randomDirection = Random.Range(0, 2); // only left and right!!!??   TODO: change back
-            if (deviationType == devType.sineWave)
-            {
-                waitDeviationDuration = deviationDuration;
-                StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
-            }
-            else if (deviationType == devType.forthPauseBack)
-            {
-                waitDeviationDuration = deviationDuration + pauseAtGoal;
-                StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
-            } 
+            //// random direction generator 
+            //deviationDirection = Random.Range(0, 2); // left and right
+            //if (deviationType == devType.sineWave)
+            //{
+            //    waitDeviationDuration = deviationDuration;
+            //    StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
+            //}
+            //else if (deviationType == devType.forthPauseBack)
+            //{
+            //    waitDeviationDuration = deviationDuration + pauseAtGoal;
+            //    StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
+            //} 
 
-            // now. there is no golden sphere to activate a trigger.
+            //// now. there is no golden sphere to activate a trigger.
         }
         else
         {
