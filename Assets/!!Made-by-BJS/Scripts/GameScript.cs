@@ -10,8 +10,12 @@ using System.IO;
 using UnityEditor.ShaderGraph.Drawing;
 using TMPro;
 using OVR.OpenVR;
+using UnityEngine.UI;
 
-
+// DONE: deviation begint al in het midden. percentage berekening is niet goed.
+// DOING: deviation blijft vast in een loop en hij gaat ook omhoog. zoek waarom ie niet uitgaat
+// DONE: en scale de goals terug.
+// TODO: hoofd schiet tijdens deviation verder naar voren (Z). na deviation is er een offset. check welke z waarde die pakt. haal evt eerst de lines weg waarin ie Z negeert
 
 public class GameScript : MonoBehaviour
 {
@@ -109,15 +113,19 @@ public class GameScript : MonoBehaviour
 
     private bool currentlyDeviating = false;
 
+    private float goalRotation;
+
     public float closerDeviationCutoff = 0.6f;
     public float fartherDeviationCutoff = 0.8f;
     private float deviationCutoff;
     private GameObject deviationGoal;
 
+    private bool animationTriggered = false;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
-        print("headReference" + headReference.transform.position); 
+        //print("headReference" + headReference.transform.position); 
 
         // scale down avatar & targets based on participant height
         if (gender == gendr.male)
@@ -171,12 +179,21 @@ public class GameScript : MonoBehaviour
         if (thisTrialContainsDeviation)
         {
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
-            print("angle HMD position:" + angle);
-            float goalRotation2 = currentGoal.transform.rotation.z;
-            if (angle / goalRotation2 >= deviationCutoff)
+            //print("angle / goalRotation >= deviationCutoff...?");
+            //print("HMD position angle:" + angle);
+            //print("goalRotation: " + goalRotation);
+            //print("angle / goalRotation: " + angle / goalRotation);
+            //print("deviationCutoff" + deviationCutoff);
+            //print("animationTriggered" + animationTriggered);
+            //print("currentlyDeviating" + currentlyDeviating);
+            if (angle / goalRotation >= deviationCutoff)
             {
-                deviationClock = 0;
-                currentlyDeviating = true;
+                if (!animationTriggered)
+                {
+                    currentlyDeviating = true;
+                    deviationClock = 0;
+                    animationTriggered = true;
+                }
             }
         }
         else if (!thisTrialContainsDeviation)
@@ -309,8 +326,8 @@ public class GameScript : MonoBehaviour
 
             // determine deviation position
             Vector3 lerpielerpie = Vector3.Slerp(start, end, deviationLerpValue) + center;
-            // only alter X & Y. Z-position (fore-aft) is still tracked.
-            lerpielerpie.z = start.z;
+            //// only alter X & Y. Z-position (fore-aft) is still tracked.
+            //lerpielerpie.z = start.z;
             transform.position = lerpielerpie;
 
             // both perspectives
@@ -457,10 +474,14 @@ public class GameScript : MonoBehaviour
         }
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
+        print("currentGoal: " + currentGoal);
 
         // Determine deviation goal
         if (thisTrialContainsDeviation)
         {
+            animationTriggered = false;
+            goalRotation = currentGoal.transform.eulerAngles.z;
+            if (goalRotation > 180) { goalRotation -= 360; }
             // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
             if (randomIndex == 0 || randomIndex == 4)
             {
@@ -474,11 +495,12 @@ public class GameScript : MonoBehaviour
             {
                 deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
             }
+            print("deviation direction: " + deviationDirection);
 
             if (deviationDirection == 0)
             {
                 deviationCutoff = closerDeviationCutoff;
-                try { deviationGoal = goals[randomIndex + 1]; }
+                try { deviationGoal = goals[randomIndex - 1]; }
                 catch (IndexOutOfRangeException e)
                 {
                     Debug.LogError("Deviation aborted. Index is out of range: " + e.Message);
@@ -488,7 +510,7 @@ public class GameScript : MonoBehaviour
             else if (deviationDirection == 1)
             {
                 deviationCutoff = fartherDeviationCutoff;
-                try { deviationGoal = goals[randomIndex - 1]; }
+                try { deviationGoal = goals[randomIndex + 1]; }
                 catch (IndexOutOfRangeException e)
                 {
                     Debug.LogError("Deviation aborted. Index is out of range: " + e.Message);
@@ -501,6 +523,9 @@ public class GameScript : MonoBehaviour
             }
             deviationGoalPosition = deviationGoal.transform.position;
             deviationGoalRotation = deviationGoal.transform.rotation;
+            print("deviationGoal: " + deviationGoal);
+            print("deviationGoalPosition: " + deviationGoalPosition);
+            print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
 
