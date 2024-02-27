@@ -10446,15 +10446,15 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 50
-  phaseTwoInstructions: 15
-  deviatePercentage: 40
-  deviationDuration: 4
-  pauseAtGoal: 1
-  waitTimeLowerLimit: 1
-  waitTimeUpperLimit: 3
+  phaseOneInstructions: 10
+  phaseTwoInstructions: 50
+  deviatePercentage: 100
+  deviationDuration: 2
+  pauseAtGoal: 0.5
+  waitTimeLowerLimit: 0
+  waitTimeUpperLimit: 1
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
-  deviationType: 0
+  deviationType: 1
   instructionDuration: 1
   flashTime: 30
   topGoal: {fileID: 1225742808}
@@ -10491,7 +10491,29 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 3279264004350380116, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
+  thumbButtonB:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Thumb Button B
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: d692614a-c7a4-4ba6-b786-fee38a0eb3ab
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -4928370872940462309, guid: c348712bda248c246b8c49b3db54643f,
+      type: 3}
+  CameraOffsetRef: {fileID: 1378044564}
+  MainCamera: {fileID: 8315415}
   myMeasuredPivotPoint: {fileID: 781013527}
+  closerDeviationCutoff: 0.6
+  fartherDeviationCutoff: 0.8
+  hmdResetView: {fileID: 401317275}
+  head: {fileID: 8315416}
+  origin: {fileID: 401317278}
+  target: {fileID: 763024548}
+  XRORIGINN: {fileID: 401317277}
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13303,6 +13325,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 758815860}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &763024547
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 763024548}
+  m_Layer: 0
+  m_Name: HeadFixedTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &763024548
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763024547}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.206, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &765894418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23710,7 +23763,7 @@ Transform:
   m_GameObject: {fileID: 1378044564}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1176, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34572,9 +34625,9 @@ Transform:
   m_GameObject: {fileID: 2129731290}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.076, z: 0}
-  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1225742809}
   - {fileID: 1514667177}
@@ -34879,3 +34932,4 @@ SceneRoots:
   - {fileID: 2129731291}
   - {fileID: 781013527}
   - {fileID: 9987441}
+  - {fileID: 763024548}

@@ -11,11 +11,15 @@ using UnityEditor.ShaderGraph.Drawing;
 using TMPro;
 using OVR.OpenVR;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Unity.XR.CoreUtils;
 
 // DONE: deviation begint al in het midden. percentage berekening is niet goed.
-// DOING: deviation blijft vast in een loop en hij gaat ook omhoog. zoek waarom ie niet uitgaat
+// DONE: deviation blijft vast in een loop en hij gaat ook omhoog. zoek waarom ie niet uitgaat
 // DONE: en scale de goals terug.
-// TODO: hoofd schiet tijdens deviation verder naar voren (Z). na deviation is er een offset. check welke z waarde die pakt. haal evt eerst de lines weg waarin ie Z negeert
+// DONE: hoofd schiet tijdens deviation verder naar voren (Z). na deviation is er een offset. check welke z waarde die pakt. haal evt eerst de lines weg waarin ie Z negeert
+// DOING: implement in-game "reset view" button
+// TODO: test 3pp
 
 public class GameScript : MonoBehaviour
 {
@@ -102,6 +106,13 @@ public class GameScript : MonoBehaviour
     private bool scoreSaved;
 
     public InputActionProperty thumbButtonA;
+    public InputActionProperty thumbButtonB;
+
+    [SerializeField]
+    private GameObject CameraOffsetRef;
+
+    [SerializeField]
+    private GameObject MainCamera;
 
     private int totalScore = 0;
 
@@ -121,6 +132,20 @@ public class GameScript : MonoBehaviour
     private GameObject deviationGoal;
 
     private bool animationTriggered = false;
+
+    private float originalZ;
+
+    public GameObject hmdResetView;
+
+    public Transform head;
+    public Transform origin;
+    public Transform target;
+
+    private Vector3 offset;
+    private Vector3 targetForward;
+    private Vector3 cameraForward;
+    private float angle;
+    public XROrigin XRORIGINN;
 
     void Start()
     {
@@ -169,6 +194,8 @@ public class GameScript : MonoBehaviour
 
         // wait, remove text and SetRandomGoal
         StartCoroutine(WaitAndStartGame());
+
+        thumbButtonB.action.performed += OnThumbB;
 
     }
 
@@ -317,23 +344,59 @@ public class GameScript : MonoBehaviour
             if (!thirdPersonPerspective)
             {
                 start = hmdTarget.position - center;
+                originalZ = hmdTarget.position.z;
             }
             // third person perspective
             else if (thirdPersonPerspective)
             {
-                start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
+                Vector3 noCompensation = hmdTarget.position - thirdPersonPerspectiveOffsetPosition;
+                start = noCompensation - center;
+                originalZ = noCompensation.z;
             }
 
             // determine deviation position
             Vector3 lerpielerpie = Vector3.Slerp(start, end, deviationLerpValue) + center;
             //// only alter X & Y. Z-position (fore-aft) is still tracked.
-            //lerpielerpie.z = start.z;
+            lerpielerpie.z = originalZ;
             transform.position = lerpielerpie;
 
             // both perspectives
             transform.rotation = Quaternion.Slerp(hmdTarget.rotation, deviationGoalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
         }
     } // Update() end-
+
+    void OnThumbB(InputAction.CallbackContext context)
+    {
+        //doSomething
+        Debug.Log("B Pressed");
+        //Vector3 deltaOffset = hmdResetView.transform.position - MainCamera.transform.position;
+        //Debug.Log(deltaOffset);
+        //CameraOffsetRef.transform.position = new Vector3(deltaOffset.x, 0, deltaOffset.z);
+        //MainCamera.transform.rotation = Quaternion.identity;
+
+
+        //// method 2 https://stackoverflow.com/questions/76297143/in-unity-openxr-environment-how-to-reset-the-player-position-to-center
+        //offset = head.position - origin.position;
+        //offset.y = 0;
+        //origin.position = target.position + offset;
+
+        //targetForward = target.forward;
+        //targetForward.y = 0;
+        //cameraForward = head.forward;
+        //cameraForward.y = 0;
+
+        //angle = Vector3.SignedAngle(cameraForward, targetForward, Vector3.up);
+
+        //origin.RotateAround(head.position, Vector3.up, angle);
+
+        // Method 3 Valem
+        //XROrigin xrOrigin = GetComponent<XROrigin>();
+        //xrOrigin.MoveCameraToWorldLocation(target.position);
+        //xrOrigin.MatchOriginUpCameraForward(target.up, target.forward);
+
+        XRORIGINN.MoveCameraToWorldLocation(target.position);
+        XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
+    }
 
     IEnumerator ShowScore()
     {
