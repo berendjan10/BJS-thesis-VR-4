@@ -11,6 +11,8 @@ using UnityEditor.ShaderGraph.Drawing;
 using TMPro;
 using OVR.OpenVR;
 
+
+
 public class GameScript : MonoBehaviour
 {
     public GameObject headReference;
@@ -71,11 +73,11 @@ public class GameScript : MonoBehaviour
     private float deviationLerpValue = 0;
     private float currentTime; // clock
     private float transitionTime = 0; // clock
-    private float deviationCurrentTime = 3600;
-    private float deviationTimer2;
+    private float deviationClock = 3600;
+    private float deviationClock2;
 
-    private Vector3 goalPosition;
-    private Quaternion goalRotation;
+    private Vector3 deviationGoalPosition;
+    private Quaternion deviationGoalRotation;
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
     [SerializeField] private GameObject gameInstructions;
@@ -105,6 +107,13 @@ public class GameScript : MonoBehaviour
 
     public Transform myMeasuredPivotPoint;
 
+    private bool currentlyDeviating = false;
+
+    public float closerDeviationCutoff = 0.6f;
+    public float fartherDeviationCutoff = 0.8f;
+    private float deviationCutoff;
+    private GameObject deviationGoal;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -118,6 +127,10 @@ public class GameScript : MonoBehaviour
         else if (gender == gendr.female)
         {
             scale = Mathf.Pow(_height / 185f, scalingIntensity);
+        }
+        else
+        {
+            Debug.LogError("Unexpected gender vaLue:" + gender);
         }
 
         // scale avatar
@@ -154,13 +167,22 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (thisTrialContainsDeviation)
-        //{
-        //}
-        float angler = Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y); // radians!!!
-        float angler_deg = (float)(angler * 360 / (2 * Math.PI));
-        print("angle HMD position:" + angler_deg);
-        // TODO: put in if-loop above, vergelijk met goalrotatie*(-1). zodra deze >= 80% van goalrotatie*(-1) dan begint de deviation/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // check head position relative to goal position, start deviating at 80%
+        if (thisTrialContainsDeviation)
+        {
+            float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
+            print("angle HMD position:" + angle);
+            float goalRotation2 = currentGoal.transform.rotation.z;
+            if (angle / goalRotation2 >= deviationCutoff)
+            {
+                deviationClock = 0;
+                currentlyDeviating = true;
+            }
+        }
+        else if (!thisTrialContainsDeviation)
+        {
+            currentlyDeviating = false;
+        }
 
         // controller trigger button press
         float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
@@ -171,7 +193,7 @@ public class GameScript : MonoBehaviour
         currentTime += Time.deltaTime;
 
         // Match head & hand target rotations with controllers (same for 1PP & 3PP)
-        transform.rotation = hmdTarget.rotation;
+        if (!currentlyDeviating) { transform.rotation = hmdTarget.rotation; }
         leftHandTargetFollow.transform.rotation = leftHandTarget.transform.rotation;
         rightHandTargetFollow.transform.rotation = rightHandTarget.transform.rotation;
 
@@ -226,61 +248,75 @@ public class GameScript : MonoBehaviour
         }
 
         /////////////////////////////////////////////////////////////////////////////////// DEVIATION ///////////////////////////////////////////////////////////////////////////////////
-        // deviation timing
-        deviationCurrentTime += Time.deltaTime;
-
-        if (deviationType == devType.sineWave)
+        if (currentlyDeviating)
         {
-            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration)
+            // deviation timing
+            deviationClock += Time.deltaTime;
+
+            if (deviationType == devType.sineWave)
             {
-                // movement speed function
-                deviationLerpValue = sineWave(deviationCurrentTime);
+                if (deviationClock >= 0 && deviationClock <= deviationDuration)
+                {
+                    // movement speed function
+                    deviationLerpValue = sineWave(deviationClock);
+                }
+                else if (deviationClock > deviationDuration)
+                {
+                    currentlyDeviating = false;
+                }
             }
-        }
-        else if (deviationType == devType.forthPauseBack)
-        {
-            if (deviationCurrentTime >= 0 && deviationCurrentTime <= deviationDuration / 2)
+            else if (deviationType == devType.forthPauseBack)
             {
-                // movement speed function
-                deviationLerpValue = sineWave(deviationCurrentTime);
+                if (deviationClock >= 0 && deviationClock <= deviationDuration / 2)
+                {
+                    // movement speed function
+                    deviationLerpValue = sineWave(deviationClock);
+                }
+                else if (deviationClock > deviationDuration / 2 && deviationClock <= (deviationDuration / 2 + pauseAtGoal)) // pause at goal
+                {
+                    // movement speed function
+                    deviationLerpValue = 1;
+
+                    // set next loop timer to timestamp top of sine wave
+                    deviationClock2 = deviationDuration / 2;
+                }
+                else if (deviationClock > (deviationDuration / 2 + pauseAtGoal) && deviationClock <= (deviationDuration + pauseAtGoal))
+                {
+                    deviationClock2 += Time.deltaTime;
+                    // movement speed function
+                    deviationLerpValue = sineWave(deviationClock2);
+                }
+                else if (deviationClock > (deviationDuration + pauseAtGoal))
+                {
+                    currentlyDeviating = false;
+                }
             }
-            else if (deviationCurrentTime > deviationDuration / 2 && deviationCurrentTime <= (deviationDuration / 2 + pauseAtGoal)) // pause at goal
+
+            // calculate position current frame
+            Vector3 center = hipAnchor.transform.position; // hip pivot point
+            Vector3 end = deviationGoalPosition - center;
+            Vector3 start = new Vector3();
+            // first person perspective
+            if (!thirdPersonPerspective)
             {
-                // movement speed function
-                deviationLerpValue = 1;
-
-                // set next loop timer to timestamp top of sine wave
-                deviationTimer2 = deviationDuration / 2;
+                start = hmdTarget.position - center;
             }
-            else if (deviationCurrentTime > (deviationDuration / 2 + pauseAtGoal) && deviationCurrentTime <= (deviationDuration + pauseAtGoal))
+            // third person perspective
+            else if (thirdPersonPerspective)
             {
-                deviationTimer2 += Time.deltaTime;
-                // movement speed function
-                deviationLerpValue = sineWave(deviationTimer2);
+                start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
             }
+
+            // determine deviation position
+            Vector3 lerpielerpie = Vector3.Slerp(start, end, deviationLerpValue) + center;
+            // only alter X & Y. Z-position (fore-aft) is still tracked.
+            lerpielerpie.z = start.z;
+            transform.position = lerpielerpie;
+
+            // both perspectives
+            transform.rotation = Quaternion.Slerp(hmdTarget.rotation, deviationGoalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
         }
-
-        // calculate position current frame
-        Vector3 center = hipAnchor.transform.position; // hip pivot point
-        Vector3 end = goalPosition - center;
-        Vector3 start = new Vector3();
-        // first person perspective
-        if (!thirdPersonPerspective)
-        {
-            start = hmdTarget.position - center;
-        }
-        // third person perspective
-        else if (thirdPersonPerspective)
-        {
-            start = hmdTarget.position - thirdPersonPerspectiveOffsetPosition - center;
-        }
-
-        transform.position = Vector3.Slerp(start, end, deviationLerpValue) + center; /////////////////////////////////////////////////// slerp overwrites position? Keertje met debug functie op de tu uitzoeken
-
-        // both perspectives
-        transform.rotation = Quaternion.Slerp(hmdTarget.rotation, goalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
-
-    } /////////////////////////////////////////////////////////////////////////////////// end of DEVIATION ///////////////////////////////////////////////////////////////////////////////////
+    } // Update() end-
 
     IEnumerator ShowScore()
     {
@@ -405,51 +441,77 @@ public class GameScript : MonoBehaviour
         scoreSaved = false;
 
         thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
-        if (thisTrialContainsDeviation) // TODO: nog aanpassen.
+        // Generate a random index to choose the next sphere
+        int randomIndex;
+
+        if (goals.Count <= 1)
         {
-            //// Get a reference to the AvatarHeadMovement instance
-
-            //// random direction generator 
-            //deviationDirection = Random.Range(0, 2); // left and right
-            //if (deviationType == devType.sineWave)
-            //{
-            //    waitDeviationDuration = deviationDuration;
-            //    StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
-            //}
-            //else if (deviationType == devType.forthPauseBack)
-            //{
-            //    waitDeviationDuration = deviationDuration + pauseAtGoal;
-            //    StartCoroutine(WaitAndHandleDiskTouched(waitDeviationDuration));
-            //} 
-
-            //// now. there is no golden sphere to activate a trigger.
+            randomIndex = 0;
         }
         else
         {
-            // Generate a random index to choose the next sphere
-            int randomIndex;
-
-            if (goals.Count <= 1)
+            do
             {
-                randomIndex = 0;
+                randomIndex = Random.Range(0, goals.Count);
+            } while (goals[randomIndex] == previousGoal);
+        }
+        previousGoal = goals[randomIndex];
+        currentGoal = goals[randomIndex];
+
+        // Determine deviation goal
+        if (thisTrialContainsDeviation)
+        {
+            // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+            if (randomIndex == 0 || randomIndex == 4)
+            {
+                deviationDirection = 1; // farther
+            }
+            else if (randomIndex == 3 || randomIndex == 7)
+            {
+                deviationDirection= 0; // closer
             }
             else
             {
-                do
-                {
-                    randomIndex = Random.Range(0, goals.Count);
-                } while (goals[randomIndex] == previousGoal);
+                deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
             }
-            previousGoal = goals[randomIndex];
-            currentGoal = goals[randomIndex];
 
-            gameState = "Waiting for user to touch goal";
-            print(gameState);
-
-            // Make selected number red
-            ChangeTextColor(currentGoal, Color.red);
-
+            if (deviationDirection == 0)
+            {
+                deviationCutoff = closerDeviationCutoff;
+                try { deviationGoal = goals[randomIndex + 1]; }
+                catch (IndexOutOfRangeException e)
+                {
+                    Debug.LogError("Deviation aborted. Index is out of range: " + e.Message);
+                    thisTrialContainsDeviation = false;
+                }
+            }
+            else if (deviationDirection == 1)
+            {
+                deviationCutoff = fartherDeviationCutoff;
+                try { deviationGoal = goals[randomIndex - 1]; }
+                catch (IndexOutOfRangeException e)
+                {
+                    Debug.LogError("Deviation aborted. Index is out of range: " + e.Message);
+                    thisTrialContainsDeviation = false;
+                }
+            }
+            else
+            {
+                Debug.LogError("Unexpected deviationDirection vaLue: " + deviationDirection);
+            }
+            deviationGoalPosition = deviationGoal.transform.position;
+            deviationGoalRotation = deviationGoal.transform.rotation;
         }
+
+
+        gameState = "Waiting for user to touch goal";
+        print(gameState);
+
+        // Make selected number red
+        ChangeTextColor(currentGoal, Color.red);
+
+
+
     }
 
 
@@ -509,7 +571,7 @@ public class GameScript : MonoBehaviour
         rightHandTargetFollow.transform.position = rightHandTarget.transform.position;
 
         // 1PP avatar head no deviation
-        transform.position = hmdTarget.position; ////////////////////////////////////////////////////////////////////////////////////// HMD
+        if (!currentlyDeviating) { transform.position = hmdTarget.position; }
     }
 
     private void thirdPersonPerspectiveFcn()
@@ -522,9 +584,8 @@ public class GameScript : MonoBehaviour
         rightHandTargetFollow.transform.position = rightHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition;
 
         // 3PP avatar head no deviation
-        transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition; ///////////////////////////////////////////////////// HMD
+        if (!currentlyDeviating) { transform.position = hmdTarget.position - thirdPersonPerspectiveOffsetPosition; }
     }
-
 
 
     // one direction
