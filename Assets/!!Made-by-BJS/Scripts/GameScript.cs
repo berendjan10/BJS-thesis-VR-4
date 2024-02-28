@@ -22,8 +22,8 @@ using Oculus.Interaction.Input;
 // DONE: implement in-game "reset view" button
 // DONE: test 3pp
 
-// DOING: schaal de doelen naar de hoogte van de gebruiker
-// TODO: na deviation mag ie terug. niet eerst nog wachten op gebnruiker hoofd touch
+// DONE: schaal de doelen naar de hoogte van de gebruiker
+// TODO: na deviation mag ie terug. niet eerst nog wachten op gebruiker hoofd touch
 // TODO: verander snelheidsverloop deviation
 // TODO: press A to start the game
 
@@ -221,6 +221,7 @@ public class GameScript : MonoBehaviour
                     currentlyDeviating = true;
                     deviationClock = 0;
                     animationTriggered = true;
+                    StartCoroutine(WaitForDeviationAndActAsIfGoalTouched());
                 }
             }
         }
@@ -375,6 +376,23 @@ public class GameScript : MonoBehaviour
         target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
+
+        print("BEFORE: ");
+        print("pivot scale: " + myMeasuredPivotPoint.localScale);
+        print("head: " + transform.position.y);
+        print("topGoal: " + topGoal.transform.position.y);
+        print("myMeasuredPivotPoint: " + myMeasuredPivotPoint.transform.position.y);
+        print("head - pivot: " + (transform.position.y - myMeasuredPivotPoint.transform.position.y));
+        print("topGoal - pivot: " + (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
+
+        float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x;
+        print("scale: " + (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
+        print("calculation: " + scaleDeviationGoals);
+        myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
+        print("AFTER: ");
+        print("pivot scale: " + myMeasuredPivotPoint.localScale);
+        print("topGoal: " + topGoal.transform.position.y);
+        print("topGoal - pivot: " + (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
     }
 
     IEnumerator ShowScore()
@@ -396,18 +414,11 @@ public class GameScript : MonoBehaviour
     {
         if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal)
         {
-            print("yay goal touched!");
-            ChangeTextColor(currentGoal, Color.black);
-            gameState = "Waiting for user to sit straight";
-            ChangeTextColor(topGoal, Color.red);
-            print(gameState);
+            HandleGoalTouched();
         }
         else if (gameState == "Waiting for user to sit straight" && other.gameObject == topGoal)
         {
-            print("yay sitting straight!");
-
             ChangeTextColor(topGoal, Color.black);
-
             waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
             gameState = "Waiting before next instruction is given";
             StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
@@ -460,37 +471,40 @@ public class GameScript : MonoBehaviour
         SetRandomGoal();
     }
 
-    //// Coroutine (used when avatar deviates from user) to wait for a random period and then call the function to handle the logic after touching a sphere 
-    //IEnumerator WaitAndHandleDiskTouched(float waitTime1)
-    //{
-    //    float elapsedTime = 0f;
+    // Coroutine used when avatar deviates from user to act as if goal is touched
+    IEnumerator WaitForDeviationAndActAsIfGoalTouched()
+    {
+        float elapsedTime = 0f;
 
-    //    // Continue waiting until the elapsed time reaches the wait time
-    //    while (elapsedTime < waitTime1)
-    //    {
-    //        // Increment the elapsed time using Time.deltaTime
-    //        elapsedTime += Time.deltaTime;
+        // Continue waiting until the elapsed time reaches the wait time
+        while (elapsedTime < deviationDuration)
+        {
+            // Increment the elapsed time using Time.deltaTime
+            elapsedTime += Time.deltaTime;
 
-    //        // Wait for the next frame
-    //        yield return null;
-    //    }
+            // Wait for the next frame
+            yield return null;
+        }
 
-    //    // Call the function to handle the logic after touching a sphere
-    //    HandleDiskTouched();
-    //}
+        // Call the function to handle the logic after touching a sphere
+        HandleGoalTouched();
+    }
 
-    //public void HandleDiskTouched()
-    //{
-    //    if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
-    //    {
-    //        gameInstructions.SetActive(true);
-    //        textScript.ChangeTextFcn("Thanks for playing!");
-    //    }
-    //    else
-    //    {
-    //        ChangeTextColor(topGoal, Color.red);
-    //    }
-    //}
+    public void HandleGoalTouched()
+    {
+        if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
+        {
+            gameInstructions.SetActive(true);
+            textScript.ChangeTextFcn("Thanks for playing!");
+        }
+        else
+        {
+            ChangeTextColor(currentGoal, Color.black);
+            gameState = "Waiting for user to sit straight";
+            ChangeTextColor(topGoal, Color.red);
+            print(gameState);
+        }
+    }
 
     void SetRandomGoal()
     {
@@ -605,26 +619,6 @@ public class GameScript : MonoBehaviour
                     deviatingTrials.Add(trial);
                 }
             }
-        }
-    }
-    public string GetReach()
-    {
-        return reach;
-    }
-
-    public void ActivateDisk(int nr)
-    {
-        goals[nr].SetActive(true);
-        switch (nr)
-        {
-            case 0:
-                reach = "head";
-                textScript.ChangeTextFcn("Please lean to the left - touch the blue disk with your head");
-                break;
-            case 1:
-                reach = "head";
-                textScript.ChangeTextFcn("Please lean to the right - touch the blue disk with your head");
-                break;
         }
     }
 
