@@ -13,13 +13,19 @@ using OVR.OpenVR;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Unity.XR.CoreUtils;
+using Oculus.Interaction.Input;
 
 // DONE: deviation begint al in het midden. percentage berekening is niet goed.
 // DONE: deviation blijft vast in een loop en hij gaat ook omhoog. zoek waarom ie niet uitgaat
 // DONE: en scale de goals terug.
 // DONE: hoofd schiet tijdens deviation verder naar voren (Z). na deviation is er een offset. check welke z waarde die pakt. haal evt eerst de lines weg waarin ie Z negeert
-// DOING: implement in-game "reset view" button
-// TODO: test 3pp
+// DONE: implement in-game "reset view" button
+// DONE: test 3pp
+
+// DOING: schaal de doelen naar de hoogte van de gebruiker
+// TODO: na deviation mag ie terug. niet eerst nog wachten op gebnruiker hoofd touch
+// TODO: verander snelheidsverloop deviation
+// TODO: press A to start the game
 
 public class GameScript : MonoBehaviour
 {
@@ -89,8 +95,8 @@ public class GameScript : MonoBehaviour
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
     [SerializeField] private GameObject gameInstructions;
-    private Vector3 standardCameraOffsetPosition = new Vector3();
-    private Vector3 standardCameraOffsetRotation = new Vector3();
+    //private Vector3 standardCameraOffsetPosition = new Vector3();
+    //private Vector3 standardCameraOffsetRotation = new Vector3();
     [SerializeField] private GameObject alienAntenna;
     //public Vector3 thirdPersonPerspectiveOffsetRotation = new Vector3(15.0f, 0.0f, 0.0f);
 
@@ -108,8 +114,7 @@ public class GameScript : MonoBehaviour
     public InputActionProperty thumbButtonA;
     public InputActionProperty thumbButtonB;
 
-    [SerializeField]
-    private GameObject CameraOffsetRef;
+    //[SerializeField] private GameObject CameraOffsetRef;
 
     [SerializeField]
     private GameObject MainCamera;
@@ -137,14 +142,10 @@ public class GameScript : MonoBehaviour
 
     public GameObject hmdResetView;
 
-    public Transform head;
+    public Transform mainCamera;
     public Transform origin;
     public Transform target;
 
-    private Vector3 offset;
-    private Vector3 targetForward;
-    private Vector3 cameraForward;
-    private float angle;
     public XROrigin XRORIGINN;
 
     void Start()
@@ -271,7 +272,8 @@ public class GameScript : MonoBehaviour
                     transitionTime += Time.deltaTime;
                     transitionLerpValue = lerpTransition(transitionTime);
                     // transition camera view
-                    cameraOffset.transform.position = Vector3.Lerp(standardCameraOffsetPosition, standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
+                    cameraOffset.transform.position = Vector3.Lerp(Vector3.zero, thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
+                    print("line 274 executed (1PP -> 3PP transition)!");
                     // transition avatar head & hands positions, compensate for camera offset
                     transform.position = Vector3.Lerp(hmdTarget.position, hmdTarget.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue); //// HMD
                     leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
@@ -365,35 +367,12 @@ public class GameScript : MonoBehaviour
         }
     } // Update() end-
 
+
+    // pressing B resets the view. (Only works in 1PP, because MoveCameraToWorldLocation checks mainCamera location and sets XROrigin location accordingly, XROrigin is parent of CameraOffset is parent of mainCamera and 3PP is achieved by changing CameraOffset.)
     void OnThumbB(InputAction.CallbackContext context)
     {
-        //doSomething
-        Debug.Log("B Pressed");
-        //Vector3 deltaOffset = hmdResetView.transform.position - MainCamera.transform.position;
-        //Debug.Log(deltaOffset);
-        //CameraOffsetRef.transform.position = new Vector3(deltaOffset.x, 0, deltaOffset.z);
-        //MainCamera.transform.rotation = Quaternion.identity;
-
-
-        //// method 2 https://stackoverflow.com/questions/76297143/in-unity-openxr-environment-how-to-reset-the-player-position-to-center
-        //offset = head.position - origin.position;
-        //offset.y = 0;
-        //origin.position = target.position + offset;
-
-        //targetForward = target.forward;
-        //targetForward.y = 0;
-        //cameraForward = head.forward;
-        //cameraForward.y = 0;
-
-        //angle = Vector3.SignedAngle(cameraForward, targetForward, Vector3.up);
-
-        //origin.RotateAround(head.position, Vector3.up, angle);
-
-        // Method 3 Valem
-        //XROrigin xrOrigin = GetComponent<XROrigin>();
-        //xrOrigin.MoveCameraToWorldLocation(target.position);
-        //xrOrigin.MatchOriginUpCameraForward(target.up, target.forward);
-
+        //Debug.Log("B Pressed");
+        target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
     }
@@ -652,7 +631,7 @@ public class GameScript : MonoBehaviour
     private void firstPersonPerspective()
     {
         // 1PP camera view
-        cameraOffset.transform.position = standardCameraOffsetPosition;
+        cameraOffset.transform.localPosition = Vector3.zero;
 
         // 1PP avatar hand targets match controllers
         leftHandTargetFollow.transform.position = leftHandTarget.transform.position;
@@ -665,7 +644,7 @@ public class GameScript : MonoBehaviour
     private void thirdPersonPerspectiveFcn()
     {
         // 3PP camera view
-        cameraOffset.transform.position = standardCameraOffsetPosition + thirdPersonPerspectiveOffsetPosition;
+        cameraOffset.transform.position = XRORIGINN.transform.position + thirdPersonPerspectiveOffsetPosition;
 
         // 3PP avatar hand targets, compensate for camera offset
         leftHandTargetFollow.transform.position = leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition;

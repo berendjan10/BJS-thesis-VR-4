@@ -10446,7 +10446,7 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 10
+  phaseOneInstructions: 0
   phaseTwoInstructions: 50
   deviatePercentage: 100
   deviationDuration: 2
@@ -10504,13 +10504,12 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: -4928370872940462309, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
-  CameraOffsetRef: {fileID: 1378044564}
   MainCamera: {fileID: 8315415}
   myMeasuredPivotPoint: {fileID: 781013527}
   closerDeviationCutoff: 0.6
   fartherDeviationCutoff: 0.8
   hmdResetView: {fileID: 401317275}
-  head: {fileID: 8315416}
+  mainCamera: {fileID: 8315416}
   origin: {fileID: 401317278}
   target: {fileID: 763024548}
   XRORIGINN: {fileID: 401317277}
@@ -34859,7 +34858,7 @@ PrefabInstance:
     - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
