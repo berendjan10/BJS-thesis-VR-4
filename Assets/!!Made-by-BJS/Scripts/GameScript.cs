@@ -23,9 +23,12 @@ using Oculus.Interaction.Input;
 // DONE: test 3pp
 
 // DONE: schaal de doelen naar de hoogte van de gebruiker
-// TODO: na deviation mag ie terug. niet eerst nog wachten op gebruiker hoofd touch
-// TODO: verander snelheidsverloop deviation
+// DONE: na deviation mag ie terug. niet eerst nog wachten op gebruiker hoofd touch
+// DONE: added initial instruction to recenter
+// DONE: addded thingy on head
+// DONE: altered game instruction 
 // TODO: press A to start the game
+// TODO: score
 
 public class GameScript : MonoBehaviour
 {
@@ -48,9 +51,11 @@ public class GameScript : MonoBehaviour
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
     public enum devType { sineWave, forthPauseBack }
     public devType deviationType;
-    public float instructionDuration = 10f;
     public float flashTime = 0.2f; // [s]
     public bool useGhost = false;
+
+    public GameObject instructionZero;
+    public GameObject three3DObjects;
 
     public GameObject topGoal;
     public GameObject goal1;
@@ -124,7 +129,7 @@ public class GameScript : MonoBehaviour
 
     private TextMeshPro textMeshProToChange;
 
-    private string gameState; // "Waiting for user to touch goal" "Waiting for user to sit straight"
+    private string gameState; // "waiting for user to recenter" "Waiting for user to read instruction" "Waiting for user to touch goal" "Waiting for user to sit straight"
 
     public Transform myMeasuredPivotPoint;
 
@@ -196,18 +201,25 @@ public class GameScript : MonoBehaviour
         // Choose which trials wil deviate
         GenerateDeviatingTrials(deviatingTrialsCount);
 
-        // wait, remove text and SetRandomGoal
-        StartCoroutine(WaitAndStartGame());
-
         thumbButtonB.action.performed += OnThumbB;
+        thumbButtonA.action.performed += OnThumbA;
 
         if (!useGhost) {  ghost.SetActive(false); }
 
+        // initial game state just prompts the user to recenter
+        three3DObjects.SetActive(false);
+        instructionZero.SetActive(true);
+        gameState = "waiting for user to recenter";
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (gameState == "waiting for user to recenter")
+        {
+            InstructionInFrontOfCamera();
+        }
+
         // check head position relative to goal position, start deviating at 80%
         if (thisTrialContainsDeviation)
         {
@@ -235,8 +247,8 @@ public class GameScript : MonoBehaviour
             currentlyDeviating = false;
         }
 
-        // controller trigger button press
-        float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
+        //// controller trigger button press
+        //float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
 
         scoreScript = scoreText.GetComponent<ChangeText>();
 
@@ -385,27 +397,56 @@ public class GameScript : MonoBehaviour
     // pressing B resets the view. (Only works in 1PP, because MoveCameraToWorldLocation checks mainCamera location and sets XROrigin location accordingly, XROrigin is parent of CameraOffset is parent of mainCamera and 3PP is achieved by changing CameraOffset.)
     void OnThumbB(InputAction.CallbackContext context)
     {
+        if (gameState == "waiting for user to recenter")
+        {
+            three3DObjects.SetActive(true);
+            instructionZero.SetActive(false);
+            gameState = "Waiting for user to read instruction";
+        }
         //Debug.Log("B Pressed");
         target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
 
-        print("BEFORE: ");
-        print("pivot scale: " + myMeasuredPivotPoint.localScale);
-        print("head: " + transform.position.y);
-        print("topGoal: " + topGoal.transform.position.y);
-        print("myMeasuredPivotPoint: " + myMeasuredPivotPoint.transform.position.y);
-        print("head - pivot: " + (transform.position.y - myMeasuredPivotPoint.transform.position.y));
-        print("topGoal - pivot: " + (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
-
         float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x;
-        print("scale: " + (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
-        print("calculation: " + scaleDeviationGoals);
         myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
-        print("AFTER: ");
-        print("pivot scale: " + myMeasuredPivotPoint.localScale);
-        print("topGoal: " + topGoal.transform.position.y);
-        print("topGoal - pivot: " + (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y));
+    }
+
+    void OnThumbA(InputAction.CallbackContext context)
+    {
+        if (gameState == "Waiting for user to read instruction")
+        {
+            gameInstructions.SetActive(false);
+            SetRandomGoal();
+        }
+        else
+        {
+            gameInstructions.SetActive(!gameInstructions.activeInHierarchy);
+        }
+    }
+
+    private void InstructionInFrontOfCamera()
+    {
+        if (mainCamera != null)
+        {
+            // Calculate the position in front of the main camera
+            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 10.0f;
+
+            // Update the position of the object
+            instructionZero.transform.position = newPosition;
+
+            // Calculate the direction from the object to the main camera
+            Vector3 lookDir = mainCamera.transform.position - instructionZero.transform.position;
+
+            // Ensure the object is not rotated in the x or z axis
+            lookDir.y = 0;
+
+            // Rotate the object to face the main camera
+            instructionZero.transform.rotation = Quaternion.LookRotation(lookDir);
+
+            // Flip the object 180 degrees around its vertical Y-axis
+            instructionZero.transform.Rotate(Vector3.up, 180f);
+        }
     }
 
     IEnumerator ShowScore()
@@ -444,25 +485,6 @@ public class GameScript : MonoBehaviour
         Vector3 newPosition = moveThis.transform.localPosition;
         newPosition.y *= scale1;
         moveThis.transform.localPosition = newPosition;
-    }
-
-    // Coroutine to wait for a random period and then remove instructions and let the first goal appear
-    IEnumerator WaitAndStartGame()
-    {
-        float elapsedTime = 0f;
-
-        // Continue waiting until the elapsed time reaches the randomly chosen wait time
-        while (elapsedTime < instructionDuration)
-        {
-            // Increment the elapsed time using Time.deltaTime
-            elapsedTime += Time.deltaTime;
-            // Wait for the next frame
-            yield return null;
-        }
-
-        // Call the function to generate a new random game instruction
-        gameInstructions.SetActive(false);
-        SetRandomGoal();
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
@@ -597,15 +619,11 @@ public class GameScript : MonoBehaviour
             print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
-
         gameState = "Waiting for user to touch goal";
         print(gameState);
 
         // Make selected number red
         ChangeTextColor(currentGoal, Color.red);
-
-
-
     }
 
 
