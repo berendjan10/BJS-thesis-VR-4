@@ -10450,13 +10450,14 @@ MonoBehaviour:
   phaseTwoInstructions: 50
   deviatePercentage: 100
   deviationDuration: 2
-  pauseAtGoal: 0.5
+  pauseAtGoal: 0.33
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 1
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
   deviationType: 1
   instructionDuration: 1
   flashTime: 30
+  useGhost: 0
   topGoal: {fileID: 1225742808}
   goal1: {fileID: 1514667176}
   goal2: {fileID: 1102676913}
@@ -10513,6 +10514,7 @@ MonoBehaviour:
   origin: {fileID: 401317278}
   target: {fileID: 763024548}
   XRORIGINN: {fileID: 401317277}
+  ghost: {fileID: 974739299}
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11697,37 +11699,37 @@ PrefabInstance:
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.21500015
+      value: 2.3785418e-12
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.3781411
+      value: 0.122638084
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.05086577
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.95900863
+      value: 0.9866796
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.16167368
+      value: -0.16267596
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.038689036
+      value: 0.00000031497368
       objectReference: {fileID: 0}
     - target: {fileID: 2886290772835594412, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.22949372
+      value: 0.00000038317222
       objectReference: {fileID: 0}
     - target: {fileID: 3050251060893140669, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
@@ -11779,6 +11781,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3566957545068007412, guid: f832025b31d82e44999f71310d78cb42,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3566957545068007412, guid: f832025b31d82e44999f71310d78cb42,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 88b0343547a9b694995e2536a04b78cd, type: 2}
+    - target: {fileID: 5512510953515465489, guid: f832025b31d82e44999f71310d78cb42,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6070482321239056212, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_Name
@@ -11787,7 +11804,12 @@ PrefabInstance:
     - target: {fileID: 6070482321239056212, guid: f832025b31d82e44999f71310d78cb42,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6291532682684698101, guid: f832025b31d82e44999f71310d78cb42,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.165
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11797,6 +11819,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 974739304}
+    - targetCorrespondingSourceObject: {fileID: 6070482321239056212, guid: f832025b31d82e44999f71310d78cb42,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 974739307}
   m_SourcePrefab: {fileID: 100100000, guid: f832025b31d82e44999f71310d78cb42, type: 3}
 --- !u!1001 &686167936
 PrefabInstance:
@@ -17157,7 +17183,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 974739299}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfac4fa329d1f4f23814af71a247c14b, type: 3}
   m_Name: 
@@ -17286,6 +17312,409 @@ MonoBehaviour:
       rotationWeight: 0
       bendGoal: {fileID: 353128386}
       bendGoalWeight: 1
+      swivelOffset: 0
+      bendToTargetWeight: 0.5
+      legLengthMlp: 1
+      stretchCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      useAnimatedBendNormal: 0
+    locomotion:
+      mode: 0
+      weight: 1
+      moveThreshold: 0.3
+      animationHeader: 0
+      minAnimationSpeed: 0.2
+      maxAnimationSpeed: 3
+      animationSmoothTime: 0.1
+      rootPositionHeader: 0
+      standOffset: {x: 0, y: 0}
+      rootLerpSpeedWhileMoving: 30
+      rootLerpSpeedWhileStopping: 10
+      rootLerpSpeedWhileTurning: 10
+      maxRootOffset: 0.5
+      rootRotationHeader: 0
+      maxRootAngleMoving: 10
+      maxRootAngleStanding: 90
+      stepLengthMlp: 1
+      footDistance: 0.3
+      stepThreshold: 0.4
+      angleThreshold: 60
+      comAngleMlp: 1
+      maxVelocity: 0.4
+      velocityFactor: 0.4
+      maxLegStretch: 1
+      rootSpeed: 20
+      stepSpeed: 3
+      stepHeight:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5
+          value: 0.03
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      maxBodyYOffset: 0.05
+      heelHeight:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5
+          value: 0.03
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      relaxLegTwistMinAngle: 20
+      relaxLegTwistSpeed: 400
+      stepInterpolation: 3
+      offset: {x: 0, y: 0, z: 0}
+      blockingEnabled: 0
+      blockingLayers:
+        serializedVersion: 2
+        m_Bits: 0
+      raycastRadius: 0.2
+      raycastHeight: 0.2
+      onLeftFootstep:
+        m_PersistentCalls:
+          m_Calls: []
+      onRightFootstep:
+        m_PersistentCalls:
+          m_Calls: []
+--- !u!114 &974739307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974739299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfac4fa329d1f4f23814af71a247c14b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixTransforms: 1
+  references:
+    root: {fileID: 974739303}
+    pelvis: {fileID: 1298480463}
+    spine: {fileID: 1569476636}
+    chest: {fileID: 2099223842}
+    neck: {fileID: 1122792599}
+    head: {fileID: 1928131454}
+    leftShoulder: {fileID: 1990245304}
+    leftUpperArm: {fileID: 1260151284}
+    leftForearm: {fileID: 1206192965}
+    leftHand: {fileID: 771675963}
+    rightShoulder: {fileID: 237132859}
+    rightUpperArm: {fileID: 1037584650}
+    rightForearm: {fileID: 290944146}
+    rightHand: {fileID: 823633178}
+    leftThigh: {fileID: 1775471256}
+    leftCalf: {fileID: 1612187007}
+    leftFoot: {fileID: 85114213}
+    leftToes: {fileID: 118780108}
+    rightThigh: {fileID: 1611710464}
+    rightCalf: {fileID: 1103657365}
+    rightFoot: {fileID: 679203532}
+    rightToes: {fileID: 1487484147}
+  solver:
+    executedInEditor: 0
+    IKPosition: {x: 0, y: 0, z: 0}
+    IKPositionWeight: 1
+    root: {fileID: 1800788687}
+    LOD: 0
+    scale: 1
+    plantFeet: 0
+    spine:
+      bones:
+      - readPosition: {x: 0.20161968, y: 1.0191902, z: -0.091185726}
+        readRotation: {x: 0.01608366, y: -0.1341189, z: 0.002177938, w: 0.9908323}
+        solverPosition: {x: 0.08618872, y: 0.49652898, z: -0.004947461}
+        solverRotation: {x: -0.23232885, y: -0.06260677, z: -0.5979142, w: 0.764593}
+        length: 0.0984731
+        sqrMag: 0.009696951
+        axis: {x: 0.000000001990164, y: 0.098473094, z: 0.000000013353911}
+      - readPosition: {x: 0.20076984, y: 1.1176114, z: -0.088104665}
+        readRotation: {x: -0.05201794, y: -0.1339777, z: -0.00704255, w: 0.9895931}
+        solverPosition: {x: 0.1790895, y: 0.51396304, z: -0.03256}
+        solverRotation: {x: -0.2245001, y: -0.18513817, z: -0.39083213, w: 0.8732547}
+        length: 0.13049743
+        sqrMag: 0.017029578
+        axis: {x: -0.0000000047093422, y: 0.13049743, z: 0.000000029057393}
+      - readPosition: {x: 0.2044077, y: 1.2473897, z: -0.101293504}
+        readRotation: {x: -0.08382996, y: -0.13368183, z: -0.01134957, w: 0.98740727}
+        solverPosition: {x: 0.27901387, y: 0.59143937, z: -0.06484187}
+        solverRotation: {x: -0.35381117, y: -0.2030285, z: -0.36495605, w: 0.8369018}
+        length: 0.27707678
+        sqrMag: 0.07677155
+        axis: {x: 0.000000030479825, y: 0.27668816, z: 0.014670257}
+      - readPosition: {x: 0.21296568, y: 1.5225909, z: -0.13231951}
+        readRotation: {x: 0.1647356, y: -0.13229585, z: 0.022302616, w: 0.9771708}
+        solverPosition: {x: 0.48658723, y: 0.73601073, z: -0.17790821}
+        solverRotation: {x: -0.29812416, y: -0.13627999, z: -0.38760188, w: 0.86157733}
+        length: 0.12263801
+        sqrMag: 0.015040081
+        axis: {x: 0.00000000940912, y: 0.12263801, z: 0.0000000022979505}
+      - readPosition: {x: 0.20227477, y: 1.6384506, z: -0.09355994}
+        readRotation: {x: 0.0035790226, y: -0.13416146, z: 0.00048461382, w: 0.990953}
+        solverPosition: {x: 0.57846206, y: 0.8, z: -0.22795296}
+        solverRotation: {x: -0.19877964, y: -0.33505312, z: -0.07638124, w: 0.9178197}
+        length: 0
+        sqrMag: 0
+        axis: {x: 0, y: 0, z: 0}
+      headTarget: {fileID: 1744460106}
+      positionWeight: 1
+      rotationWeight: 1
+      headClampWeight: 0.6
+      minHeadHeight: 0.8
+      useAnimatedHeadHeightWeight: 0
+      useAnimatedHeadHeightRange: 0.1
+      animatedHeadHeightBlend: 0.3
+      pelvisTarget: {fileID: 126323089}
+      pelvisPositionWeight: 1
+      pelvisRotationWeight: 0
+      maintainPelvisPosition: 0
+      chestGoal: {fileID: 0}
+      chestGoalWeight: 0
+      chestClampWeight: 0.5
+      rotateChestByHands: 1
+      bodyPosStiffness: 0.55
+      bodyRotStiffness: 0.1
+      neckStiffness: 0.2
+      moveBodyBackWhenCrouching: 0.5
+      maxRootAngle: 25
+      rootHeadingOffset: 0
+    leftArm:
+      bones:
+      - readPosition: {x: 0.16889825, y: 1.507736, z: -0.14982432}
+        readRotation: {x: 0.41034392, y: -0.533894, z: 0.5930966, w: 0.44137496}
+        solverPosition: {x: 0.44612077, y: 0.7457586, z: -0.20504619}
+        solverRotation: {x: 0.16752423, y: -0.44745615, z: 0.4441579, w: 0.7579205}
+        length: 0.118895665
+        sqrMag: 0.014136179
+        axis: {x: 0.00000080441964, y: 1, z: 0.0000010823671}
+      - readPosition: {x: 0.054554388, y: 1.5029454, z: -0.18205334}
+        readRotation: {x: 0.563861, y: -0.22787407, z: 0.78249246, w: 0.13356704}
+        solverPosition: {x: 0.34824687, y: 0.8110703, z: -0.22211263}
+        solverRotation: {x: 0.74022615, y: -0.058857393, z: 0.5619087, w: 0.36450064}
+        length: 0.28512913
+        sqrMag: 0.08129863
+        axis: {x: 0.0000000131538815, y: 0.28512937, z: 0.00000017444926}
+      - readPosition: {x: -0.078318164, y: 1.2576013, z: -0.24078792}
+        readRotation: {x: 0.6109481, y: -0.13955511, z: 0.708135, w: 0.32528782}
+        solverPosition: {x: 0.20660412, y: 0.6036814, z: -0.087109536}
+        solverRotation: {x: -0.2415113, y: -0.61836255, z: 0.22012098, w: -0.7147387}
+        length: 0.2519722
+        sqrMag: 0.06348999
+        axis: {x: -0.000000023918814, y: 0.25197244, z: -0.00000021087915}
+      - readPosition: {x: -0.2373674, y: 1.0687672, z: -0.19043896}
+        readRotation: {x: 0.649602, y: -0.1304498, z: 0.69554466, w: 0.27788138}
+        solverPosition: {x: 0.36114815, y: 0.80184245, z: -0.06871422}
+        solverRotation: {x: -0.52557653, y: 0.068429306, z: -0.5596672, w: -0.637071}
+        length: 0
+        sqrMag: 0
+        axis: {x: 0, y: 0, z: 0}
+      target: {fileID: 846598478}
+      positionWeight: 1
+      rotationWeight: 1
+      shoulderRotationWeight: 1
+      shoulderRotationMode: 0
+      shoulderTwistWeight: 1
+      shoulderYawOffset: 45
+      shoulderPitchOffset: -30
+      bendGoal: {fileID: 0}
+      bendGoalWeight: 0
+      swivelOffset: 0
+      wristToPalmAxis: {x: 0, y: 1, z: 0}
+      palmToThumbAxis: {x: 1, y: 0, z: 0}
+      armLengthMlp: 1
+      stretchCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    rightArm:
+      bones:
+      - readPosition: {x: 0.2597756, y: 1.507736, z: -0.12475777}
+        readRotation: {x: 0.5532718, y: 0.39731532, z: -0.4626338, w: 0.5674516}
+        solverPosition: {x: 0.50750756, y: 0.7017154, z: -0.14866456}
+        solverRotation: {x: 0.59935135, y: -0.19437179, z: -0.5845382, w: 0.5111886}
+        length: 0.1188957
+        sqrMag: 0.014136188
+        axis: {x: -0.0000004914698, y: 1, z: -0.0000020522975}
+      - readPosition: {x: 0.3744732, y: 1.5029472, z: -0.0938108}
+        readRotation: {x: 0.75162476, y: 0.18416038, z: -0.60439205, w: 0.18935601}
+        solverPosition: {x: 0.5508599, y: 0.6539417, z: -0.048792467}
+        solverRotation: {x: 0.7811737, y: -0.5785611, z: -0.18673438, w: 0.1420074}
+        length: 0.28512833
+        sqrMag: 0.081298165
+        axis: {x: 0.0000000711902, y: 0.2851285, z: -0.00000009098474}
+      - readPosition: {x: 0.5186711, y: 1.2576061, z: -0.07612176}
+        readRotation: {x: 0.7772448, y: 0.048042007, z: -0.5201913, w: 0.35069036}
+        solverPosition: {x: 0.3082507, y: 0.5711967, z: 0.07607635}
+        solverRotation: {x: 0.39740255, y: -0.87781525, z: -0.0737229, w: 0.25706103}
+        length: 0.25197214
+        sqrMag: 0.06348996
+        axis: {x: 0.00000004595533, y: 0.25197226, z: 0.00000026976193}
+      - readPosition: {x: 0.62942094, y: 1.0687739, z: 0.04864522}
+        readRotation: {x: 0.81115913, y: 0.051867343, z: -0.4977793, w: 0.3025673}
+        solverPosition: {x: 0.14200248, y: 0.7408428, z: 0.16016981}
+        solverRotation: {x: 0.41419965, y: 0.41691452, z: 0.6357045, w: -0.50050056}
+        length: 0
+        sqrMag: 0
+        axis: {x: 0, y: 0, z: 0}
+      target: {fileID: 1941498720}
+      positionWeight: 1
+      rotationWeight: 1
+      shoulderRotationWeight: 1
+      shoulderRotationMode: 0
+      shoulderTwistWeight: 1
+      shoulderYawOffset: 45
+      shoulderPitchOffset: -30
+      bendGoal: {fileID: 0}
+      bendGoalWeight: 0
+      swivelOffset: 0
+      wristToPalmAxis: {x: 0, y: 1, z: 0}
+      palmToThumbAxis: {x: -1, y: -0, z: -0}
+      armLengthMlp: 1
+      stretchCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    leftLeg:
+      bones:
+      - readPosition: {x: 0.110539556, y: 1.0244871, z: -0.11955206}
+        readRotation: {x: -0.13212012, y: -0.010962982, z: 0.9906652, w: 0.031725943}
+        solverPosition: {x: 0.06406096, y: 0.58042914, z: -0.04494031}
+        solverRotation: {x: -0.12014349, y: 0.24779703, z: 0.9467461, w: 0.16683537}
+        length: 0.45817405
+        sqrMag: 0.20992346
+        axis: {x: -0.000000020905581, y: 0.45817402, z: -0.0000000034513092}
+      - readPosition: {x: 0.08306622, y: 0.56734556, z: -0.13334519}
+        readRotation: {x: -0.1336635, y: -0.051825106, z: 0.98939615, w: 0.023313876}
+        solverPosition: {x: -0.1079577, y: 0.20402753, z: 0.15166834}
+        solverRotation: {x: -0.19048025, y: -0.6391098, z: 0.7424396, w: -0.06355838}
+        length: 0.4438591
+        sqrMag: 0.19701089
+        axis: {x: -0.00000034154561, y: 0.44385913, z: -0.00000039482316}
+      - readPosition: {x: 0.068739295, y: 0.12635326, z: -0.18163005}
+        readRotation: {x: -0.08675118, y: 0.45681497, z: 0.8808781, w: 0.088590756}
+        solverPosition: {x: 0.042001434, y: 0.12635326, z: -0.258807}
+        solverRotation: {x: -0.13832192, y: 0.45082602, z: 0.8742662, w: 0.115259685}
+        length: 0.14884448
+        sqrMag: 0.022154678
+        axis: {x: -0.0000003938241, y: 0.14884453, z: 0.000000033106158}
+      - readPosition: {x: 0.033711553, y: 0.041966856, z: -0.064128265}
+        readRotation: {x: -0.10672184, y: 0.6780835, z: 0.7195957, w: 0.1048599}
+        solverPosition: {x: -0.006559171, y: 0.041966856, z: -0.14622143}
+        solverRotation: {x: -0.14878833, y: 0.67075694, z: 0.71208817, w: 0.14449224}
+        length: 0
+        sqrMag: 0
+        axis: {x: 0, y: 0, z: 0}
+      target: {fileID: 514946467}
+      positionWeight: 1
+      rotationWeight: 0
+      bendGoal: {fileID: 1927682712}
+      bendGoalWeight: 0.9
+      swivelOffset: 0
+      bendToTargetWeight: 0.5
+      legLengthMlp: 1
+      stretchCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      useAnimatedBendNormal: 0
+    rightLeg:
+      bones:
+      - readPosition: {x: 0.29436272, y: 1.0244875, z: -0.06884834}
+        readRotation: {x: 0.1360553, y: 0.0021323515, z: -0.9901325, w: 0.033498976}
+        solverPosition: {x: 0.116913736, y: 0.4116307, z: 0.026302256}
+        solverRotation: {x: 0.07692307, y: -0.18814522, z: -0.9659395, w: 0.16014051}
+        length: 0.4581746
+        sqrMag: 0.20992395
+        axis: {x: 0.000000022507805, y: 0.45817477, z: -0.0000000058971272}
+      - readPosition: {x: 0.3250224, y: 0.5673454, z: -0.066606596}
+        readRotation: {x: 0.13422912, y: 0.04376057, z: -0.9893197, w: 0.0362547}
+        solverPosition: {x: 0.2453981, y: 0.009393275, z: 0.20412484}
+        solverRotation: {x: -0.13504419, y: 0.60030806, z: -0.5916169, w: 0.5209446}
+        length: 0.44385955
+        sqrMag: 0.1970113
+        axis: {x: -0.000000008269234, y: 0.44385982, z: -0.00000000346148}
+      - readPosition: {x: 0.36207706, y: 0.12635261, z: -0.10071877}
+        readRotation: {x: 0.15059549, y: -0.46392515, z: -0.8722349, w: -0.03606891}
+        solverPosition: {x: 0.44702703, y: 0.12635264, z: -0.17360216}
+        solverRotation: {x: 0.15734898, y: -0.46363208, z: -0.8710429, w: -0.03966233}
+        length: 0.14884418
+        sqrMag: 0.02215459
+        axis: {x: 0.000000090714884, y: 0.14884423, z: -0.000000010943417}
+      - readPosition: {x: 0.33191353, y: 0.04196614, z: 0.018124305}
+        readRotation: {x: 0.08845939, y: -0.6815562, z: -0.72206783, w: -0.079209715}
+        solverPosition: {x: 0.41502547, y: 0.04196614, z: -0.05524072}
+        solverRotation: {x: 0.0940511, y: -0.6809219, z: -0.7213609, w: -0.08448794}
+        length: 0
+        sqrMag: 0
+        axis: {x: 0, y: 0, z: 0}
+      target: {fileID: 1461185040}
+      positionWeight: 1
+      rotationWeight: 0
+      bendGoal: {fileID: 353128386}
+      bendGoalWeight: 0.9
       swivelOffset: 0
       bendToTargetWeight: 0.5
       legLengthMlp: 1
@@ -17606,7 +18035,7 @@ Transform:
   m_GameObject: {fileID: 1008979060}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.09501342, w: 0.99547607}
-  m_LocalPosition: {x: -4.4507732, y: 23.129004, z: 0}
+  m_LocalPosition: {x: -4.4507732, y: 23.5, z: 0}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -25464,7 +25893,7 @@ Transform:
   m_GameObject: {fileID: 1514667176}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.099022515, w: 0.99508524}
-  m_LocalPosition: {x: 4.749999, y: 23.145002, z: 0}
+  m_LocalPosition: {x: 4.749999, y: 23.5, z: 0}
   m_LocalScale: {x: 49.99999, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
   m_Children:

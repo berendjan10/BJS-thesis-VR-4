@@ -50,6 +50,7 @@ public class GameScript : MonoBehaviour
     public devType deviationType;
     public float instructionDuration = 10f;
     public float flashTime = 0.2f; // [s]
+    public bool useGhost = false;
 
     public GameObject topGoal;
     public GameObject goal1;
@@ -148,6 +149,8 @@ public class GameScript : MonoBehaviour
 
     public XROrigin XRORIGINN;
 
+    public GameObject ghost;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -197,6 +200,8 @@ public class GameScript : MonoBehaviour
         StartCoroutine(WaitAndStartGame());
 
         thumbButtonB.action.performed += OnThumbB;
+
+        if (!useGhost) {  ghost.SetActive(false); }
 
     }
 
@@ -366,7 +371,15 @@ public class GameScript : MonoBehaviour
             // both perspectives
             transform.rotation = Quaternion.Slerp(hmdTarget.rotation, deviationGoalRotation, deviationLerpValue); // rotation linear interpolation between HMD & target
         }
-    } // Update() end-
+
+        if (useGhost)
+        {
+            if (currentlyDeviating) { ghost.SetActive(true); }
+            else { ghost.SetActive(false); }
+        }
+
+
+    } // Update() end
 
 
     // pressing B resets the view. (Only works in 1PP, because MoveCameraToWorldLocation checks mainCamera location and sets XROrigin location accordingly, XROrigin is parent of CameraOffset is parent of mainCamera and 3PP is achieved by changing CameraOffset.)
