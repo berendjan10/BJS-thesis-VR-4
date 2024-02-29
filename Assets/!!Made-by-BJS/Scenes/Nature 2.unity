@@ -2004,7 +2004,8 @@ MonoBehaviour:
 
 
     Lean sideways to align with the indicated number.
-    The faster, the higher your score. Press A to start the game.'
+    The faster, the higher your score, but avoid overshoot! Speed and percision are
+    both important for a high score. Press A to start the game.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2067,7 +2068,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 178.19806, y: 91.538864, z: 163.9453, w: 131.2773}
+  m_margin: {x: 178.19806, y: 156.73378, z: 167.6242, w: 138.80109}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4688,8 +4689,8 @@ RectTransform:
   m_GameObject: {fileID: 209506191}
   m_LocalRotation: {x: -0, y: 0.500426, z: -0, w: 0.86577934}
   m_LocalPosition: {x: 0, y: 0, z: 0.8009991}
-  m_LocalScale: {x: 0.0020000003, y: 0.0049309563, z: 0.0049309563}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.0022, y: 0.0049309563, z: 0.0049309563}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 139322827}
   - {fileID: 490970608}
@@ -7311,6 +7312,7 @@ Transform:
   - {fileID: 1530704344}
   - {fileID: 1993012075}
   - {fileID: 652892232}
+  - {fileID: 1800788687}
   - {fileID: 2118945580}
   - {fileID: 2129731291}
   m_Father: {fileID: 0}
@@ -9081,8 +9083,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: With your right hand thumb, press B to center the view (B is the top button
-    you feel, left of the joystick)
+  m_text: Please sit straight up on your chair and look straight forward. Please
+    press B with your right hand thumb.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9193,8 +9195,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.8612557}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00579834, y: -162.12}
-  m_SizeDelta: {x: -0, y: 324.25}
+  m_AnchoredPosition: {x: 0.0026245117, y: -136.09}
+  m_SizeDelta: {x: 0, y: 272.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &491639365
 MonoBehaviour:
@@ -10777,17 +10779,17 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 0
+  phaseOneInstructions: 5
   phaseTwoInstructions: 50
-  deviatePercentage: 100
-  deviationDuration: 2
+  deviatePercentage: 50
+  deviationDuration: 1
   pauseAtGoal: 0.33
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 1
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
   deviationType: 1
   flashTime: 30
-  useGhost: 0
+  useGhost: 1
   instructionZero: {fileID: 209506191}
   three3DObjects: {fileID: 379095368}
   topGoal: {fileID: 1225742808}
@@ -10840,13 +10842,14 @@ MonoBehaviour:
   MainCamera: {fileID: 8315415}
   myMeasuredPivotPoint: {fileID: 781013527}
   closerDeviationCutoff: 0.2
-  fartherDeviationCutoff: 0.6
+  fartherDeviationCutoff: 0.4
   hmdResetView: {fileID: 401317275}
   mainCamera: {fileID: 8315416}
   origin: {fileID: 401317278}
   target: {fileID: 763024548}
   XRORIGINN: {fileID: 401317277}
   ghost: {fileID: 974739299}
+  three3PPPlaceholder: {fileID: 1155670808}
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20738,6 +20741,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1105919580}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1155670807
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1155670808}
+  m_Layer: 0
+  m_Name: 3PP instruction placeholder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1155670808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155670807}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.363, z: -0.661}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1157077706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35164,7 +35198,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.188, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.05, z: 0.01}
+  m_LocalScale: {x: 0.012, y: 0.05, z: 0.012}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1040300838}
@@ -35212,7 +35246,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 37fe2bc362714e6439a3cf09c8686177, type: 2}
+  - {fileID: 2100000, guid: 67ae06c176cc9d2409a883fff0ef23f9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -35502,8 +35536,8 @@ RectTransform:
   m_GameObject: {fileID: 2118945579}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -2.6261}
-  m_LocalScale: {x: 0.00045, y: 0.001109465, z: 0.001109465}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.0005, y: 0.001109465, z: 0.001109465}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 491639364}
   - {fileID: 87465470}
@@ -35511,8 +35545,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -4.202, y: -0.548}
-  m_SizeDelta: {x: 771.0587, y: 376.4845}
+  m_AnchoredPosition: {x: -4.202, y: -0.59069}
+  m_SizeDelta: {x: 771.0587, y: 316.0322}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2118945581
 MonoBehaviour:
@@ -35812,7 +35846,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 379095369}
     m_Modifications:
     - target: {fileID: 342412134401844718, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
@@ -35837,7 +35871,32 @@ PrefabInstance:
     - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -4.2042813
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.811647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.5326688
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
@@ -35911,7 +35970,6 @@ SceneRoots:
   - {fileID: 1104400031}
   - {fileID: 2058325950}
   - {fileID: 224900360}
-  - {fileID: 3481067830637567576}
   - {fileID: 683159384}
   - {fileID: 1264956748}
   - {fileID: 595502765}
@@ -35923,3 +35981,4 @@ SceneRoots:
   - {fileID: 763024548}
   - {fileID: 1311405619}
   - {fileID: 379095369}
+  - {fileID: 1155670808}

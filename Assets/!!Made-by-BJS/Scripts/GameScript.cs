@@ -27,8 +27,11 @@ using Oculus.Interaction.Input;
 // DONE: added initial instruction to recenter
 // DONE: addded thingy on head
 // DONE: altered game instruction 
-// TODO: press A to start the game
-// TODO: score
+// DONE: press A to start the game
+// DONE: change instruction location for 3PP
+// TODO: score. overshoot can be penalized by using the angle calculation in line 234 (for deviationCutoff) and penalizing values above 1.
+// TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
+// TODO: set avatar scale based on HMD height at recenter action
 
 public class GameScript : MonoBehaviour
 {
@@ -156,6 +159,10 @@ public class GameScript : MonoBehaviour
 
     public GameObject ghost;
 
+    public Transform three3PPPlaceholder;
+
+    private Vector3 instruction1PPPosition;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -184,6 +191,8 @@ public class GameScript : MonoBehaviour
 
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
+
+        instruction1PPPosition = gameInstructions.transform.position;
 
         if (deviatePercentage < 0)
         {
@@ -224,13 +233,6 @@ public class GameScript : MonoBehaviour
         if (thisTrialContainsDeviation)
         {
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
-            //print("angle / goalRotation >= deviationCutoff...?");
-            //print("HMD position angle:" + angle);
-            //print("goalRotation: " + goalRotation);
-            //print("angle / goalRotation: " + angle / goalRotation);
-            //print("deviationCutoff" + deviationCutoff);
-            //print("animationTriggered" + animationTriggered);
-            //print("currentlyDeviating" + currentlyDeviating);
             if (angle / goalRotation >= deviationCutoff)
             {
                 if (!animationTriggered)
@@ -397,19 +399,22 @@ public class GameScript : MonoBehaviour
     // pressing B resets the view. (Only works in 1PP, because MoveCameraToWorldLocation checks mainCamera location and sets XROrigin location accordingly, XROrigin is parent of CameraOffset is parent of mainCamera and 3PP is achieved by changing CameraOffset.)
     void OnThumbB(InputAction.CallbackContext context)
     {
+        if (thirdPersonPerspective) { firstPersonPerspective(); }
         if (gameState == "waiting for user to recenter")
         {
             three3DObjects.SetActive(true);
+            if (thirdPersonPerspective) { gameInstructions.transform.position = three3PPPlaceholder.position; }
+            else { gameInstructions.transform.position = instruction1PPPosition; }
             instructionZero.SetActive(false);
             gameState = "Waiting for user to read instruction";
         }
-        //Debug.Log("B Pressed");
         target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
 
         float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x;
         myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
+        if (thirdPersonPerspective) { thirdPersonPerspectiveFcn(); }
     }
 
     void OnThumbA(InputAction.CallbackContext context)
@@ -422,6 +427,8 @@ public class GameScript : MonoBehaviour
         else
         {
             gameInstructions.SetActive(!gameInstructions.activeInHierarchy);
+            if (thirdPersonPerspective) { gameInstructions.transform.position = three3PPPlaceholder.position; }
+            else { gameInstructions.transform.position = instruction1PPPosition; }
         }
     }
 
@@ -430,7 +437,7 @@ public class GameScript : MonoBehaviour
         if (mainCamera != null)
         {
             // Calculate the position in front of the main camera
-            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 10.0f;
+            Vector3 newPosition = mainCamera.transform.position + mainCamera.transform.forward * 8.0f;
 
             // Update the position of the object
             instructionZero.transform.position = newPosition;
