@@ -14,8 +14,8 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Unity.XR.CoreUtils;
 using Oculus.Interaction.Input;
+using UnityEngine.SocialPlatforms.Impl;
 
-// TODO: score. overshoot can be penalized by using the angle calculation in line 234 (for deviationCutoff) and penalizing values above 1.
 // TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
 // TODO: set avatar scale based on HMD height at recenter action
 
@@ -30,8 +30,8 @@ public class GameScript : MonoBehaviour
     [SerializeField] private bool smoothTransition = false;
     [SerializeField] private float transitionStart;
     [SerializeField] private float transitionDuration; // duration of transition
-    public int phaseOneInstructions = 10;    // amount of instructions in phase 1 (no deviation)
-    public int phaseTwoInstructions = 10; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
+    public int phaseOneInstructions = 50;    // amount of instructions in phase 1 (no deviation) // ongeveer 2.42s per goal. ongeveer 50 goals in 2 seconden
+    public int phaseTwoInstructions = 50; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
     public int deviatePercentage = 40; // [%]    // percentage that deviates in phase 2
     public float deviationDuration; // duration of deviation
     public float pauseAtGoal;
@@ -62,7 +62,12 @@ public class GameScript : MonoBehaviour
 
     private List<GameObject> goals; // List to store all the sphere game objects
     private ChangeText textScript; // Reference to the ChangeText script
-    private ChangeText scoreScript;
+    public GameObject addedScoreGameObject;
+    private ChangeText addedScoreScript;
+    public GameObject totalScoreGameObject;
+    private ChangeText totalScoreScript;
+    public GameObject remainingGameObject;
+    private ChangeText remainingScript;
     private float waitTime;
     private float waitBeforeNextInstruction;
     private float waitDeviationDuration;
@@ -91,6 +96,7 @@ public class GameScript : MonoBehaviour
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
     [SerializeField] private GameObject gameInstructions;
+    public GameObject textObjects;
     //private Vector3 standardCameraOffsetPosition = new Vector3();
     //private Vector3 standardCameraOffsetRotation = new Vector3();
     [SerializeField] private GameObject alienAntenna;
@@ -100,8 +106,6 @@ public class GameScript : MonoBehaviour
     public GameObject leftHandTargetFollow;
     public GameObject rightHandTarget;
     public GameObject rightHandTargetFollow;
-
-    public GameObject scoreText;
 
     private int deviationDirection; // 0 = less far 1 = further
 
@@ -116,6 +120,7 @@ public class GameScript : MonoBehaviour
     private GameObject MainCamera;
 
     private int totalScore = 0;
+    private int roundScore = 0;
 
     private TextMeshPro textMeshProToChange;
 
@@ -152,6 +157,10 @@ public class GameScript : MonoBehaviour
 
     private float overshoot = 0;
 
+    private float instructionGivenTimestamp;
+
+    private float timeToReachGoal;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -180,8 +189,11 @@ public class GameScript : MonoBehaviour
 
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
+        addedScoreScript = addedScoreGameObject.GetComponent<ChangeText>();
+        totalScoreScript = totalScoreGameObject.GetComponent<ChangeText>();
+        remainingScript = remainingGameObject.GetComponent<ChangeText>();
 
-        instruction1PPPosition = gameInstructions.transform.position;
+        instruction1PPPosition = textObjects.transform.position;
 
         if (deviatePercentage < 0)
         {
@@ -203,6 +215,7 @@ public class GameScript : MonoBehaviour
         thumbButtonA.action.performed += OnThumbA;
 
         if (!useGhost) {  ghost.SetActive(false); }
+
 
         // initial game state just prompts the user to recenter
         three3DObjects.SetActive(false);
@@ -260,7 +273,6 @@ public class GameScript : MonoBehaviour
         //// controller trigger button press
         //float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
 
-        scoreScript = scoreText.GetComponent<ChangeText>();
 
         /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
         currentTime += Time.deltaTime;
@@ -410,10 +422,11 @@ public class GameScript : MonoBehaviour
         if (gameState == "waiting for user to recenter")
         {
             three3DObjects.SetActive(true);
-            if (thirdPersonPerspective) { gameInstructions.transform.position = three3PPPlaceholder.position; }
-            else { gameInstructions.transform.position = instruction1PPPosition; }
+            if (thirdPersonPerspective) { textObjects.transform.position = three3PPPlaceholder.position; }
+            else { textObjects.transform.position = instruction1PPPosition; }
             instructionZero.SetActive(false);
             gameState = "Waiting for user to read instruction";
+            addedScoreGameObject.SetActive(false);
         }
         target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
@@ -434,8 +447,8 @@ public class GameScript : MonoBehaviour
         else
         {
             gameInstructions.SetActive(!gameInstructions.activeInHierarchy);
-            if (thirdPersonPerspective) { gameInstructions.transform.position = three3PPPlaceholder.position; }
-            else { gameInstructions.transform.position = instruction1PPPosition; }
+            if (thirdPersonPerspective) { textObjects.transform.position = three3PPPlaceholder.position; }
+            else { textObjects.transform.position = instruction1PPPosition; }
         }
     }
 
@@ -466,15 +479,15 @@ public class GameScript : MonoBehaviour
     IEnumerator ShowScore()
     {
         float localTime = 0f;
-        scoreText.SetActive(true);
+        addedScoreGameObject.SetActive(true);
         
-        while (localTime < 2) // 2 seconds visible
+        while (localTime < 1) // 1 second visible
         {
             localTime += Time.deltaTime;
             yield return null;
         }
         
-        scoreText.SetActive(false);
+        addedScoreGameObject.SetActive(false);
     }
 
     // Collision collider
@@ -541,6 +554,9 @@ public class GameScript : MonoBehaviour
 
     public void HandleGoalTouched()
     {
+        timeToReachGoal = Time.time - instructionGivenTimestamp;
+        print("Time to reach goal" + timeToReachGoal);
+
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
             gameInstructions.SetActive(true);
@@ -559,6 +575,17 @@ public class GameScript : MonoBehaviour
     {
         // previous overshoot
         print("Overshoot = " + overshoot);
+        print("overshoot difference : " + Mathf.Abs(overshoot - 1));
+        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
+        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
+        if (roundScore < 0) { roundScore = 0; }
+        print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
+        totalScore += roundScore;
+        addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
+        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+        StartCoroutine(ShowScore());
+
 
         // Increment the instruction counter
         instructionCounter++;
@@ -642,6 +669,10 @@ public class GameScript : MonoBehaviour
 
         // Make selected number red
         ChangeTextColor(currentGoal, Color.red);
+
+        instructionGivenTimestamp = Time.time;
+
+        
     }
 
 
@@ -715,27 +746,6 @@ public class GameScript : MonoBehaviour
         float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
         deviationLerpValue = 0.5f * Mathf.Sin(B * (localCurrentTime - C)) + 0.5f; // Update the lerpValue calculation with the new amplitude. 0.5 * sin(pi * (x-0.5))+ 0.5 goes from 0 to 1 to 0 in 2s
         return deviationLerpValue;
-    }
-
-
-        // Co-routine
-    IEnumerator FlashGoal(GameObject goal)
-    {
-        float elapsedTime = 0f;
-        goal.SetActive(true);
-
-        // Wait
-        while (elapsedTime < flashTime)
-        {
-            // Increment the elapsed time using Time.deltaTime
-            elapsedTime += Time.deltaTime;
-
-            // Wait for the next frame
-            yield return null;
-        }
-
-        // Call the function to handle the logic after touching a sphere
-        goal.SetActive(false);
     }
 
     // Call this method to change the text color
