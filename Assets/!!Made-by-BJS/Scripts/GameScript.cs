@@ -15,20 +15,6 @@ using UnityEngine.UIElements;
 using Unity.XR.CoreUtils;
 using Oculus.Interaction.Input;
 
-// DONE: deviation begint al in het midden. percentage berekening is niet goed.
-// DONE: deviation blijft vast in een loop en hij gaat ook omhoog. zoek waarom ie niet uitgaat
-// DONE: en scale de goals terug.
-// DONE: hoofd schiet tijdens deviation verder naar voren (Z). na deviation is er een offset. check welke z waarde die pakt. haal evt eerst de lines weg waarin ie Z negeert
-// DONE: implement in-game "reset view" button
-// DONE: test 3pp
-
-// DONE: schaal de doelen naar de hoogte van de gebruiker
-// DONE: na deviation mag ie terug. niet eerst nog wachten op gebruiker hoofd touch
-// DONE: added initial instruction to recenter
-// DONE: addded thingy on head
-// DONE: altered game instruction 
-// DONE: press A to start the game
-// DONE: change instruction location for 3PP
 // TODO: score. overshoot can be penalized by using the angle calculation in line 234 (for deviationCutoff) and penalizing values above 1.
 // TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
 // TODO: set avatar scale based on HMD height at recenter action
@@ -86,6 +72,7 @@ public class GameScript : MonoBehaviour
     private string reach;
     private GameObject previousGoal;
     private GameObject currentGoal;
+    private GameObject goalPreviousFrame;
 
 
     [SerializeField] private Transform hmdTarget;
@@ -163,6 +150,8 @@ public class GameScript : MonoBehaviour
 
     private Vector3 instruction1PPPosition;
 
+    private float overshoot = 0;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -224,23 +213,42 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            OnThumbB(default);
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            OnThumbA(default);
+        }
         if (gameState == "waiting for user to recenter")
         {
             InstructionInFrontOfCamera();
         }
 
         // check head position relative to goal position, start deviating at 80%
-        if (thisTrialContainsDeviation)
+        if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight")
         {
+            // calculate the progress to the goal and overshoot
+            if (goalPreviousFrame != currentGoal) { overshoot = 0; } // reset overshoot when new goal is set
+            goalPreviousFrame = currentGoal;
+            // if (goalRotation != 0) // if (currentGoal != topGoal)
+
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
-            if (angle / goalRotation >= deviationCutoff)
+            float progress = angle / goalRotation;
+            if (progress > overshoot) { overshoot = progress;}
+            if (thisTrialContainsDeviation)
             {
-                if (!animationTriggered)
+                if (progress >= deviationCutoff)
                 {
-                    currentlyDeviating = true;
-                    deviationClock = 0;
-                    animationTriggered = true;
-                    StartCoroutine(WaitForDeviationAndActAsIfGoalTouched());
+                    if (!animationTriggered)
+                    {
+                        currentlyDeviating = true;
+                        deviationClock = 0;
+                        animationTriggered = true;
+                        StartCoroutine(WaitForDeviationAndActAsIfGoalTouched());
+                    }
                 }
             }
         }
@@ -293,7 +301,6 @@ public class GameScript : MonoBehaviour
                     transitionLerpValue = lerpTransition(transitionTime);
                     // transition camera view
                     cameraOffset.transform.position = Vector3.Lerp(Vector3.zero, thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
-                    print("line 274 executed (1PP -> 3PP transition)!");
                     // transition avatar head & hands positions, compensate for camera offset
                     transform.position = Vector3.Lerp(hmdTarget.position, hmdTarget.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue); //// HMD
                     leftHandTargetFollow.transform.position = Vector3.Lerp(leftHandTarget.transform.position, leftHandTarget.transform.position - thirdPersonPerspectiveOffsetPosition, transitionLerpValue);
@@ -544,15 +551,18 @@ public class GameScript : MonoBehaviour
             ChangeTextColor(currentGoal, Color.black);
             gameState = "Waiting for user to sit straight";
             ChangeTextColor(topGoal, Color.red);
-            print(gameState);
+            // print(gameState);
         }
     }
 
     void SetRandomGoal()
     {
+        // previous overshoot
+        print("Overshoot = " + overshoot);
+
         // Increment the instruction counter
         instructionCounter++;
-        print("instructionCounter: " + instructionCounter);
+        // print("instructionCounter: " + instructionCounter);
         scoreSaved = false;
 
         thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
@@ -572,14 +582,15 @@ public class GameScript : MonoBehaviour
         }
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
-        print("currentGoal: " + currentGoal);
+        // print("currentGoal: " + currentGoal);
+
+        goalRotation = currentGoal.transform.eulerAngles.z;
+        if (goalRotation > 180) { goalRotation -= 360; }
 
         // Determine deviation goal
         if (thisTrialContainsDeviation)
         {
             animationTriggered = false;
-            goalRotation = currentGoal.transform.eulerAngles.z;
-            if (goalRotation > 180) { goalRotation -= 360; }
             // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
             if (randomIndex == 0 || randomIndex == 4)
             {
@@ -593,7 +604,7 @@ public class GameScript : MonoBehaviour
             {
                 deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
             }
-            print("deviation direction: " + deviationDirection);
+            // print("deviation direction: " + deviationDirection);
 
             if (deviationDirection == 0)
             {
@@ -621,13 +632,13 @@ public class GameScript : MonoBehaviour
             }
             deviationGoalPosition = deviationGoal.transform.position;
             deviationGoalRotation = deviationGoal.transform.rotation;
-            print("deviationGoal: " + deviationGoal);
-            print("deviationGoalPosition: " + deviationGoalPosition);
-            print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
+            // print("deviationGoal: " + deviationGoal);
+            // print("deviationGoalPosition: " + deviationGoalPosition);
+            // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
         gameState = "Waiting for user to touch goal";
-        print(gameState);
+        // print(gameState);
 
         // Make selected number red
         ChangeTextColor(currentGoal, Color.red);
