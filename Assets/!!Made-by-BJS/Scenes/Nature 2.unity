@@ -9560,7 +9560,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.0741, y: 0.4920001}
+  m_AnchoredPosition: {x: -0.0741, y: 0.381}
   m_SizeDelta: {x: 1056.7334, y: 68.5085}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &505033009
@@ -11226,7 +11226,7 @@ MonoBehaviour:
   ghost: {fileID: 974739299}
   three3PPPlaceholder: {fileID: 1155670808}
   centerFastDeviationDuration: 0.5
-  centerSlowDeviationDuration: 3
+  centerSlowDeviationDuration: 1
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
 --- !u!65 &595502770
@@ -20110,8 +20110,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
