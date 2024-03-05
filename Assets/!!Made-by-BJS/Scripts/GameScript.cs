@@ -607,7 +607,7 @@ public class GameScript : MonoBehaviour
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
         //totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         //remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-        StartCoroutine(ShowScore());
+        if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
 
 
         // Increment the instruction counter
