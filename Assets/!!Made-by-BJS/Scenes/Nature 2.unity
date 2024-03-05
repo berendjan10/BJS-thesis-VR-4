@@ -11151,7 +11151,7 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 0
+  phaseOneInstructions: 10
   phaseTwoInstructions: 50
   deviatePercentage: 100
   deviationDuration: 1
