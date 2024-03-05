@@ -19,6 +19,9 @@ using UnityEngine.SocialPlatforms.Impl;
 // TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
 // TODO: set avatar scale based on HMD height at recenter action
 
+// next instruction => sit straight
+// first wait them deviate
+
 public class GameScript : MonoBehaviour
 {
     public GameObject headReference;
@@ -124,7 +127,7 @@ public class GameScript : MonoBehaviour
 
     private TextMeshPro textMeshProToChange;
 
-    private string gameState; // "waiting for user to recenter" "Waiting for user to read instruction" "Waiting for user to touch goal" "Waiting for user to sit straight"
+    private string gameState; // "waiting for user to recenter" "Waiting for user to read instruction" "Waiting for user to touch goal" "Waiting for user to sit straight" "Center goal red, user has to sit still, avatar deviates SLOW"
 
     public Transform myMeasuredPivotPoint;
 
@@ -161,6 +164,12 @@ public class GameScript : MonoBehaviour
 
     private float timeToReachGoal;
 
+    public float centerFastDeviationDuration = 0.5f;
+    public float centerSlowDeviationDuration = 3.0f;
+
+    public GameObject closeGoalLeft;
+    public GameObject closeGoalRight;
+
     void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -184,7 +193,7 @@ public class GameScript : MonoBehaviour
         avatar.transform.localScale = new Vector3(scale, scale, scale);
 
         // Initialize the list with all sphere game objects
-        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal };
         // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
@@ -226,6 +235,8 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        totalScoreScript.ChangeTextFcn(gameState);
+
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -241,7 +252,7 @@ public class GameScript : MonoBehaviour
         }
 
         // check head position relative to goal position, start deviating at 80%
-        if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight")
+        if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight" || gameState == "Center goal red, user has to sit still, avatar deviates SLOW")
         {
             // calculate the progress to the goal and overshoot
             if (goalPreviousFrame != currentGoal) { overshoot = 0; } // reset overshoot when new goal is set
@@ -260,12 +271,14 @@ public class GameScript : MonoBehaviour
                         currentlyDeviating = true;
                         deviationClock = 0;
                         animationTriggered = true;
-                        StartCoroutine(WaitForDeviationAndActAsIfGoalTouched());
+                        if (gameState != "Center goal red, user has to sit still, avatar deviates SLOW") { StartCoroutine(WaitForDeviationAndActAsIfGoalTouched()); }
+                        remainingScript.ChangeTextFcn(instructionCounter.ToString());
                     }
                 }
             }
         }
-        else if (!thisTrialContainsDeviation)
+        
+        if (!thisTrialContainsDeviation)
         {
             currentlyDeviating = false;
         }
@@ -335,9 +348,19 @@ public class GameScript : MonoBehaviour
         /////////////////////////////////////////////////////////////////////////////////// DEVIATION ///////////////////////////////////////////////////////////////////////////////////
         if (currentlyDeviating)
         {
+            if (gameState == "Center goal red, user has to sit still, avatar deviates SLOW")
+            {
+                deviationDuration = centerSlowDeviationDuration;
+                deviationType = devType.sineWave;
+            }
+            else if (gameState == "Center goal red, user has to sit still, avatar deviates FAST")
+            {
+                deviationDuration = centerFastDeviationDuration;
+                deviationType = devType.sineWave;
+            }
             // deviation timing
             deviationClock += Time.deltaTime;
-
+            
             if (deviationType == devType.sineWave)
             {
                 if (deviationClock >= 0 && deviationClock <= deviationDuration)
@@ -491,7 +514,7 @@ public class GameScript : MonoBehaviour
     }
 
     // Collision collider
-    void OnTriggerEnter(Collider other) // when the head touches a goal
+    void OnTriggerStay(Collider other) // when the head touches a goal
     {
         if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal)
         {
@@ -582,8 +605,8 @@ public class GameScript : MonoBehaviour
         print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
-        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+        //totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        //remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
         StartCoroutine(ShowScore());
 
 
@@ -614,22 +637,36 @@ public class GameScript : MonoBehaviour
         goalRotation = currentGoal.transform.eulerAngles.z;
         if (goalRotation > 180) { goalRotation -= 360; }
 
+        //////////////////////////////////////////////////////////////// choose type of deviation //////////////////////////////////////////////////////////////////
         // Determine deviation goal
-        if (thisTrialContainsDeviation)
+        if (thisTrialContainsDeviation) 
         {
             animationTriggered = false;
-            // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+            // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
             if (randomIndex == 0 || randomIndex == 4)
             {
                 deviationDirection = 1; // farther
+                gameState = "Waiting for user to touch goal";
             }
             else if (randomIndex == 3 || randomIndex == 7)
             {
-                deviationDirection= 0; // closer
+                deviationDirection = 0; // closer
+                gameState = "Waiting for user to touch goal";
+            }
+            else if (randomIndex >= 8 && randomIndex <= 9)
+            {
+                StartCoroutine(waiBeforeCenterDeviation(false));
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
+            }
+            else if (randomIndex >= 10 && randomIndex <= 11)
+            {
+                StartCoroutine(waiBeforeCenterDeviation(true));
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
             }
             else
             {
                 deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
+                gameState = "Waiting for user to touch goal";
             }
             // print("deviation direction: " + deviationDirection);
 
@@ -653,6 +690,16 @@ public class GameScript : MonoBehaviour
                     thisTrialContainsDeviation = false;
                 }
             }
+            else if (deviationDirection == 3)
+            {
+                deviationCutoff = -1;
+                deviationGoal = closeGoalLeft;
+            }
+            else if (deviationDirection == 4)
+            {
+                deviationCutoff = -1;
+                deviationGoal = closeGoalRight;
+            }
             else
             {
                 Debug.LogError("Unexpected deviationDirection vaLue: " + deviationDirection);
@@ -664,7 +711,7 @@ public class GameScript : MonoBehaviour
             // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
-        gameState = "Waiting for user to touch goal";
+        
         // print(gameState);
 
         // Make selected number red
@@ -675,7 +722,42 @@ public class GameScript : MonoBehaviour
         
     }
 
+    IEnumerator waiBeforeCenterDeviation(bool fast)
+    {
+        float localTimer = 0;
+        while (localTimer < 1.0f)
+        {
+            localTimer += Time.deltaTime;
+            yield return null;
+        }
+        if (!fast)
+        {
+            gameState = "Center goal red, user has to sit still, avatar deviates SLOW";
+            StartCoroutine(CenterDeviation(centerSlowDeviationDuration));
+        }
+        else 
+        {
+            gameState = "Center goal red, user has to sit still, avatar deviates FAST";
+            StartCoroutine(CenterDeviation(centerFastDeviationDuration));
+        }
+    }
 
+    // coroutine
+    IEnumerator CenterDeviation(float localDeviationDuration)
+    {
+        float localTimer = 0;
+        while (localTimer < localDeviationDuration)
+        {
+            localTimer += Time.deltaTime;
+            yield return null;
+        }
+        // after timer
+        ChangeTextColor(topGoal, Color.black);
+        waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+        gameState = "Waiting before next instruction is given";
+        StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
+
+    }
 
     // Function to generate a collection of instruction counters for deviating trials
     void GenerateDeviatingTrials(int count)
