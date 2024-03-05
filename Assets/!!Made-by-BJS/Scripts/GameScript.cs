@@ -65,6 +65,7 @@ public class GameScript : MonoBehaviour
     private float scale;
 
     private List<GameObject> goals; // List to store all the sphere game objects
+    private List<GameObject> goalsPhase2; // List to store all the sphere game objects
     private ChangeText textScript; // Reference to the ChangeText script
     public GameObject addedScoreGameObject;
     private ChangeText addedScoreScript;
@@ -197,7 +198,8 @@ void Start()
         avatar.transform.localScale = new Vector3(scale, scale, scale);
 
         // Initialize the list with all sphere game objects
-        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
+        goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+        goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
         // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
@@ -624,17 +626,22 @@ void Start()
 
     void SetRandomGoal()
     {
-
-
-
+        print("SetRandomGoal() entered.");
         // Increment the instruction counter
         instructionCounter++;
-        // print("instructionCounter: " + instructionCounter);
+        print("instructionCounter: " + instructionCounter);
         scoreSaved = false;
 
         thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
+        print("thisTrialContainsDeviation" + thisTrialContainsDeviation);
         // Generate a random index to choose the next sphere
         int randomIndex;
+
+        if (instructionCounter > phaseOneInstructions)
+        {
+            print("dit bericht moet pas in phase 2 verschijnen!");
+            goals = goalsPhase2;
+        }
 
         if (goals.Count <= 1)
         {
@@ -644,9 +651,10 @@ void Start()
         {
             do
             {
-                randomIndex = Random.Range(7, 12);//Random.Range(0, goals.Count); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                randomIndex = Random.Range(0, goals.Count); 
             } while (goals[randomIndex] == previousGoal);
         }
+        print("randomIndex: " + randomIndex);
 
         // catch error
         try { GameObject test123 = goals[randomIndex]; }
