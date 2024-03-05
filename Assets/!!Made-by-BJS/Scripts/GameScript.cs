@@ -99,7 +99,6 @@ public class GameScript : MonoBehaviour
     public GameObject textObjects;
     //private Vector3 standardCameraOffsetPosition = new Vector3();
     //private Vector3 standardCameraOffsetRotation = new Vector3();
-    [SerializeField] private GameObject alienAntenna;
     //public Vector3 thirdPersonPerspectiveOffsetRotation = new Vector3(15.0f, 0.0f, 0.0f);
 
     public GameObject leftHandTarget;
@@ -415,7 +414,7 @@ public class GameScript : MonoBehaviour
     } // Update() end
 
 
-    // pressing B resets the view. (Only works in 1PP, because MoveCameraToWorldLocation checks mainCamera location and sets XROrigin location accordingly, XROrigin is parent of CameraOffset is parent of mainCamera and 3PP is achieved by changing CameraOffset.)
+    // pressing B resets the view, scales it to participant
     void OnThumbB(InputAction.CallbackContext context)
     {
         if (thirdPersonPerspective) { firstPersonPerspective(); }
@@ -433,7 +432,11 @@ public class GameScript : MonoBehaviour
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
 
         float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x;
+        float scale0to1 = scaleDeviationGoals / 0.02f;
+        // scale goals which are a child of myMeasuredPivotPoint
         myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
+        // Scale avatar
+        avatar.transform.localScale = new Vector3(scale0to1, scale0to1, scale0to1);
         if (thirdPersonPerspective) { thirdPersonPerspectiveFcn(); }
     }
 
