@@ -17,11 +17,6 @@ using Oculus.Interaction.Input;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEditor;
 
-// TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
-// TODO: set avatar scale based on HMD height at recenter action
-
-// reset devtime as soon as dev really starts
-// mgeen score bij middel deviation
 
 public class GameScript : MonoBehaviour
 {
