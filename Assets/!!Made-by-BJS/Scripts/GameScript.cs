@@ -171,6 +171,8 @@ public class GameScript : MonoBehaviour
 
     public float waitForCenterDeviation = 3.0f;
 
+    private bool WaitAndSetRandomGoalCalled;
+
 void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
@@ -232,12 +234,14 @@ void Start()
         three3DObjects.SetActive(false);
         instructionZero.SetActive(true);
         gameState = "waiting for user to recenter";
+
+        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions));
     }
 
     // Update is called once per frame
     void Update()
     {
-        //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: " + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
+        totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: ");// + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -274,8 +278,7 @@ void Start()
                         currentlyDeviating = true;
                         deviationClock = 0;
                         animationTriggered = true;
-                        if (gameState == "Waiting for user to touch goal") { StartCoroutine(WaitForDeviationAndActAsIfGoalTouched()); } // skip (user has to touch goal)
-                        remainingScript.ChangeTextFcn(instructionCounter.ToString());
+                        if (gameState == "Waiting for user to touch goal") { StartCoroutine(WaitForDeviationAndActAsIfGoalTouched()); } // skip that (user has to touch goal)
                     }
                 }
             }
@@ -531,18 +534,21 @@ void Start()
     // Collision collider
     void OnTriggerStay(Collider other) // when the head touches a goal
     {
-        if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal)
+        if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal & !currentlyDeviating)
         {
             HandleGoalTouched();
         }
         else if (gameState == "Waiting for user to sit straight" && other.gameObject == topGoal)
         {
+            print("collider 2");
             ChangeTextColor(topGoal, Color.black);
             waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
             gameState = "Waiting before next instruction is given";
             StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
         }
     }
+    
+
 
     public void MoveDown(GameObject moveThis)
     {
@@ -557,17 +563,20 @@ void Start()
     {
         // CALCULATE AND SHOW SCORE
         // previous overshoot
-        print("Overshoot = " + overshoot);
-        print("overshoot difference : " + Mathf.Abs(overshoot - 1));
+        //print("Overshoot = " + overshoot);
+        //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
         // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
         roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
         if (roundScore < 0) { roundScore = 0; }
-        print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
+        //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        //totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-        if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
+        if (currentGoal != topGoal)
+        {
+            if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
+        }
 
         // Set a random wait time between 1s and 2s
         float elapsedTime = 0f;
@@ -591,7 +600,7 @@ void Start()
         float elapsedTime = 0f;
 
         // Continue waiting until the elapsed time reaches the wait time
-        while (elapsedTime < deviationDuration)
+        while (elapsedTime < (deviationDuration*0.5f)+pauseAtGoal)
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
@@ -625,7 +634,7 @@ void Start()
 
     void SetRandomGoal()
     {
-        print("SetRandomGoal() entered.");
+        //print("SetRandomGoal() entered.");
         // Increment the instruction counter
         instructionCounter++;
         print("instructionCounter: " + instructionCounter);
@@ -668,7 +677,7 @@ void Start()
         {
             animationTriggered = false;
             // get position of currentGoal in Goals list (length 12. idxs 0 t/m 11)
-            if (randomIndex == 0 || randomIndex == 4)
+            if (randomIndex == 0 || randomIndex == 4) // improve: if (currentGoal == goal1 etc
             {
                 deviationDirection = 1; // farther
                 gameState = "Waiting for user to touch goal";
@@ -678,12 +687,13 @@ void Start()
                 deviationDirection = 0; // closer
                 gameState = "Waiting for user to touch goal";
             }
+            // topGoalDeviationSlow
             else if (randomIndex >= 8 && randomIndex <= 9)
             {
                 StartCoroutine(waiBeforeCenterDeviation(false));
                 deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
-                // do not change gameState
             }
+            // topGoalDeviationFast
             else if (randomIndex >= 10 && randomIndex <= 11)
             {
                 StartCoroutine(waiBeforeCenterDeviation(true));
