@@ -11183,7 +11183,6 @@ MonoBehaviour:
   mirror: {fileID: 652892233}
   gameInstructions: {fileID: 2118945579}
   textObjects: {fileID: 2117976517}
-  alienAntenna: {fileID: 0}
   leftHandTarget: {fileID: 586590418}
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
