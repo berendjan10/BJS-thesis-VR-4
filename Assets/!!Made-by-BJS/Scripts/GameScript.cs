@@ -359,12 +359,12 @@ void Start()
 
             if (gameState == "Sudden deviation SLOW")
             {
-                deviationTypeLocal = devType.sineWave;
-                deviationDurationLocal = centerSlowDeviationDuration;
+                deviationTypeLocal = devType.forthPauseBack;
+                deviationDurationLocal = centerSlowDeviationDuration; // change back? change line in CenterDeviation(): while (localTimer < localDeviationDuration+pauseAtGoal)
             }
             else if (gameState == "Sudden deviation FAST")
             {
-                deviationTypeLocal = devType.sineWave;
+                deviationTypeLocal = devType.forthPauseBack;
                 deviationDurationLocal = centerFastDeviationDuration;
             }
             else
@@ -389,26 +389,26 @@ void Start()
             }
             else if (deviationTypeLocal == devType.forthPauseBack)
             {
-                if (deviationClock >= 0 && deviationClock <= deviationDuration / 2)
+                if (deviationClock >= 0 && deviationClock <= deviationDurationLocal / 2)
                 {
                     // movement speed function
-                    deviationLerpValue = sineWave(deviationClock, deviationDuration);
+                    deviationLerpValue = sineWave(deviationClock, deviationDurationLocal);
                 }
-                else if (deviationClock > deviationDuration / 2 && deviationClock <= (deviationDuration / 2 + pauseAtGoal)) // pause at goal
+                else if (deviationClock > deviationDurationLocal / 2 && deviationClock <= (deviationDurationLocal / 2 + pauseAtGoal)) // pause at goal
                 {
                     // movement speed function
                     deviationLerpValue = 1;
 
                     // set next loop timer to timestamp top of sine wave
-                    deviationClock2 = deviationDuration / 2;
+                    deviationClock2 = deviationDurationLocal / 2;
                 }
-                else if (deviationClock > (deviationDuration / 2 + pauseAtGoal) && deviationClock <= (deviationDuration + pauseAtGoal))
+                else if (deviationClock > (deviationDurationLocal / 2 + pauseAtGoal) && deviationClock <= (deviationDurationLocal + pauseAtGoal))
                 {
                     deviationClock2 += Time.deltaTime;
                     // movement speed function
-                    deviationLerpValue = sineWave(deviationClock2, deviationDuration);
+                    deviationLerpValue = sineWave(deviationClock2, deviationDurationLocal);
                 }
-                else if (deviationClock > (deviationDuration + pauseAtGoal))
+                else if (deviationClock > (deviationDurationLocal + pauseAtGoal))
                 {
                     currentlyDeviating = false;
                 }
@@ -782,7 +782,7 @@ void Start()
     IEnumerator CenterDeviation(float localDeviationDuration)
     {
         float localTimer = 0;
-        while (localTimer < localDeviationDuration)
+        while (localTimer < localDeviationDuration+pauseAtGoal)
         {
             localTimer += Time.deltaTime;
             yield return null;
