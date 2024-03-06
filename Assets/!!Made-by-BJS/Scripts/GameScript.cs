@@ -241,8 +241,7 @@ void Start()
     // Update is called once per frame
     void Update()
     {
-        totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: " + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
-
+        //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: " + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -566,8 +565,8 @@ void Start()
         print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        //totalScoreScript.ChangeTextFcn("Score: " + totalScore);
-        //remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
         if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
 
         // Set a random wait time between 1s and 2s
@@ -656,14 +655,6 @@ void Start()
         }
         print("randomIndex: " + randomIndex);
 
-        // catch error
-        try { GameObject test123 = goals[randomIndex]; }
-        catch (IndexOutOfRangeException e)
-        {
-            Debug.LogError("eeeyyooooo randomIndex is out of range: " + randomIndex + ". Error message: " + e.Message);
-        }
-
-
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
         // print("currentGoal: " + currentGoal);
@@ -691,6 +682,7 @@ void Start()
             {
                 StartCoroutine(waiBeforeCenterDeviation(false));
                 deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
+                // do not change gameState
             }
             else if (randomIndex >= 10 && randomIndex <= 11)
             {
@@ -745,7 +737,7 @@ void Start()
             // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
-        
+        else { gameState = "Waiting for user to touch goal"; } 
         // print(gameState);
 
         // Make selected number red
