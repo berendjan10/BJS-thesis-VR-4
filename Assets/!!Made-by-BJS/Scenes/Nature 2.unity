@@ -11183,7 +11183,6 @@ MonoBehaviour:
   mirror: {fileID: 652892233}
   gameInstructions: {fileID: 2118945579}
   textObjects: {fileID: 2117976517}
-  alienAntenna: {fileID: 0}
   leftHandTarget: {fileID: 586590418}
   leftHandTargetFollow: {fileID: 846598477}
   rightHandTarget: {fileID: 731271490}
@@ -20223,8 +20222,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
