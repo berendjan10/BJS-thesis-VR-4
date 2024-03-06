@@ -241,7 +241,7 @@ void Start()
     // Update is called once per frame
     void Update()
     {
-        totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: ");// + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
+        //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: ");// + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -571,7 +571,7 @@ void Start()
         //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        //totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
         if (currentGoal != topGoal)
         {
