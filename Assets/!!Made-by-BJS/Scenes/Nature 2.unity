@@ -11151,7 +11151,7 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 30
+  phaseOneInstructions: 10
   phaseTwoInstructions: 30
   deviatePercentage: 40
   deviationDuration: 1.5
@@ -11228,6 +11228,7 @@ MonoBehaviour:
   centerSlowDeviationDuration: 2.2
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
+  waitForCenterDeviation: 3
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0

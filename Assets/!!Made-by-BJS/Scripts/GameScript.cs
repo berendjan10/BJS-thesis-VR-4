@@ -17,6 +17,7 @@ using Oculus.Interaction.Input;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEditor;
 
+// tweak middle deviation timing
 
 public class GameScript : MonoBehaviour
 {
@@ -168,6 +169,7 @@ public class GameScript : MonoBehaviour
 
     private float progress0debug;
 
+    public float waitForCenterDeviation = 3.0f;
 
 void Start()
     {
@@ -735,11 +737,11 @@ void Start()
             // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
-        else { gameState = "Waiting for user to touch goal"; } 
+        else { gameState = "Waiting for user to touch goal"; }
         // print(gameState);
 
         // Make selected number red
-        ChangeTextColor(currentGoal, Color.red);
+        if (currentGoal != topGoal) { ChangeTextColor(currentGoal, Color.red); }
 
         instructionGivenTimestamp = Time.time;
 
@@ -749,7 +751,7 @@ void Start()
     IEnumerator waiBeforeCenterDeviation(bool fast)
     {
         float localTimer = 0;
-        while (localTimer < 3.0f)
+        while (localTimer < waitForCenterDeviation)
         {
             localTimer += Time.deltaTime;
             yield return null;
