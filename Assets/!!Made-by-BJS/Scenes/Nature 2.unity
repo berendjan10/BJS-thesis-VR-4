@@ -11151,9 +11151,9 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 0
+  phaseOneInstructions: 30
   phaseTwoInstructions: 30
-  deviatePercentage: 100
+  deviatePercentage: 40
   deviationDuration: 1.5
   pauseAtGoal: 0.2
   waitTimeLowerLimit: 0
@@ -11225,7 +11225,7 @@ MonoBehaviour:
   ghost: {fileID: 974739299}
   three3PPPlaceholder: {fileID: 1155670808}
   centerFastDeviationDuration: 1
-  centerSlowDeviationDuration: 3
+  centerSlowDeviationDuration: 2.2
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
 --- !u!65 &595502770
