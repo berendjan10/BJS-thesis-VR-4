@@ -15,9 +15,13 @@ using UnityEngine.UIElements;
 using Unity.XR.CoreUtils;
 using Oculus.Interaction.Input;
 using UnityEngine.SocialPlatforms.Impl;
+using UnityEditor;
 
 // TODO: make gameflow: first practice, then for real (phase 1 + 2). phase 1 is 2 minutes regardless of amount of goals reached, phase 2 also.
 // TODO: set avatar scale based on HMD height at recenter action
+
+// reset devtime as soon as dev really starts
+// mgeen score bij middel deviation
 
 public class GameScript : MonoBehaviour
 {
@@ -61,6 +65,7 @@ public class GameScript : MonoBehaviour
     private float scale;
 
     private List<GameObject> goals; // List to store all the sphere game objects
+    private List<GameObject> goalsPhase2; // List to store all the sphere game objects
     private ChangeText textScript; // Reference to the ChangeText script
     public GameObject addedScoreGameObject;
     private ChangeText addedScoreScript;
@@ -123,7 +128,7 @@ public class GameScript : MonoBehaviour
 
     private TextMeshPro textMeshProToChange;
 
-    private string gameState; // "waiting for user to recenter" "Waiting for user to read instruction" "Waiting for user to touch goal" "Waiting for user to sit straight"
+    private string gameState; // "waiting for user to recenter" "Waiting for user to read instruction" "Waiting for user to touch goal" "Waiting for user to sit straight" "Sudden deviation SLOW" "Waiting before next instruction is given"
 
     public Transform myMeasuredPivotPoint;
 
@@ -160,7 +165,16 @@ public class GameScript : MonoBehaviour
 
     private float timeToReachGoal;
 
-    void Start()
+    public float centerFastDeviationDuration = 0.5f;
+    public float centerSlowDeviationDuration = 3.0f;
+
+    public GameObject closeGoalLeft;
+    public GameObject closeGoalRight;
+
+    private float progress0debug;
+
+
+void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
         //print("headReference" + headReference.transform.position); 
@@ -184,6 +198,7 @@ public class GameScript : MonoBehaviour
 
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+        goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
         // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
@@ -225,6 +240,7 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: " + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -240,7 +256,7 @@ public class GameScript : MonoBehaviour
         }
 
         // check head position relative to goal position, start deviating at 80%
-        if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight")
+        if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight" || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
         {
             // calculate the progress to the goal and overshoot
             if (goalPreviousFrame != currentGoal) { overshoot = 0; } // reset overshoot when new goal is set
@@ -249,22 +265,26 @@ public class GameScript : MonoBehaviour
 
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
             float progress = angle / goalRotation;
+            progress0debug = progress;
             if (progress > overshoot) { overshoot = progress;}
             if (thisTrialContainsDeviation)
             {
-                if (progress >= deviationCutoff)
+                if (progress >= deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
                 {
-                    if (!animationTriggered)
+                    if (!animationTriggered && gameState != "Waiting for user to sit straight")
                     {
+                        // Trigger deviation
                         currentlyDeviating = true;
                         deviationClock = 0;
                         animationTriggered = true;
-                        StartCoroutine(WaitForDeviationAndActAsIfGoalTouched());
+                        if (gameState == "Waiting for user to touch goal") { StartCoroutine(WaitForDeviationAndActAsIfGoalTouched()); } // skip (user has to touch goal)
+                        remainingScript.ChangeTextFcn(instructionCounter.ToString());
                     }
                 }
             }
         }
-        else if (!thisTrialContainsDeviation)
+        
+        if (!thisTrialContainsDeviation)
         {
             currentlyDeviating = false;
         }
@@ -334,27 +354,45 @@ public class GameScript : MonoBehaviour
         /////////////////////////////////////////////////////////////////////////////////// DEVIATION ///////////////////////////////////////////////////////////////////////////////////
         if (currentlyDeviating)
         {
+            float deviationDurationLocal;
+            devType deviationTypeLocal;
+
+            if (gameState == "Sudden deviation SLOW")
+            {
+                deviationTypeLocal = devType.sineWave;
+                deviationDurationLocal = centerSlowDeviationDuration;
+            }
+            else if (gameState == "Sudden deviation FAST")
+            {
+                deviationTypeLocal = devType.sineWave;
+                deviationDurationLocal = centerFastDeviationDuration;
+            }
+            else
+            {
+                deviationTypeLocal = deviationType;
+                deviationDurationLocal = deviationDuration;
+            }
             // deviation timing
             deviationClock += Time.deltaTime;
-
-            if (deviationType == devType.sineWave)
+            
+            if (deviationTypeLocal == devType.sineWave)
             {
-                if (deviationClock >= 0 && deviationClock <= deviationDuration)
+                if (deviationClock >= 0 && deviationClock <= deviationDurationLocal)
                 {
                     // movement speed function
-                    deviationLerpValue = sineWave(deviationClock);
+                    deviationLerpValue = sineWave(deviationClock, deviationDurationLocal);
                 }
-                else if (deviationClock > deviationDuration)
+                else if (deviationClock > deviationDurationLocal)
                 {
                     currentlyDeviating = false;
                 }
             }
-            else if (deviationType == devType.forthPauseBack)
+            else if (deviationTypeLocal == devType.forthPauseBack)
             {
                 if (deviationClock >= 0 && deviationClock <= deviationDuration / 2)
                 {
                     // movement speed function
-                    deviationLerpValue = sineWave(deviationClock);
+                    deviationLerpValue = sineWave(deviationClock, deviationDuration);
                 }
                 else if (deviationClock > deviationDuration / 2 && deviationClock <= (deviationDuration / 2 + pauseAtGoal)) // pause at goal
                 {
@@ -368,7 +406,7 @@ public class GameScript : MonoBehaviour
                 {
                     deviationClock2 += Time.deltaTime;
                     // movement speed function
-                    deviationLerpValue = sineWave(deviationClock2);
+                    deviationLerpValue = sineWave(deviationClock2, deviationDuration);
                 }
                 else if (deviationClock > (deviationDuration + pauseAtGoal))
                 {
@@ -376,8 +414,8 @@ public class GameScript : MonoBehaviour
                 }
             }
 
-            // calculate position current frame
-            Vector3 center = hipAnchor.transform.position; // hip pivot point
+                // calculate position current frame
+                Vector3 center = hipAnchor.transform.position; // hip pivot point
             Vector3 end = deviationGoalPosition - center;
             Vector3 start = new Vector3();
             // first person perspective
@@ -494,7 +532,7 @@ public class GameScript : MonoBehaviour
     }
 
     // Collision collider
-    void OnTriggerEnter(Collider other) // when the head touches a goal
+    void OnTriggerStay(Collider other) // when the head touches a goal
     {
         if (gameState == "Waiting for user to touch goal" && other.gameObject == currentGoal)
         {
@@ -520,6 +558,20 @@ public class GameScript : MonoBehaviour
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomGoal(float waitTime0)
     {
+        // CALCULATE AND SHOW SCORE
+        // previous overshoot
+        print("Overshoot = " + overshoot);
+        print("overshoot difference : " + Mathf.Abs(overshoot - 1));
+        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
+        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
+        if (roundScore < 0) { roundScore = 0; }
+        print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
+        totalScore += roundScore;
+        addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
+        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+        if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
+
         // Set a random wait time between 1s and 2s
         float elapsedTime = 0f;
 
@@ -576,28 +628,22 @@ public class GameScript : MonoBehaviour
 
     void SetRandomGoal()
     {
-        // previous overshoot
-        print("Overshoot = " + overshoot);
-        print("overshoot difference : " + Mathf.Abs(overshoot - 1));
-        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
-        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
-        if (roundScore < 0) { roundScore = 0; }
-        print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
-        totalScore += roundScore;
-        addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
-        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-        StartCoroutine(ShowScore());
-
-
+        print("SetRandomGoal() entered.");
         // Increment the instruction counter
         instructionCounter++;
-        // print("instructionCounter: " + instructionCounter);
+        print("instructionCounter: " + instructionCounter);
         scoreSaved = false;
 
         thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
+        print("thisTrialContainsDeviation" + thisTrialContainsDeviation);
         // Generate a random index to choose the next sphere
         int randomIndex;
+
+        if (instructionCounter > phaseOneInstructions)
+        {
+            print("dit bericht moet pas in phase 2 verschijnen!");
+            goals = goalsPhase2;
+        }
 
         if (goals.Count <= 1)
         {
@@ -607,9 +653,11 @@ public class GameScript : MonoBehaviour
         {
             do
             {
-                randomIndex = Random.Range(0, goals.Count);
+                randomIndex = Random.Range(0, goals.Count); 
             } while (goals[randomIndex] == previousGoal);
         }
+        print("randomIndex: " + randomIndex);
+
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
         // print("currentGoal: " + currentGoal);
@@ -617,22 +665,37 @@ public class GameScript : MonoBehaviour
         goalRotation = currentGoal.transform.eulerAngles.z;
         if (goalRotation > 180) { goalRotation -= 360; }
 
+        //////////////////////////////////////////////////////////////// choose type of deviation //////////////////////////////////////////////////////////////////
         // Determine deviation goal
-        if (thisTrialContainsDeviation)
+        if (thisTrialContainsDeviation) 
         {
             animationTriggered = false;
-            // get position of currentGoal in Goals list { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
+            // get position of currentGoal in Goals list (length 12. idxs 0 t/m 11)
             if (randomIndex == 0 || randomIndex == 4)
             {
                 deviationDirection = 1; // farther
+                gameState = "Waiting for user to touch goal";
             }
             else if (randomIndex == 3 || randomIndex == 7)
             {
-                deviationDirection= 0; // closer
+                deviationDirection = 0; // closer
+                gameState = "Waiting for user to touch goal";
+            }
+            else if (randomIndex >= 8 && randomIndex <= 9)
+            {
+                StartCoroutine(waiBeforeCenterDeviation(false));
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
+                // do not change gameState
+            }
+            else if (randomIndex >= 10 && randomIndex <= 11)
+            {
+                StartCoroutine(waiBeforeCenterDeviation(true));
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
             }
             else
             {
                 deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
+                gameState = "Waiting for user to touch goal";
             }
             // print("deviation direction: " + deviationDirection);
 
@@ -656,6 +719,16 @@ public class GameScript : MonoBehaviour
                     thisTrialContainsDeviation = false;
                 }
             }
+            else if (deviationDirection == 3)
+            {
+                deviationCutoff = -1;
+                deviationGoal = closeGoalLeft;
+            }
+            else if (deviationDirection == 4)
+            {
+                deviationCutoff = -1;
+                deviationGoal = closeGoalRight;
+            }
             else
             {
                 Debug.LogError("Unexpected deviationDirection vaLue: " + deviationDirection);
@@ -667,7 +740,7 @@ public class GameScript : MonoBehaviour
             // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
         }
 
-        gameState = "Waiting for user to touch goal";
+        else { gameState = "Waiting for user to touch goal"; } 
         // print(gameState);
 
         // Make selected number red
@@ -678,7 +751,47 @@ public class GameScript : MonoBehaviour
         
     }
 
+    IEnumerator waiBeforeCenterDeviation(bool fast)
+    {
+        float localTimer = 0;
+        while (localTimer < 1.0f)
+        {
+            localTimer += Time.deltaTime;
+            yield return null;
+        }
+        if (!fast)
+        {
+            gameState = "Sudden deviation SLOW";
+            StartCoroutine(CenterDeviation(centerSlowDeviationDuration));
+        }
+        else 
+        {
+            gameState = "Sudden deviation FAST";
+            StartCoroutine(CenterDeviation(centerFastDeviationDuration));
+        }
+    }
 
+    // coroutine. waits as long as the deviation duurt then: 
+    IEnumerator CenterDeviation(float localDeviationDuration)
+    {
+        float localTimer = 0;
+        while (localTimer < localDeviationDuration)
+        {
+            localTimer += Time.deltaTime;
+            yield return null;
+        }
+        // after timer
+        ChangeTextColor(topGoal, Color.black);
+
+        // stop deviation
+        currentlyDeviating = false;
+        gameState = "Waiting before next instruction is given";
+
+        // make game continue
+        waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
+        StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
+
+    }
 
     // Function to generate a collection of instruction counters for deviating trials
     void GenerateDeviatingTrials(int count)
@@ -743,7 +856,7 @@ public class GameScript : MonoBehaviour
     }
 
     // forth & back
-    private float sineWave(float localCurrentTime)
+    private float sineWave(float localCurrentTime, float deviationDuration)
     {
         float B = 2 * Mathf.PI / Mathf.Abs(deviationDuration); // frequency
         float C = deviationDuration / 4; // phase shift of sine wave (horizontal shift)
