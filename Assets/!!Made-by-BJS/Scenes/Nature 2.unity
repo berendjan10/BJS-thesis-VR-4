@@ -11151,7 +11151,7 @@ MonoBehaviour:
   smoothTransition: 0
   transitionStart: 10
   transitionDuration: 4
-  phaseOneInstructions: 30
+  phaseOneInstructions: 0
   phaseTwoInstructions: 30
   deviatePercentage: 100
   deviationDuration: 1.5
@@ -11224,8 +11224,8 @@ MonoBehaviour:
   XRORIGINN: {fileID: 401317277}
   ghost: {fileID: 974739299}
   three3PPPlaceholder: {fileID: 1155670808}
-  centerFastDeviationDuration: 0.5
-  centerSlowDeviationDuration: 1
+  centerFastDeviationDuration: 1
+  centerSlowDeviationDuration: 3
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
 --- !u!65 &595502770

@@ -749,7 +749,7 @@ void Start()
     IEnumerator waiBeforeCenterDeviation(bool fast)
     {
         float localTimer = 0;
-        while (localTimer < 1.0f)
+        while (localTimer < 3.0f)
         {
             localTimer += Time.deltaTime;
             yield return null;
