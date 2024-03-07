@@ -1,21 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
-using Random = UnityEngine.Random;
-using UnityEngine.InputSystem;
 //using static OVRTask<TResult>;
 using System.IO;
-using UnityEditor.ShaderGraph.Drawing;
 using TMPro;
-using OVR.OpenVR;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using Unity.XR.CoreUtils;
-using Oculus.Interaction.Input;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEditor;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 // tweak middle deviation timing
 
@@ -173,7 +165,15 @@ public class GameScript : MonoBehaviour
 
     private bool WaitAndSetRandomGoalCalled;
 
-void Start()
+    public bool record;
+
+    private string startGameTimestamp;
+
+    private float farthestX;
+
+    private float farthestY;
+
+    void Start()
     {
         // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
         //print("headReference" + headReference.transform.position); 
@@ -227,7 +227,7 @@ void Start()
         thumbButtonB.action.performed += OnThumbB;
         thumbButtonA.action.performed += OnThumbA;
 
-        if (!useGhost) {  ghost.SetActive(false); }
+        if (!useGhost) { ghost.SetActive(false); }
 
 
         // initial game state just prompts the user to recenter
@@ -236,6 +236,28 @@ void Start()
         gameState = "waiting for user to recenter";
 
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions));
+
+        startGameTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+
+        
+        if (record)
+        {
+            // header of hmd tracking log
+            string header = "Timestamp; x; y; z; rx; ry; rz; instruction ID; Game state";
+            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            using (StreamWriter writer = new StreamWriter(filePath, true))
+            {
+                writer.WriteLine(header);
+            }
+
+            // tracking summary log header
+            string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot; time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
+            string filePath2 = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            using (StreamWriter writer = new StreamWriter(filePath2, true))
+            {
+                writer.WriteLine(summaryHeader);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -267,7 +289,13 @@ void Start()
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
             float progress = angle / goalRotation;
             progress0debug = progress;
-            if (progress > overshoot) { overshoot = progress;}
+            if (progress > overshoot)
+            {
+                // farthest reached hmd position
+                farthestX = hmdTarget.position.x;
+                farthestY = hmdTarget.position.y;
+                overshoot = progress; // in percentage
+            }
             if (thisTrialContainsDeviation)
             {
                 if (progress >= deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
@@ -283,7 +311,7 @@ void Start()
                 }
             }
         }
-        
+
         if (!thisTrialContainsDeviation)
         {
             currentlyDeviating = false;
@@ -374,7 +402,7 @@ void Start()
             }
             // deviation timing
             deviationClock += Time.deltaTime;
-            
+
             if (deviationTypeLocal == devType.sineWave)
             {
                 if (deviationClock >= 0 && deviationClock <= deviationDurationLocal)
@@ -414,8 +442,8 @@ void Start()
                 }
             }
 
-                // calculate position current frame
-                Vector3 center = hipAnchor.transform.position; // hip pivot point
+            // calculate position current frame
+            Vector3 center = hipAnchor.transform.position; // hip pivot point
             Vector3 end = deviationGoalPosition - center;
             Vector3 start = new Vector3();
             // first person perspective
@@ -449,6 +477,20 @@ void Start()
         }
 
 
+
+
+        // Store headset movement
+        if (record)
+        {
+            string log = System.DateTime.Now.ToString() + ";" + mainCamera.transform.position.x + ";" + mainCamera.transform.position.y + ";" + mainCamera.transform.position.z
+                + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + instructionCounter
+                + ";" + gameState;
+            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            using (StreamWriter writer = new StreamWriter(filePath, true))
+            {
+                writer.WriteLine(log);
+            }
+        }
     } // Update() end
 
 
@@ -521,13 +563,13 @@ void Start()
     {
         float localTime = 0f;
         addedScoreGameObject.SetActive(true);
-        
+
         while (localTime < 1) // 1 second visible
         {
             localTime += Time.deltaTime;
             yield return null;
         }
-        
+
         addedScoreGameObject.SetActive(false);
     }
 
@@ -540,17 +582,61 @@ void Start()
         }
         else if (gameState == "Waiting for user to sit straight" && other.gameObject == topGoal)
         {
-            print("collider 2");
             ChangeTextColor(topGoal, Color.black);
             waitBeforeNextInstruction = Random.Range(waitTimeLowerLimit, waitTimeUpperLimit);
             gameState = "Waiting before next instruction is given";
+            logSummary();
+            calculateScore();
             StartCoroutine(WaitAndSetRandomGoal(waitBeforeNextInstruction));
         }
     }
-    
 
 
-    public void MoveDown(GameObject moveThis)
+
+
+    void logSummary()
+    {
+        if (record)
+        {
+            string log;
+            if (!thisTrialContainsDeviation)
+            {
+                log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
+                    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";;;";
+            }
+            else
+            {
+                log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
+                    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";" + deviationGoal.name
+                    + ";" + deviationGoal.transform.position.x + ";" + deviationGoal.transform.position.y;
+            }
+
+            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            using (StreamWriter writer = new StreamWriter(filePath, true))
+            {
+                writer.WriteLine(log);
+            }
+        }
+    }
+
+    void calculateScore()
+    {
+        // CALCULATE AND SHOW SCORE
+        // previous overshoot
+        // print("Overshoot = " + overshoot);
+        //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
+        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
+        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
+        if (roundScore < 0) { roundScore = 0; }
+        //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
+        totalScore += roundScore;
+        addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
+        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
+        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+    }
+
+
+public void MoveDown(GameObject moveThis)
     {
         float scale1 = Mathf.Pow(_height / 185f, scalingIntensity);
         Vector3 newPosition = moveThis.transform.localPosition;
@@ -561,23 +647,6 @@ void Start()
     // Coroutine to wait for a random period and then set a new random game instruction
     IEnumerator WaitAndSetRandomGoal(float waitTime0)
     {
-        // CALCULATE AND SHOW SCORE
-        // previous overshoot
-        //print("Overshoot = " + overshoot);
-        //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
-        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
-        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
-        if (roundScore < 0) { roundScore = 0; }
-        //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
-        totalScore += roundScore;
-        addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
-        totalScoreScript.ChangeTextFcn("Score: " + totalScore);
-        remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-        if (currentGoal != topGoal)
-        {
-            if (instructionCounter >= 1) { StartCoroutine(ShowScore()); }
-        }
-
         // Set a random wait time between 1s and 2s
         float elapsedTime = 0f;
 
@@ -885,5 +954,8 @@ void Start()
             Debug.LogWarning("TextMeshPro reference is missing!");
         }
     }
+
+
+
 
 }

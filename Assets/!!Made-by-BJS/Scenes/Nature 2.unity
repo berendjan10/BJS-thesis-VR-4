@@ -11229,6 +11229,7 @@ MonoBehaviour:
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
   waitForCenterDeviation: 2
+  record: 0
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0
