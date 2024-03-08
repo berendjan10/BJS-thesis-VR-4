@@ -11146,7 +11146,7 @@ MonoBehaviour:
   headReference: {fileID: 500053580}
   gender: 0
   thirdPersonPerspective: 0
-  phaseOneInstructions: 25
+  phaseOneInstructions: 2
   phaseTwoInstructions: 25
   deviatePercentage: 40
   deviationDuration: 1.5

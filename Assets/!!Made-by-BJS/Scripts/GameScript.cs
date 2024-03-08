@@ -574,6 +574,7 @@ public class GameScript : MonoBehaviour
 
     IEnumerator ShowScore()
     {
+        print("show score");
         float localTime = 0f;
         addedScoreGameObject.SetActive(true);
 
@@ -643,6 +644,7 @@ public class GameScript : MonoBehaviour
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
         totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
+        ShowScore();
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
