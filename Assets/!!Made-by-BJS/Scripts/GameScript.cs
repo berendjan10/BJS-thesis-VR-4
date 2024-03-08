@@ -1,10 +1,13 @@
+using Oculus.Platform;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 //using static OVRTask<TResult>;
 using System.IO;
 using TMPro;
+using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -16,11 +19,10 @@ public class GameScript : MonoBehaviour
     public GameObject headReference;
     public enum Gender { male, female } // dropdown menu
     public Gender gender;
-    [SerializeField] private float _height; // [cm]
     [SerializeField] private bool thirdPersonPerspective = false;
-    [SerializeField] private bool smoothTransition = false;
-    [SerializeField] private float transitionStart;
-    [SerializeField] private float transitionDuration; // duration of transition
+    private bool smoothTransition = false;
+    private float transitionStart;
+    private float transitionDuration; // duration of transition
     public int phaseOneInstructions = 50;    // amount of instructions in phase 1 (no deviation) // ongeveer 2.42s per goal. ongeveer 50 goals in 2 seconden
     public int phaseTwoInstructions = 50; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
     public int deviatePercentage = 40; // [%]    // percentage that deviates in phase 2
@@ -36,7 +38,7 @@ public class GameScript : MonoBehaviour
     public enum CenterDeviationSpeed { slowAndFast, onlySlow, onlyFast }
     public CenterDeviationSpeed centerDeviationSpeed;
 
-    public float flashTime = 0.2f; // [s]
+    private float flashTime = 0.2f; // [s]
     public bool useGhost = false;
 
     public GameObject instructionZero;
@@ -52,7 +54,7 @@ public class GameScript : MonoBehaviour
     public GameObject goalmin3;
     public GameObject goalmin4;
 
-    [SerializeField] private GameObject avatar;
+    public GameObject avatar;
 
     private List<GameObject> goals; // List to store all the sphere game objects
     private List<GameObject> goalsPhase2; // List to store all the sphere game objects
@@ -161,11 +163,7 @@ public class GameScript : MonoBehaviour
     public GameObject closeGoalLeft;
     public GameObject closeGoalRight;
 
-    private float progress0debug;
-
     public float waitForCenterDeviation = 3.0f;
-
-    private bool WaitAndSetRandomGoalCalled;
 
     public bool record;
 
@@ -175,8 +173,22 @@ public class GameScript : MonoBehaviour
 
     private float farthestY;
 
+    public GameObject femaleAvatarPresetFile;
+
+    public GameObject maleAvatarPresetFile;
+
+
     void Start()
     {
+        //if (gender == Gender.female)
+        //{
+        //    //print(avatar.GetComponent("PrefabInstance").IsPrefabInstance());
+            //PrefabUtility.ReplacePrefabAssetOfPrefabInstance(avatar, femaleAvatarPresetFile, InteractionMode.AutomatedAction);
+        //}
+        //else if (gender == Gender.male)
+        //{
+        //    PrefabUtility.ReplacePrefabAssetOfPrefabInstance(avatar, maleAvatarPresetFile, InteractionMode.AutomatedAction);
+        //}
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
@@ -226,7 +238,7 @@ public class GameScript : MonoBehaviour
         {
             // header of hmd tracking log
             string header = "Timestamp; x; y; z; rx; ry; rz; instruction ID; Game state";
-            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(header);
@@ -234,7 +246,7 @@ public class GameScript : MonoBehaviour
 
             // tracking summary log header
             string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot; time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
-            string filePath2 = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            string filePath2 = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath2, true))
             {
                 writer.WriteLine(summaryHeader);
@@ -270,7 +282,6 @@ public class GameScript : MonoBehaviour
 
             float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
             float progress = angle / goalRotation;
-            progress0debug = progress;
             if (progress > overshoot)
             {
                 // farthest reached hmd position
@@ -467,7 +478,7 @@ public class GameScript : MonoBehaviour
             string log = System.DateTime.Now.ToString() + ";" + mainCamera.transform.position.x + ";" + mainCamera.transform.position.y + ";" + mainCamera.transform.position.z
                 + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + instructionCounter
                 + ";" + gameState;
-            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(log);
@@ -610,7 +621,7 @@ public class GameScript : MonoBehaviour
                     + ";" + deviationGoal.transform.position.x + ";" + deviationGoal.transform.position.y;
             }
 
-            string filePath = Path.Combine(Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(log);
@@ -735,7 +746,6 @@ public class GameScript : MonoBehaviour
         if (thisTrialContainsDeviation) 
         {
             animationTriggered = false;
-            // get position of currentGoal in Goals list (length 12. idxs 0 t/m 11)
             if (currentGoal == goal1 || currentGoal == goalmin1)
             {
                 deviationDirection = 1; // further
@@ -746,29 +756,22 @@ public class GameScript : MonoBehaviour
                 deviationDirection = 0; // closer
                 gameState = "Waiting for user to touch goal";
             }
-            // topGoalDeviationSlow
-            else if (currentGoal == topGoal)
+            else if (currentGoal == topGoal) // center deviation
             {
-                StartCoroutine(waiBeforeCenterDeviation(false)); // (bool fast)
+                int randomInt = Random.Range(0, 2);
+                switch (randomInt)
+                {
+                    case 0:
+                        StartCoroutine(waiBeforeCenterDeviation(false)); // (bool fast)
+                        break;
+                    case 1:
+                        StartCoroutine(waiBeforeCenterDeviation(true)); // (bool fast)
+                        break;
+                    default:
+                        break;
+                }
                 deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
             }
-            // topGoalDeviationFast
-            else if (randomIndex >= 10 && randomIndex <= 11)
-            {
-                StartCoroutine(waiBeforeCenterDeviation(true)); // (bool fast)
-                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
-            }
-            //else if (randomIndex >= 8 && randomIndex <= 9)
-            //{
-            //    StartCoroutine(waiBeforeCenterDeviation(false));
-            //    deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
-            //}
-            //// topGoalDeviationFast
-            //else if (randomIndex >= 10 && randomIndex <= 11)
-            //{
-            //    StartCoroutine(waiBeforeCenterDeviation(true));
-            //    deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
-            //}
             else
             {
                 deviationDirection = Random.Range(0, 2); // 0 = closer 1 = farther

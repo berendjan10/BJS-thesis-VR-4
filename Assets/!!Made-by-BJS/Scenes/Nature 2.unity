@@ -11145,22 +11145,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headReference: {fileID: 500053580}
   gender: 0
-  _height: 185
-  scalingIntensity: 1.03
   thirdPersonPerspective: 0
-  smoothTransition: 0
-  transitionStart: 10
-  transitionDuration: 4
-  phaseOneInstructions: 5
-  phaseTwoInstructions: 50
-  deviatePercentage: 100
+  phaseOneInstructions: 25
+  phaseTwoInstructions: 25
+  deviatePercentage: 40
   deviationDuration: 1.5
   pauseAtGoal: 0.2
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 1.5
   thirdPersonPerspectiveOffsetPosition: {x: 0, y: 0.15, z: -1.5}
   deviationType: 1
-  flashTime: 30
+  centerDeviationPrevalence: 0
+  centerDeviationSpeed: 0
   useGhost: 0
   instructionZero: {fileID: 209506191}
   three3DObjects: {fileID: 379095368}
@@ -11230,6 +11226,10 @@ MonoBehaviour:
   closeGoalRight: {fileID: 1591757172}
   waitForCenterDeviation: 2
   record: 0
+  femaleAvatarPresetFile: {fileID: 4432149821429097329, guid: bedaebaff8f7a68409e28ca6181adc42,
+    type: 3}
+  maleAvatarPresetFile: {fileID: 4432149821429097329, guid: bedaebaff8f7a68409e28ca6181adc42,
+    type: 3}
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0
