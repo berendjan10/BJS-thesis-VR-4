@@ -14,10 +14,9 @@ using Random = UnityEngine.Random;
 public class GameScript : MonoBehaviour
 {
     public GameObject headReference;
-    public enum gendr { male, female } // dropdown menu
-    public gendr gender;
+    public enum Gender { male, female } // dropdown menu
+    public Gender gender;
     [SerializeField] private float _height; // [cm]
-    public float scalingIntensity = 1.03f; // % =1 scale exactly, <1 scale more, >1 scale less
     [SerializeField] private bool thirdPersonPerspective = false;
     [SerializeField] private bool smoothTransition = false;
     [SerializeField] private float transitionStart;
@@ -30,8 +29,13 @@ public class GameScript : MonoBehaviour
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
-    public enum devType { sineWave, forthPauseBack }
-    public devType deviationType;
+    public enum DeviationType { sineWave, forthPauseBack }
+    public DeviationType deviationType;
+    public enum CenterDeviationPrevalence { noMiddleDeviations, allTypesOfDeviations, onlyMiddleDeviations }
+    public CenterDeviationPrevalence centerDeviationPrevalence;
+    public enum CenterDeviationSpeed { slowAndFast, onlySlow, onlyFast }
+    public CenterDeviationSpeed centerDeviationSpeed;
+
     public float flashTime = 0.2f; // [s]
     public bool useGhost = false;
 
@@ -49,8 +53,6 @@ public class GameScript : MonoBehaviour
     public GameObject goalmin4;
 
     [SerializeField] private GameObject avatar;
-
-    private float scale;
 
     private List<GameObject> goals; // List to store all the sphere game objects
     private List<GameObject> goalsPhase2; // List to store all the sphere game objects
@@ -175,26 +177,6 @@ public class GameScript : MonoBehaviour
 
     void Start()
     {
-        // for later calibration: SAVE HEAD POSITION OF AVATAR (M/F) FOR LATER CALCS then read out head position when "calibrate" is pressed.
-        //print("headReference" + headReference.transform.position); 
-
-        // scale down avatar & targets based on participant height
-        if (gender == gendr.male)
-        {
-            scale = Mathf.Pow(_height / 185f, scalingIntensity);
-        }
-        else if (gender == gendr.female)
-        {
-            scale = Mathf.Pow(_height / 185f, scalingIntensity);
-        }
-        else
-        {
-            Debug.LogError("Unexpected gender vaLue:" + gender);
-        }
-
-        // scale avatar
-        avatar.transform.localScale = new Vector3(scale, scale, scale);
-
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
@@ -383,16 +365,16 @@ public class GameScript : MonoBehaviour
         if (currentlyDeviating)
         {
             float deviationDurationLocal;
-            devType deviationTypeLocal;
+            DeviationType deviationTypeLocal;
 
             if (gameState == "Sudden deviation SLOW")
             {
-                deviationTypeLocal = devType.forthPauseBack;
-                deviationDurationLocal = centerSlowDeviationDuration; // change back? change line in CenterDeviation(): while (localTimer < localDeviationDuration+pauseAtGoal)
+                deviationTypeLocal = DeviationType.forthPauseBack; // IF change back to sineWave ALSO CHANGE line in CenterDeviation(): while (localTimer < localDeviationDuration+pauseAtGoal)
+                deviationDurationLocal = centerSlowDeviationDuration;
             }
             else if (gameState == "Sudden deviation FAST")
             {
-                deviationTypeLocal = devType.forthPauseBack;
+                deviationTypeLocal = DeviationType.forthPauseBack;
                 deviationDurationLocal = centerFastDeviationDuration;
             }
             else
@@ -403,7 +385,7 @@ public class GameScript : MonoBehaviour
             // deviation timing
             deviationClock += Time.deltaTime;
 
-            if (deviationTypeLocal == devType.sineWave)
+            if (deviationTypeLocal == DeviationType.sineWave)
             {
                 if (deviationClock >= 0 && deviationClock <= deviationDurationLocal)
                 {
@@ -415,7 +397,7 @@ public class GameScript : MonoBehaviour
                     currentlyDeviating = false;
                 }
             }
-            else if (deviationTypeLocal == devType.forthPauseBack)
+            else if (deviationTypeLocal == DeviationType.forthPauseBack)
             {
                 if (deviationClock >= 0 && deviationClock <= deviationDurationLocal / 2)
                 {
@@ -518,24 +500,25 @@ public class GameScript : MonoBehaviour
 
         // Scale goals & avatar
         float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x; // scales goals so that topGoal aligns with HMD
-        float scale0to1;
-        if(gender == gendr.male)
+        float avatarScale;
+        if(gender == Gender.male)
         {
-            scale0to1 = scaleDeviationGoals / 0.02f;
+            avatarScale = scaleDeviationGoals / 0.02f;
         }
         else
         {
             float femaleAvatarHeight = 1.736281f;
             float maleAvatarHeight = 1.86452f;
             float maleToFemaleScaling = femaleAvatarHeight / maleAvatarHeight;
-            scale0to1 = scaleDeviationGoals / 0.02f / maleToFemaleScaling;
+            avatarScale = scaleDeviationGoals / 0.02f / maleToFemaleScaling;
         }
-        if (scale0to1 > 1.125f) { scale0to1 = 1.125f; }
-        else if (scale0to1 < 0.88f) { scale0to1 = 0.88f; }
+        if (avatarScale > 1.125f) { avatarScale = 1.125f; }
+        else if (avatarScale < 0.88f) { avatarScale = 0.88f; }
+        avatarScale *= 1.0f; // scaling intensity scalingIntensity
         // scale goals which are a child of myMeasuredPivotPoint
         myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
         // Scale avatar
-        avatar.transform.localScale = new Vector3(scale0to1, scale0to1, scale0to1);
+        avatar.transform.localScale = new Vector3(avatarScale, avatarScale, avatarScale);
         if (thirdPersonPerspective) { thirdPersonPerspectiveFcn(); }
     }
 
@@ -610,9 +593,6 @@ public class GameScript : MonoBehaviour
         }
     }
 
-
-
-
     void logSummary()
     {
         if (record)
@@ -652,15 +632,6 @@ public class GameScript : MonoBehaviour
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
         totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-    }
-
-
-public void MoveDown(GameObject moveThis)
-    {
-        float scale1 = Mathf.Pow(_height / 185f, scalingIntensity);
-        Vector3 newPosition = moveThis.transform.localPosition;
-        newPosition.y *= scale1;
-        moveThis.transform.localPosition = newPosition;
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
@@ -765,36 +736,47 @@ public void MoveDown(GameObject moveThis)
         {
             animationTriggered = false;
             // get position of currentGoal in Goals list (length 12. idxs 0 t/m 11)
-            if (randomIndex == 0 || randomIndex == 4) // improve: if (currentGoal == goal1 etc
+            if (currentGoal == goal1 || currentGoal == goalmin1)
             {
-                deviationDirection = 1; // farther
+                deviationDirection = 1; // further
                 gameState = "Waiting for user to touch goal";
             }
-            else if (randomIndex == 3 || randomIndex == 7)
+            else if (currentGoal == goal4 || currentGoal == goalmin4)
             {
                 deviationDirection = 0; // closer
                 gameState = "Waiting for user to touch goal";
             }
             // topGoalDeviationSlow
-            else if (randomIndex >= 8 && randomIndex <= 9)
+            else if (currentGoal == topGoal)
             {
-                StartCoroutine(waiBeforeCenterDeviation(false));
-                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
+                StartCoroutine(waiBeforeCenterDeviation(false)); // (bool fast)
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
             }
             // topGoalDeviationFast
             else if (randomIndex >= 10 && randomIndex <= 11)
             {
-                StartCoroutine(waiBeforeCenterDeviation(true));
-                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R?
+                StartCoroutine(waiBeforeCenterDeviation(true)); // (bool fast)
+                deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
             }
+            //else if (randomIndex >= 8 && randomIndex <= 9)
+            //{
+            //    StartCoroutine(waiBeforeCenterDeviation(false));
+            //    deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
+            //}
+            //// topGoalDeviationFast
+            //else if (randomIndex >= 10 && randomIndex <= 11)
+            //{
+            //    StartCoroutine(waiBeforeCenterDeviation(true));
+            //    deviationDirection = Random.Range(3, 5); // 3 = L, 4 = R
+            //}
             else
             {
-                deviationDirection = Random.Range(0, 2); // 0 = less far 1 = farther
+                deviationDirection = Random.Range(0, 2); // 0 = closer 1 = farther
                 gameState = "Waiting for user to touch goal";
             }
             // print("deviation direction: " + deviationDirection);
 
-            if (deviationDirection == 0)
+            if (deviationDirection == 0) // closer
             {
                 deviationCutoff = closerDeviationCutoff;
                 try { deviationGoal = goals[randomIndex - 1]; }
@@ -804,7 +786,7 @@ public void MoveDown(GameObject moveThis)
                     thisTrialContainsDeviation = false;
                 }
             }
-            else if (deviationDirection == 1)
+            else if (deviationDirection == 1) // farther
             {
                 deviationCutoff = fartherDeviationCutoff;
                 try { deviationGoal = goals[randomIndex + 1]; }
@@ -814,12 +796,12 @@ public void MoveDown(GameObject moveThis)
                     thisTrialContainsDeviation = false;
                 }
             }
-            else if (deviationDirection == 3)
+            else if (deviationDirection == 3) // L
             {
                 deviationCutoff = -1;
                 deviationGoal = closeGoalLeft;
             }
-            else if (deviationDirection == 4)
+            else if (deviationDirection == 4) // R
             {
                 deviationCutoff = -1;
                 deviationGoal = closeGoalRight;
