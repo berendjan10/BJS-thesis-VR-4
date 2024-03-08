@@ -497,6 +497,7 @@ public class GameScript : MonoBehaviour
     // pressing B resets the view, scales it to participant
     void OnThumbB(InputAction.CallbackContext context)
     {
+        // switch from start view to forest with mirror
         if (thirdPersonPerspective) { firstPersonPerspective(); }
         if (gameState == "waiting for user to recenter")
         {
@@ -507,12 +508,30 @@ public class GameScript : MonoBehaviour
             gameState = "Waiting for user to read instruction";
             addedScoreGameObject.SetActive(false);
         }
+
+        // Recenter the view
         target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
 
-        float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x;
-        float scale0to1 = scaleDeviationGoals / 0.02f;
+
+
+        // Scale goals & avatar
+        float scaleDeviationGoals = (transform.position.y - myMeasuredPivotPoint.transform.position.y) / (topGoal.transform.position.y - myMeasuredPivotPoint.transform.position.y) * myMeasuredPivotPoint.localScale.x; // scales goals so that topGoal aligns with HMD
+        float scale0to1;
+        if(gender == gendr.male)
+        {
+            scale0to1 = scaleDeviationGoals / 0.02f;
+        }
+        else
+        {
+            float femaleAvatarHeight = 1.736281f;
+            float maleAvatarHeight = 1.86452f;
+            float maleToFemaleScaling = femaleAvatarHeight / maleAvatarHeight;
+            scale0to1 = scaleDeviationGoals / 0.02f / maleToFemaleScaling;
+        }
+        if (scale0to1 > 1.125f) { scale0to1 = 1.125f; }
+        else if (scale0to1 < 0.88f) { scale0to1 = 0.88f; }
         // scale goals which are a child of myMeasuredPivotPoint
         myMeasuredPivotPoint.localScale = new Vector3(scaleDeviationGoals, scaleDeviationGoals, scaleDeviationGoals);
         // Scale avatar
