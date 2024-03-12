@@ -637,14 +637,14 @@ public class GameScript : MonoBehaviour
         // print("Overshoot = " + overshoot);
         //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
         // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
-        roundScore = (int)(100 - timeToReachGoal * 20 - Mathf.Abs(overshoot - 1) * 150);
+        roundScore = (int)(100 - timeToReachGoal * 10 - Mathf.Abs(overshoot - 1) * 150);
         if (roundScore < 0) { roundScore = 0; }
         //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
         totalScoreScript.ChangeTextFcn("Score: " + totalScore);
         remainingScript.ChangeTextFcn("Remaining: " + (phaseOneInstructions + phaseTwoInstructions - instructionCounter));
-        ShowScore();
+        StartCoroutine(ShowScore());
     }
 
     // Coroutine to wait for a random period and then set a new random game instruction
