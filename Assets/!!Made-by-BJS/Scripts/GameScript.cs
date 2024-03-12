@@ -177,15 +177,7 @@ public class GameScript : MonoBehaviour
 
     void Start()
     {
-        //if (gender == Gender.female)
-        //{
-        //    //print(avatar.GetComponent("PrefabInstance").IsPrefabInstance());
-            //PrefabUtility.ReplacePrefabAssetOfPrefabInstance(avatar, femaleAvatarPresetFile, InteractionMode.AutomatedAction);
-        //}
-        //else if (gender == Gender.male)
-        //{
-        //    PrefabUtility.ReplacePrefabAssetOfPrefabInstance(avatar, maleAvatarPresetFile, InteractionMode.AutomatedAction);
-        //}
+        thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
