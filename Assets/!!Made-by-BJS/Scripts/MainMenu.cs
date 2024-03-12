@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public Toggle avatar1Toggle;
+    public Toggle maleAvatarToggle;
     public Toggle thirdPersonPerspective;
 
     // Start is called before the first frame update
@@ -12,12 +12,18 @@ public class MainMenu : MonoBehaviour
     {
         PlayerPrefs.SetInt("3PP", thirdPersonPerspective.isOn ? 1 : 0);
         PlayerPrefs.Save();
-        if (avatar1Toggle.isOn)
+        if (maleAvatarToggle.isOn)
         {
+            PlayerPrefs.SetInt("gender", 0);
+            PlayerPrefs.Save();
+
             SceneManager.LoadScene("NatureMale");
         }
         else
         {
+            PlayerPrefs.SetInt("gender", 1);
+            PlayerPrefs.Save();
+
             SceneManager.LoadScene("NatureFemale");
         }
     }

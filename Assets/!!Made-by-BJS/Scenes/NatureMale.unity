@@ -11147,7 +11147,7 @@ MonoBehaviour:
   gender: 0
   thirdPersonPerspective: 0
   record: 0
-  phaseOneInstructions: 2
+  phaseOneInstructions: 25
   phaseTwoInstructions: 25
   deviatePercentage: 40
   deviationDuration: 1.5
@@ -37461,46 +37461,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 379095369}
     m_Modifications:
-    - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_Name
-      value: Male avatar
-      objectReference: {fileID: 0}
-    - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8189973534927770711, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8189973534927770711, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 68ab3b0472209154b92943b8069cf257, type: 2}
-    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.9991501
-      objectReference: {fileID: 0}
-    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.03905657
-      objectReference: {fileID: 0}
-    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.01304224
-      objectReference: {fileID: 0}
-    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.0018972948
-      objectReference: {fileID: 0}
     - target: {fileID: 342412134401844718, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -37551,6 +37511,46 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
+    - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Name
+      value: Male avatar
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9991501
+      objectReference: {fileID: 0}
+    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.03905657
+      objectReference: {fileID: 0}
+    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.01304224
+      objectReference: {fileID: 0}
+    - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.0018972948
+      objectReference: {fileID: 0}
+    - target: {fileID: 8189973534927770711, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8189973534927770711, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 68ab3b0472209154b92943b8069cf257, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

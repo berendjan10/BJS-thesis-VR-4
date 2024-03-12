@@ -178,6 +178,15 @@ public class GameScript : MonoBehaviour
     void Start()
     {
         thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
+        bool genderInt = Convert.ToBoolean(PlayerPrefs.GetInt("gender"));
+        if (genderInt)
+        {
+            gender = Gender.female;
+        }
+        else
+        {
+            gender = Gender.male;
+        }
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };

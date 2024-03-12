@@ -1748,7 +1748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19845c1122426f6448da0e600b4c88fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar1Toggle: {fileID: 382996726}
+  maleAvatarToggle: {fileID: 382996726}
   thirdPersonPerspective: {fileID: 1343970851}
 --- !u!1 &1627414265
 GameObject:
