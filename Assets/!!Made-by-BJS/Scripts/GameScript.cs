@@ -20,6 +20,7 @@ public class GameScript : MonoBehaviour
     public enum Gender { male, female } // dropdown menu
     public Gender gender;
     [SerializeField] private bool thirdPersonPerspective = false;
+    public bool record;
     private bool smoothTransition = false;
     private float transitionStart;
     private float transitionDuration; // duration of transition
@@ -30,6 +31,8 @@ public class GameScript : MonoBehaviour
     public float pauseAtGoal;
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
+    public float closerDeviationCutoff = 0.2f;
+    public float fartherDeviationCutoff = 0.4f;
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
     public enum DeviationType { sineWave, forthPauseBack }
     public DeviationType deviationType;
@@ -128,8 +131,6 @@ public class GameScript : MonoBehaviour
 
     private float goalRotation;
 
-    public float closerDeviationCutoff = 0.6f;
-    public float fartherDeviationCutoff = 0.8f;
     private float deviationCutoff;
     private GameObject deviationGoal;
 
@@ -140,7 +141,6 @@ public class GameScript : MonoBehaviour
     public GameObject hmdResetView;
 
     public Transform mainCamera;
-    public Transform origin;
     public Transform target;
 
     public XROrigin XRORIGINN;
@@ -165,17 +165,14 @@ public class GameScript : MonoBehaviour
 
     public float waitForCenterDeviation = 3.0f;
 
-    public bool record;
-
     private string startGameTimestamp;
 
-    private float farthestX;
+    private float farthestX; // farthest reached hmd position
+    private float farthestY; // farthest reached hmd position
 
-    private float farthestY;
+    //public GameObject femaleAvatarPresetFile;
 
-    public GameObject femaleAvatarPresetFile;
-
-    public GameObject maleAvatarPresetFile;
+    //public GameObject maleAvatarPresetFile;
 
 
     void Start()
@@ -503,7 +500,7 @@ public class GameScript : MonoBehaviour
         }
 
         // Recenter the view
-        target.position = new Vector3(target.position.x, mainCamera.position.y, target.position.z);
+        target.position = new Vector3(target.position.x, mainCamera.transform.position.y, target.position.z);
         XRORIGINN.MoveCameraToWorldLocation(target.position);
         XRORIGINN.MatchOriginUpCameraForward(target.up, target.forward);
 
