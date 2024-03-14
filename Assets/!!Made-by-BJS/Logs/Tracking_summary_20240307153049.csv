@@ -1,8 +1,0 @@
-Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot; time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y
-1;Devation goal -4;-0,2142396;1,128894;-0,1975451;1,146971;0,8924783;2,924046;False;;;
-2;Devation goal -2;-0,1330195;1,162502;-0,1225913;1,159922;0,9320291;1,534433;False;;;
-3;Devation goal 3;0,177148;1,146745;0,1818024;1,145554;1,027889;0,8593979;False;;;
-4;Devation goal 2;0,1369659;1,162039;0,1505908;1,157132;1,112267;0,8513603;False;;;
-5;Devation goal -1;-0,08746406;1,180908;-0,08626156;1,168439;0,9965997;0,663559;False;;;
-6;Devation goal 4;0,2195;1,126615;0,199791;1,131814;0,9150338;1,29431;True;Devation goal 3 (UnityEngine.GameObject);0,177148;1,146745
-7;Devation goal -1;-0,08746406;1,180908;-0,06819112;1,168044;0,7920601;1,796066;True;Devation goal -2 (UnityEngine.GameObject);-0,1330195;1,162502
