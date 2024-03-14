@@ -5,9 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/!!Made-by-BJS/Scenes/START MENU VR.unity
+    guid: eb16305b82e9c034fa749cca8d6a95b3
   - enabled: 1
-    path: Assets/!!Made-by-BJS/Scenes/Nature.unity
-    guid: c8009344fff7e864192b7a62662955e9
+    path: Assets/!!Made-by-BJS/Scenes/START MENU.unity
+    guid: bf3da0f205ed7d242b624fd5f1e735fd
+  - enabled: 1
+    path: Assets/!!Made-by-BJS/Scenes/NatureMale.unity
+    guid: 4debc9c2187787049a17bbc2f2976745
+  - enabled: 0
+    path: Assets/!!Made-by-BJS/Scenes/NatureFemale.unity
+    guid: ebceb7b2875f8ef4d97fcd475116ea1b
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: e9e58c2c6a2a8ac439aa74bec77571e3,
       type: 2}

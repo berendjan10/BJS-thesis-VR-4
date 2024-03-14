@@ -1,0 +1,7 @@
+Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot (percentage); time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y
+1;Devation goal -2;-0,1334468;1,163926;-0,1360355;1,164288;1,019014;1,423707;False;;;
+2;Devation goal 2;0,1373884;1,16338;0,1407146;1,164499;1,027908;1,700037;False;;;
+3;Devation goal -1;-0,08774506;1,182392;-0,0908542;1,171538;1,041304;1,058485;False;;;
+4;Devation goal -4;-0,2158744;1,132022;-0,1996652;1,138154;0,9174616;1,513691;False;;;
+5;Devation goal 1;0,09364416;1,182392;0,08675723;1,171117;0,9559268;1,359697;False;;;
+6;Devation goal 2;0,137386;1,163372;0,1445688;1,160929;1,062387;3,362619;False;;;

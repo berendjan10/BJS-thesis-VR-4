@@ -36,7 +36,7 @@ public class GameScript : MonoBehaviour
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
     public enum DeviationType { sineWave, forthPauseBack }
     public DeviationType deviationType;
-    public enum CenterDeviationPrevalence { noMiddleDeviations, allTypesOfDeviations, onlyMiddleDeviations }
+    public enum CenterDeviationPrevalence { noMiddleDeviations, allTypesOfDeviations }
     public CenterDeviationPrevalence centerDeviationPrevalence;
     public enum CenterDeviationSpeed { slowAndFast, onlySlow, onlyFast }
     public CenterDeviationSpeed centerDeviationSpeed;
@@ -66,6 +66,8 @@ public class GameScript : MonoBehaviour
     private ChangeText addedScoreScript;
     public GameObject totalScoreGameObject;
     private ChangeText totalScoreScript;
+    public GameObject goalDisplayGameObject;
+    private ChangeText goalDisplayScript;
     public GameObject remainingGameObject;
     private ChangeText remainingScript;
     private float waitTime;
@@ -152,6 +154,7 @@ public class GameScript : MonoBehaviour
     private Vector3 instruction1PPPosition;
 
     private float overshoot = 0;
+    private float degreesDifference;
 
     private float instructionGivenTimestamp;
 
@@ -174,6 +177,11 @@ public class GameScript : MonoBehaviour
 
     //public GameObject maleAvatarPresetFile;
 
+    // 3PP offset compensated 
+    private float headY;
+    private float headZ;
+
+    private int goalInt;
 
     void Start()
     {
@@ -190,12 +198,15 @@ public class GameScript : MonoBehaviour
         // Initialize the list with all sphere game objects
         goals = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 };
         goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal };
+        if (centerDeviationPrevalence == CenterDeviationPrevalence.noMiddleDeviations) { goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4 }; }
+        else { goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal }; }
         // goals = new List<GameObject> { goal1 };
 
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
         addedScoreScript = addedScoreGameObject.GetComponent<ChangeText>();
         totalScoreScript = totalScoreGameObject.GetComponent<ChangeText>();
+        goalDisplayScript = goalDisplayGameObject.GetComponent<ChangeText>();
         remainingScript = remainingGameObject.GetComponent<ChangeText>();
 
         instruction1PPPosition = textObjects.transform.position;
@@ -236,15 +247,47 @@ public class GameScript : MonoBehaviour
         {
             // header of hmd tracking log
             string header = "Timestamp; x; y; z; rx; ry; rz; instruction ID; Game state";
-            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            //string header =
+            //    "Timestamp; " +
+            //    "instruction ID; " +
+            //    "Game state; " +
+            //    "goal; " +
+            //    "goal position (rotational, [angle]); " +
+            //    "x; y; z; " +
+            //    "rx; ry; rz; " +
+            //    "current head position (rotational, [angle]); " +
+            //    "difference with regards to goal [deg];" +
+            //    "trial contains deviation; " +
+            //    "deviation goal; " +
+            //    "deviation goal position (rotational, [angle]);" +
+            //    "drifting towards avatar [degrees]" +
+            //    "drifting towards avatar [percentage] (0 is at goal, 100 is at avatar); " +
+            //    "";
+            Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(header);
             }
 
             // tracking summary log header
-            string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot; time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
-            string filePath2 = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot (percentage); time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
+            //string summaryHeader =
+            //    "Instruction ID; " +
+            //    "goal; " +
+            //    "goal position (rotational, [angle]); " +
+            //    "farthest head position (rotational, [angle]); " +
+            //    "difference with regards to goal [deg];" +
+            //    "time to reach goal; " +
+            //    "trial contains deviation; " +
+            //    "deviation goal; " +
+            //    "deviation goal position (rotational, [angle]);" +
+            //    "drifted towards avatar [degrees]" +
+            //    "drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); ";
+
+
+            Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
+            string filePath2 = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Tracking_summary_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath2, true))
             {
                 writer.WriteLine(summaryHeader);
@@ -270,6 +313,18 @@ public class GameScript : MonoBehaviour
             InstructionInFrontOfCamera();
         }
 
+        // head position without 3PP offset
+        if (thirdPersonPerspective)
+        {
+            headY = hmdTarget.position.y - thirdPersonPerspectiveOffsetPosition.y;
+            headZ = hmdTarget.position.z - thirdPersonPerspectiveOffsetPosition.z;
+        }
+        else
+        {
+            headY = hmdTarget.position.y;
+            headZ = hmdTarget.position.z;
+        }
+
         // check head position relative to goal position, start deviating at 80%
         if (gameState == "Waiting for user to touch goal" || gameState == "Waiting for user to sit straight" || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
         {
@@ -278,15 +333,17 @@ public class GameScript : MonoBehaviour
             goalPreviousFrame = currentGoal;
             // if (goalRotation != 0) // if (currentGoal != topGoal)
 
-            float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, hmdTarget.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // radians!!!
+            float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, headY - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // degrees
             float progress = angle / goalRotation;
             if (progress > overshoot)
             {
                 // farthest reached hmd position
                 farthestX = hmdTarget.position.x;
-                farthestY = hmdTarget.position.y;
+                farthestY = headY;
                 overshoot = progress; // in percentage
+                degreesDifference = angle - goalRotation;
             }
+            //totalScoreScript.ChangeTextFcn("currentGoal: "+ currentGoal + "\nangle: " + Math.Round(angle, 1) + "\ngoalRotation: " + Math.Round(goalRotation,1) + "\ndegreesDifference: " + degreesDifference + "\novershoot: " + Math.Round(overshoot,2));
             if (thisTrialContainsDeviation)
             {
                 if (progress >= deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
@@ -467,16 +524,15 @@ public class GameScript : MonoBehaviour
             else { ghost.SetActive(false); }
         }
 
-
-
-
         // Store headset movement
         if (record)
         {
-            string log = System.DateTime.Now.ToString() + ";" + mainCamera.transform.position.x + ";" + mainCamera.transform.position.y + ";" + mainCamera.transform.position.z
+            string log = System.DateTime.Now.ToString() + ";" + hmdTarget.position.x + ";" + headY + ";" + headZ
                 + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + instructionCounter
                 + ";" + gameState;
-            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
+            // Create folder "RecordingLogs"
+            Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(log);
@@ -585,6 +641,15 @@ public class GameScript : MonoBehaviour
         addedScoreGameObject.SetActive(false);
     }
 
+    //// Collision collider
+    //void OnTriggerEnter(Collider other) // when the head touches a goal
+    //{
+    //    if (other.gameObject == topGoal)
+    //    {
+    //        ChangeTextColor(topGoal, Color.black);
+    //    }
+    //}
+
     // Collision collider
     void OnTriggerStay(Collider other) // when the head touches a goal
     {
@@ -603,6 +668,15 @@ public class GameScript : MonoBehaviour
         }
     }
 
+    //// Collision collider
+    //void OnTriggerExit(Collider other) // when the head touches a goal
+    //{
+    //    if (other.gameObject == topGoal)
+    //    {
+    //        ChangeTextColor(topGoal, Color.red);
+    //    }
+    //}
+
     void logSummary()
     {
         if (record)
@@ -619,8 +693,8 @@ public class GameScript : MonoBehaviour
                     + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";" + deviationGoal.name
                     + ";" + deviationGoal.transform.position.x + ";" + deviationGoal.transform.position.y;
             }
-
-            string filePath = Path.Combine(UnityEngine.Application.dataPath, "!!Made-by-BJS", "Logs", "Tracking_summary_" + startGameTimestamp + ".csv");
+            Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
+            string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Tracking_summary_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
                 writer.WriteLine(log);
@@ -632,12 +706,14 @@ public class GameScript : MonoBehaviour
     {
         // CALCULATE AND SHOW SCORE
         // previous overshoot
-        // print("Overshoot = " + overshoot);
+        //print("Overshoot = " + overshoot);
         //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
-        // print("Accuracy = " + ((1-Mathf.Abs(overshoot - 1)) * 100));
-        roundScore = (int)(100 - timeToReachGoal * 10 - Mathf.Abs(overshoot - 1) * 150);
-        if (roundScore < 0) { roundScore = 0; }
-        //print("Score = 100 - " + (timeToReachGoal * 20) + " - " + (Mathf.Abs(overshoot - 1) * 150) + " = " + roundScore);
+        //print("Accuracy = " + ((1 - Mathf.Abs(overshoot - 1)) * 100));
+        if (thisTrialContainsDeviation) { roundScore = Random.Range(90, 100); }
+        else {
+            roundScore = (int)(100 - timeToReachGoal * 5 - Mathf.Abs(degreesDifference) * 30);
+            if (roundScore < 0) { roundScore = 0; }
+        }
         totalScore += roundScore;
         addedScoreScript.ChangeTextFcn("+" + roundScore + "!");
         totalScoreScript.ChangeTextFcn("Score: " + totalScore);
@@ -695,9 +771,7 @@ public class GameScript : MonoBehaviour
         }
         else
         {
-            ChangeTextColor(currentGoal, Color.black);
             gameState = "Waiting for user to sit straight";
-            ChangeTextColor(topGoal, Color.red);
             // print(gameState);
         }
     }
@@ -736,6 +810,39 @@ public class GameScript : MonoBehaviour
 
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
+        switch (randomIndex)
+        {
+            case 0:
+                goalInt = 1;
+                break;
+            case 1:
+                goalInt = 2;
+                break;
+            case 2:
+                goalInt = 3;
+                break;
+            case 3:
+                goalInt = 4;
+                break;
+            case 4:
+                goalInt = -1;
+                break;
+            case 5:
+                goalInt = -2;
+                break;
+            case 6:
+                goalInt = -3;
+                break;
+            case 7:
+                goalInt = -4;
+                break;
+            default:
+                goalInt = 0;
+                break;
+        }
+
+        goalDisplayScript.ChangeTextFcn("Touch goal " + goalInt + " and return to 0");
+
         // print("currentGoal: " + currentGoal);
 
         goalRotation = currentGoal.transform.eulerAngles.z;
@@ -824,7 +931,10 @@ public class GameScript : MonoBehaviour
         // print(gameState);
 
         // Make selected number red
-        if (currentGoal != topGoal) { ChangeTextColor(currentGoal, Color.red); }
+        if (currentGoal != topGoal)
+        {
+            StartCoroutine(FlashGoal());
+        }
 
         instructionGivenTimestamp = Time.time;
 
@@ -957,9 +1067,20 @@ public class GameScript : MonoBehaviour
         {
             Debug.LogWarning("TextMeshPro reference is missing!");
         }
+        
     }
 
-
+    IEnumerator FlashGoal()
+    {
+        ChangeTextColor(currentGoal, Color.red);
+        float localClock = 0.0f;
+        while (localClock < 0.5f)
+        {
+            localClock += Time.deltaTime;
+            yield return null;
+        }
+        ChangeTextColor(currentGoal, Color.black);
+    }
 
 
 }
