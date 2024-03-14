@@ -11339,7 +11339,7 @@ MonoBehaviour:
   gender: 0
   thirdPersonPerspective: 1
   record: 1
-  phaseOneInstructions: 0
+  phaseOneInstructions: 25
   phaseTwoInstructions: 25
   deviatePercentage: 40
   deviationDuration: 1.5
