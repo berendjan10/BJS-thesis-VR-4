@@ -183,6 +183,8 @@ public class GameScript : MonoBehaviour
 
     private int goalInt;
 
+    private float farthestAngle;
+
     void Start()
     {
         thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
@@ -271,19 +273,19 @@ public class GameScript : MonoBehaviour
             }
 
             // tracking summary log header
-            string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot (percentage); time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
-            //string summaryHeader =
-            //    "Instruction ID; " +
-            //    "goal; " +
-            //    "goal position (rotational, [angle]); " +
-            //    "farthest head position (rotational, [angle]); " +
-            //    "difference with regards to goal [deg];" +
-            //    "time to reach goal; " +
-            //    "trial contains deviation; " +
-            //    "deviation goal; " +
-            //    "deviation goal position (rotational, [angle]);" +
-            //    "drifted towards avatar [degrees]" +
-            //    "drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); ";
+            //string summaryHeader = "Instruction ID; goal; goal x-position; goal y-position; farthest reached x; farthest reached y; overshoot (percentage); time to reach goal; trial contains deviation; deviation goal; deviation goal x; deviation goal y";
+            string summaryHeader =
+                "Instruction ID; " +
+                "goal; " +
+                "goal position (rotational, [angle]); " +
+                "farthest head position (rotational, [angle]); " +
+                "difference with regards to goal [deg];" +
+                "time to reach goal; " +
+                "trial contains deviation; " +
+                "deviation goal; " +
+                "deviation goal position (rotational, [angle]);" +
+                "drifted towards avatar [degrees]" +
+                "drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); ";
 
 
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
@@ -341,6 +343,7 @@ public class GameScript : MonoBehaviour
                 farthestX = hmdTarget.position.x;
                 farthestY = headY;
                 overshoot = progress; // in percentage
+                farthestAngle = angle;
                 degreesDifference = angle - goalRotation;
             }
             //totalScoreScript.ChangeTextFcn("currentGoal: "+ currentGoal + "\nangle: " + Math.Round(angle, 1) + "\ngoalRotation: " + Math.Round(goalRotation,1) + "\ndegreesDifference: " + degreesDifference + "\novershoot: " + Math.Round(overshoot,2));
@@ -684,14 +687,57 @@ public class GameScript : MonoBehaviour
             string log;
             if (!thisTrialContainsDeviation)
             {
-                log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
-                    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";;;";
+                //log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
+                //    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";;;";
+                log =
+                    instructionCounter + ";" +
+                    currentGoal.name + ";" +
+                    goalRotation + ";" +
+                    farthestAngle + ";" +
+                    degreesDifference + ";" +
+                    timeToReachGoal + ";" +
+                    thisTrialContainsDeviation + ";" +
+                    //    "deviation goal; " +
+                    ";" +
+                    //    "deviation goal position (rotational, [angle]);" +
+                    ";" +
+                    //    "drifted towards avatar [degrees]" +
+                    ";" +
+                    //    "drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); ";
+                    "";
             }
             else
             {
-                log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
-                    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";" + deviationGoal.name
-                    + ";" + deviationGoal.transform.position.x + ";" + deviationGoal.transform.position.y;
+                //log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
+                //    + ";" + farthestX + ";" + farthestY + ";" + overshoot + ";" + timeToReachGoal + ";" + thisTrialContainsDeviation + ";" + deviationGoal.name
+                //    + ";" + deviationGoal.transform.position.x + ";" + deviationGoal.transform.position.y;
+
+                float driftedTowardsAvatar;
+                float driftedTowardsAvatarPercentage;
+
+                if (goalRotation < deviationGoalRotation.eulerAngles.z)
+                {
+                    driftedTowardsAvatar = degreesDifference; // [degrees]
+                }
+                else
+                {
+                    driftedTowardsAvatar = degreesDifference * -1; // [degrees]
+                }
+                float deviationDegreesDifference = deviationGoalRotation.eulerAngles.z - goalRotation;
+                driftedTowardsAvatarPercentage = driftedTowardsAvatar / deviationDegreesDifference * 100;
+
+                log =
+                    instructionCounter + ";" +
+                    currentGoal.name + ";" +
+                    goalRotation + ";" +
+                    farthestAngle + ";" +
+                    degreesDifference + ";" +
+                    timeToReachGoal + ";" +
+                    thisTrialContainsDeviation + ";" +
+                    deviationGoal + ";" +
+                    deviationGoalRotation.eulerAngles.z + ";" +
+                    driftedTowardsAvatar + ";" +
+                    driftedTowardsAvatarPercentage;
             }
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Tracking_summary_" + startGameTimestamp + ".csv");
@@ -855,7 +901,7 @@ public class GameScript : MonoBehaviour
             animationTriggered = false;
             if (currentGoal == goal1 || currentGoal == goalmin1)
             {
-                deviationDirection = 1; // further
+                deviationDirection = 1; // farther
                 gameState = "Waiting for user to touch goal";
             }
             else if (currentGoal == goal4 || currentGoal == goalmin4)

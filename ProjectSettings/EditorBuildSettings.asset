@@ -14,9 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/!!Made-by-BJS/Scenes/NatureMale.unity
     guid: 4debc9c2187787049a17bbc2f2976745
-  - enabled: 0
+  - enabled: 1
     path: Assets/!!Made-by-BJS/Scenes/NatureFemale.unity
-    guid: ebceb7b2875f8ef4d97fcd475116ea1b
+    guid: 151fdc8b847cb7049be4d2b2f5add904
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: e9e58c2c6a2a8ac439aa74bec77571e3,
       type: 2}

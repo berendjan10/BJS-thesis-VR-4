@@ -1,0 +1,1 @@
+Instruction ID; goal; goal position (rotational, [angle]); farthest head position (rotational, [angle]); difference with regards to goal [deg];time to reach goal; trial contains deviation; deviation goal; deviation goal position (rotational, [angle]);drifted towards avatar [degrees]drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); 

@@ -1,0 +1,5 @@
+Instruction ID; goal; goal position (rotational, [angle]); farthest head position (rotational, [angle]); difference with regards to goal [deg];time to reach goal; trial contains deviation; deviation goal; deviation goal position (rotational, [angle]);drifted towards avatar [degrees]drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); 
+1;Devation goal 3;-22,46265;-23,76104;-1,298389;2,159256;True;Devation goal 4 (UnityEngine.GameObject);331,7703;-1,298389;-0,3665355
+2;Devation goal 2;-17,05859;-9,619884;7,43871;2,130246;True;Devation goal 1 (UnityEngine.GameObject);348,6342;7,43871;2,034142
+3;Devation goal -3;22,07629;22,32872;0,2524281;4,679842;False;;;;
+4;Devation goal 3;-22,46265;-25,05001;-2,58736;2,464201;True;Devation goal 4 (UnityEngine.GameObject);331,7703;-2,58736;-0,7304122
