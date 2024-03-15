@@ -120,6 +120,8 @@ public class GameScript : MonoBehaviour
 
     [SerializeField]
     private GameObject MainCamera;
+    public Transform mainCamera;
+    public Camera mainCameraCamera;
 
     private int totalScore = 0;
     private int roundScore = 0;
@@ -143,7 +145,7 @@ public class GameScript : MonoBehaviour
 
     public GameObject hmdResetView;
 
-    public Transform mainCamera;
+
     public Transform target;
 
     public XROrigin XRORIGINN;
@@ -290,6 +292,14 @@ public class GameScript : MonoBehaviour
                 writer.WriteLine(summaryHeader);
             }
         }
+        if (!thirdPersonPerspective)
+        {
+            mainCameraCamera.cullingMask = LayerMask.GetMask("Default", "UI");
+        }
+        else
+        {
+            mainCameraCamera.cullingMask = LayerMask.GetMask("Default", "UI", "Hide in 1PP");
+        }
     }
 
     // Update is called once per frame
@@ -390,6 +400,7 @@ public class GameScript : MonoBehaviour
         // Third Person Perspective
         else if (thirdPersonPerspective) // HMD
         {
+
             if (!smoothTransition)
             {
                 thirdPersonPerspectiveFcn(); // HMD

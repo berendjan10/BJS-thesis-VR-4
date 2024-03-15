@@ -322,7 +322,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 33
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -11339,9 +11339,9 @@ MonoBehaviour:
   gender: 0
   thirdPersonPerspective: 1
   record: 1
-  phaseOneInstructions: 25
+  phaseOneInstructions: 0
   phaseTwoInstructions: 25
-  deviatePercentage: 40
+  deviatePercentage: 100
   deviationDuration: 1.5
   pauseAtGoal: 0.2
   waitTimeLowerLimit: 0
@@ -11406,9 +11406,10 @@ MonoBehaviour:
     m_Reference: {fileID: -4928370872940462309, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
   MainCamera: {fileID: 8315415}
+  mainCamera: {fileID: 8315416}
+  mainCameraCamera: {fileID: 8315419}
   myMeasuredPivotPoint: {fileID: 781013527}
   hmdResetView: {fileID: 401317275}
-  mainCamera: {fileID: 8315416}
   target: {fileID: 763024548}
   XRORIGINN: {fileID: 401317277}
   ghost: {fileID: 974739299}
@@ -12317,6 +12318,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4759930916735469766, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759930916735469766, guid: bda76372da3fc8a4c9cba39d03cf0227,
+        type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -12333,7 +12339,7 @@ PrefabInstance:
     - target: {fileID: 5294776246115269975, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
       propertyPath: m_LayerMask.m_Bits
-      value: 807
+      value: 815
       objectReference: {fileID: 0}
     - target: {fileID: 5294776246115269975, guid: bda76372da3fc8a4c9cba39d03cf0227,
         type: 3}
@@ -37086,7 +37092,7 @@ GameObject:
   - component: {fileID: 2076381623}
   - component: {fileID: 2076381622}
   - component: {fileID: 2076381621}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37809,6 +37815,21 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.04321945
       objectReference: {fileID: 0}
+    - target: {fileID: 562568076893083651, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1503641747734095379, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569984041314594071, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3050251060893140669, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -37839,6 +37860,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
+    - target: {fileID: 4525546686359833522, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6070482321239056212, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
       propertyPath: m_Name
@@ -37848,6 +37874,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6973102428503032632, guid: 5191c2a8b26f63d4f8573b1ccb026576,
+        type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8159705790956300016, guid: 5191c2a8b26f63d4f8573b1ccb026576,
         type: 3}
