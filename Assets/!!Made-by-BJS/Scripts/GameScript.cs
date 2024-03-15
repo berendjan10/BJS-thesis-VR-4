@@ -30,7 +30,7 @@ public class GameScript : MonoBehaviour
     public float deviationDuration; // duration of deviation
     public float pauseAtGoal;
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
-    public float waitTimeUpperLimit = 2.0f; // TODO: change waittime back to 2-5s
+    public float waitTimeUpperLimit = 2.0f;
     public float closerDeviationCutoff = 0.2f;
     public float fartherDeviationCutoff = 0.4f;
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
@@ -95,6 +95,7 @@ public class GameScript : MonoBehaviour
 
     private Vector3 deviationGoalPosition;
     private Quaternion deviationGoalRotation;
+    private float deviationGoalRotationFloat;
     [SerializeField] private GameObject cameraOffset;
     [SerializeField] private GameObject mirror;
     [SerializeField] private GameObject gameInstructions;
@@ -184,6 +185,7 @@ public class GameScript : MonoBehaviour
     private int goalInt;
 
     private float farthestAngle;
+    private float angle; // head position angle
 
     void Start()
     {
@@ -248,23 +250,15 @@ public class GameScript : MonoBehaviour
         if (record)
         {
             // header of hmd tracking log
-            string header = "Timestamp; x; y; z; rx; ry; rz; instruction ID; Game state";
-            //string header =
-            //    "Timestamp; " +
-            //    "instruction ID; " +
-            //    "Game state; " +
-            //    "goal; " +
-            //    "goal position (rotational, [angle]); " +
-            //    "x; y; z; " +
-            //    "rx; ry; rz; " +
-            //    "current head position (rotational, [angle]); " +
-            //    "difference with regards to goal [deg];" +
-            //    "trial contains deviation; " +
-            //    "deviation goal; " +
-            //    "deviation goal position (rotational, [angle]);" +
-            //    "drifting towards avatar [degrees]" +
-            //    "drifting towards avatar [percentage] (0 is at goal, 100 is at avatar); " +
-            //    "";
+            //string header = "Timestamp; x; y; z; rx; ry; rz; instruction ID; Game state";
+            string header =
+                "Timestamp; " +
+                "instruction ID; " +
+                "Game state; " +
+                "x; y; z; " +
+                "rx; ry; rz; " +
+                "current head position (rotational, [angle]); " +
+                "";
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
@@ -277,15 +271,16 @@ public class GameScript : MonoBehaviour
             string summaryHeader =
                 "Instruction ID; " +
                 "goal; " +
-                "goal position (rotational, [angle]); " +
-                "farthest head position (rotational, [angle]); " +
-                "difference with regards to goal [deg];" +
+                "goal position [deg]; " +
+                "farthest head position [deg]; " +
+                "over-/undershoot [deg] (farther = positive); " +
+                "over-/undershoot [%] (0 at vertical, 100 at goal); " + 
                 "time to reach goal; " +
-                "trial contains deviation; " +
+                "average angular velocity [deg/sec]; " +
                 "deviation goal; " +
-                "deviation goal position (rotational, [angle]);" +
-                "drifted towards avatar [degrees]" +
-                "drifted towards avatar [percentage] (0 is at goal, 100 is at avatar); ";
+                "deviation goal position [deg]; " +
+                "drifted towards avatar [deg]; " +
+                "drifted towards avatar [%] (0 is at goal, 100 is at avatar)";
 
 
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
@@ -335,7 +330,7 @@ public class GameScript : MonoBehaviour
             goalPreviousFrame = currentGoal;
             // if (goalRotation != 0) // if (currentGoal != topGoal)
 
-            float angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, headY - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // degrees
+            angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, headY - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // degrees
             float progress = angle / goalRotation;
             if (progress > overshoot)
             {
@@ -530,9 +525,21 @@ public class GameScript : MonoBehaviour
         // Store headset movement
         if (record)
         {
-            string log = System.DateTime.Now.ToString() + ";" + hmdTarget.position.x + ";" + headY + ";" + headZ
-                + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + instructionCounter
-                + ";" + gameState;
+            //    string log = 
+            //        System.DateTime.Now.ToString() + ";" + 
+            //        hmdTarget.position.x + ";" + headY + ";" + headZ
+            //        + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + 
+            //        instructionCounter + ";" + 
+            //        gameState;
+
+            string log =
+                System.DateTime.Now.ToString() + ";" +
+                instructionCounter + ";" +
+                gameState + ";" +
+                hmdTarget.position.x + ";" + headY + ";" + headZ
+                + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" +
+                angle + ";" +
+                "";
             // Create folder "RecordingLogs"
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
@@ -541,6 +548,8 @@ public class GameScript : MonoBehaviour
                 writer.WriteLine(log);
             }
         }
+
+                
     } // Update() end
 
 
@@ -685,6 +694,9 @@ public class GameScript : MonoBehaviour
         if (record)
         {
             string log;
+            float angularVelocity = timeToReachGoal / Math.Abs(goalRotation);
+            float overshootDeg = Math.Sign(overshoot-1) * Math.Abs(degreesDifference);
+
             if (!thisTrialContainsDeviation)
             {
                 //log = instructionCounter + ";" + currentGoal.name + ";" + currentGoal.transform.position.x + ";" + currentGoal.transform.position.y
@@ -694,9 +706,10 @@ public class GameScript : MonoBehaviour
                     currentGoal.name + ";" +
                     goalRotation + ";" +
                     farthestAngle + ";" +
-                    degreesDifference + ";" +
+                    overshootDeg + ";" +
+                    overshoot * 100 + ";" +
                     timeToReachGoal + ";" +
-                    thisTrialContainsDeviation + ";" +
+                    angularVelocity + ";" +
                     //    "deviation goal; " +
                     ";" +
                     //    "deviation goal position (rotational, [angle]);" +
@@ -715,7 +728,7 @@ public class GameScript : MonoBehaviour
                 float driftedTowardsAvatar;
                 float driftedTowardsAvatarPercentage;
 
-                if (goalRotation < deviationGoalRotation.eulerAngles.z)
+                if (goalRotation < deviationGoalRotationFloat)
                 {
                     driftedTowardsAvatar = degreesDifference; // [degrees]
                 }
@@ -723,7 +736,7 @@ public class GameScript : MonoBehaviour
                 {
                     driftedTowardsAvatar = degreesDifference * -1; // [degrees]
                 }
-                float deviationDegreesDifference = deviationGoalRotation.eulerAngles.z - goalRotation;
+                float deviationDegreesDifference = Math.Abs(deviationGoalRotationFloat - goalRotation);
                 driftedTowardsAvatarPercentage = driftedTowardsAvatar / deviationDegreesDifference * 100;
 
                 log =
@@ -731,13 +744,14 @@ public class GameScript : MonoBehaviour
                     currentGoal.name + ";" +
                     goalRotation + ";" +
                     farthestAngle + ";" +
-                    degreesDifference + ";" +
+                    overshootDeg + ";" +
+                    overshoot * 100 + ";" +
                     timeToReachGoal + ";" +
-                    thisTrialContainsDeviation + ";" +
-                    deviationGoal + ";" +
-                    deviationGoalRotation.eulerAngles.z + ";" +
-                    driftedTowardsAvatar + ";" +
-                    driftedTowardsAvatarPercentage;
+                    angularVelocity + ";" +
+                    deviationGoal.name + ";" +
+                    deviationGoalRotationFloat + ";" +
+                    driftedTowardsAvatar + ";" + 
+                    driftedTowardsAvatarPercentage; 
             }
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Tracking_summary_" + startGameTimestamp + ".csv");
@@ -745,6 +759,7 @@ public class GameScript : MonoBehaviour
             {
                 writer.WriteLine(log);
             }
+            //totalScoreScript.ChangeTextFcn("farthestAngle: " + farthestAngle + "\ndegreesDifference: " + degreesDifference + "\ndriftedTowardsAvatar: " + driftedTowardsAvatar + "\ndriftedTowardsAvatarPercentage: " + driftedTowardsAvatarPercentage);
         }
     }
 
@@ -968,6 +983,9 @@ public class GameScript : MonoBehaviour
             }
             deviationGoalPosition = deviationGoal.transform.position;
             deviationGoalRotation = deviationGoal.transform.rotation;
+            deviationGoalRotationFloat = deviationGoalRotation.eulerAngles.z;
+            if (deviationGoalRotationFloat > 180) { deviationGoalRotationFloat -= 360; }
+
             // print("deviationGoal: " + deviationGoal);
             // print("deviationGoalPosition: " + deviationGoalPosition);
             // print("deviationGoalRotation: " + deviationGoalRotation.eulerAngles);
