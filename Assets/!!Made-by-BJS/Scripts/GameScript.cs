@@ -20,7 +20,7 @@ public class GameScript : MonoBehaviour
     public enum Gender { male, female } // dropdown menu
     public Gender gender;
     [SerializeField] private bool thirdPersonPerspective = false;
-    public bool record;
+    private bool record = true; // moet aan blijven!!!
     private bool smoothTransition = false;
     private float transitionStart;
     private float transitionDuration; // duration of transition
@@ -189,6 +189,8 @@ public class GameScript : MonoBehaviour
 
     private float farthestAngle;
     private float angle; // head position angle
+    private float angularVelocitySum = 0.0f;
+    private float averageAngularVelocity;
 
     void Start()
     {
@@ -308,7 +310,6 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        print(gameState);
         //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: ");// + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
@@ -664,7 +665,7 @@ public class GameScript : MonoBehaviour
 
     IEnumerator ShowScore()
     {
-        print("show score");
+        //print("show score");
         float localTime = 0f;
         addedScoreGameObject.SetActive(true);
 
@@ -719,6 +720,10 @@ public class GameScript : MonoBehaviour
         {
             string log;
             float angularVelocity = timeToReachGoal / Math.Abs(goalRotation);
+            angularVelocitySum += angularVelocity;
+            averageAngularVelocity = angularVelocitySum / instructionCounter;
+            print("angularVelocity: " + angularVelocity);
+            print("averageAngularVelocity: " + averageAngularVelocity);
             float overshootDeg = Math.Sign(overshoot-1) * Math.Abs(degreesDifference);
 
             if (!thisTrialContainsDeviation)
@@ -847,7 +852,7 @@ public class GameScript : MonoBehaviour
     public void HandleGoalTouched()
     {
         timeToReachGoal = Time.time - instructionGivenTimestamp;
-        print("Time to reach goal" + timeToReachGoal);
+        //print("Time to reach goal" + timeToReachGoal);
 
         if (instructionCounter > (phaseOneInstructions + phaseTwoInstructions))
         {
@@ -866,11 +871,11 @@ public class GameScript : MonoBehaviour
         //print("SetRandomGoal() entered.");
         // Increment the instruction counter
         instructionCounter++;
-        print("instructionCounter: " + instructionCounter);
+        //print("instructionCounter: " + instructionCounter);
         scoreSaved = false;
 
         thisTrialContainsDeviation = deviatingTrials.Contains(instructionCounter);
-        print("thisTrialContainsDeviation" + thisTrialContainsDeviation);
+        //print("thisTrialContainsDeviation" + thisTrialContainsDeviation);
         // Generate a random index to choose the next sphere
         int randomIndex;
 
@@ -891,7 +896,7 @@ public class GameScript : MonoBehaviour
                 randomIndex = Random.Range(0, goals.Count); 
             } while (goals[randomIndex] == previousGoal);
         }
-        print("randomIndex: " + randomIndex);
+        //print("randomIndex: " + randomIndex);
 
         previousGoal = goals[randomIndex];
         currentGoal = goals[randomIndex];
