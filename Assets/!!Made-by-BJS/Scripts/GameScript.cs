@@ -28,6 +28,7 @@ public class GameScript : MonoBehaviour
     public int phaseTwoInstructions = 50; // [2, 4, 6] uit [2, 3, 4, 5, 6, 7]    // amount of instructions in phase 2 (with deviation)
     public int deviatePercentage = 40; // [%]    // percentage that deviates in phase 2
     public float deviationDuration; // duration of deviation
+    public float deviationDuration2; // duration of further deviation
     public float pauseAtGoal;
     public float waitTimeLowerLimit = 1.0f;    // wait time to sit straight between instructions
     public float waitTimeUpperLimit = 2.0f;
@@ -208,6 +209,8 @@ public class GameScript : MonoBehaviour
         else { goalsPhase2 = new List<GameObject> { goal1, goal2, goal3, goal4, goalmin1, goalmin2, goalmin3, goalmin4, topGoal, topGoal, topGoal, topGoal }; }
         // goals = new List<GameObject> { goal1 };
 
+        gameInstructions.SetActive(false);
+
         // Find the game object with the ChangeText script
         textScript = gameInstructions.GetComponent<ChangeText>();
         addedScoreScript = addedScoreGameObject.GetComponent<ChangeText>();
@@ -305,6 +308,7 @@ public class GameScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        print(gameState);
         //totalScoreScript.ChangeTextFcn(gameState + "\nContains Deviation: ");// + thisTrialContainsDeviation + "\nAnimation Triggered: " + animationTriggered + "\n" + "progress >= deviationcutoff:\n" + progress0debug + "\n" + deviationCutoff);
 
         if (Input.GetKeyDown(KeyCode.B))
@@ -454,8 +458,16 @@ public class GameScript : MonoBehaviour
             }
             else
             {
+                if (deviationDirection == 1)
+                {
+                    deviationDurationLocal = deviationDuration2;
+                }
+                else
+                {
+                    deviationDurationLocal = deviationDuration;
+                }
                 deviationTypeLocal = deviationType;
-                deviationDurationLocal = deviationDuration;
+                
             }
             // deviation timing
             deviationClock += Time.deltaTime;
@@ -575,8 +587,9 @@ public class GameScript : MonoBehaviour
             if (thirdPersonPerspective) { textObjects.transform.position = three3PPPlaceholder.position; }
             else { textObjects.transform.position = instruction1PPPosition; }
             instructionZero.SetActive(false);
-            gameState = "Waiting for user to read instruction";
+            //gameState = "Waiting for user to read instruction";
             addedScoreGameObject.SetActive(false);
+            StartCoroutine(WaitAndSetRandomGoal(1.25f));
         }
 
         // Recenter the view
@@ -612,17 +625,17 @@ public class GameScript : MonoBehaviour
 
     void OnThumbA(InputAction.CallbackContext context)
     {
-        if (gameState == "Waiting for user to read instruction")
-        {
-            gameInstructions.SetActive(false);
-            SetRandomGoal();
-        }
-        else
-        {
-            gameInstructions.SetActive(!gameInstructions.activeInHierarchy);
-            if (thirdPersonPerspective) { textObjects.transform.position = three3PPPlaceholder.position; }
-            else { textObjects.transform.position = instruction1PPPosition; }
-        }
+        //if (gameState == "Waiting for user to read instruction")
+        //{
+        //    gameInstructions.SetActive(false);
+        //    SetRandomGoal();
+        //}
+        //else
+        //{
+        //    gameInstructions.SetActive(!gameInstructions.activeInHierarchy);
+        //    if (thirdPersonPerspective) { textObjects.transform.position = three3PPPlaceholder.position; }
+        //    else { textObjects.transform.position = instruction1PPPosition; }
+        //}
     }
 
     private void InstructionInFrontOfCamera()
@@ -781,9 +794,9 @@ public class GameScript : MonoBehaviour
         //print("Overshoot = " + overshoot);
         //print("overshoot difference : " + Mathf.Abs(overshoot - 1));
         //print("Accuracy = " + ((1 - Mathf.Abs(overshoot - 1)) * 100));
-        if (thisTrialContainsDeviation) { roundScore = Random.Range(90, 100); }
+        if (thisTrialContainsDeviation) { roundScore = Random.Range(85, 98); }
         else {
-            roundScore = (int)(100 - timeToReachGoal * 5 - Mathf.Abs(degreesDifference) * 30);
+            roundScore = (int)(100 - timeToReachGoal * 5 - Mathf.Abs(degreesDifference) * 20);
             if (roundScore < 0) { roundScore = 0; }
         }
         totalScore += roundScore;

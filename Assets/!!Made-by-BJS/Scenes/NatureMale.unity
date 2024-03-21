@@ -3575,10 +3575,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 209506192}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.8612557}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.005859375, y: -162.12}
-  m_SizeDelta: {x: -0, y: 324.25}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &139322828
 MonoBehaviour:
@@ -4688,7 +4688,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 209506191}
   m_LocalRotation: {x: -0, y: 0.500426, z: -0, w: 0.86577934}
-  m_LocalPosition: {x: 0, y: 0, z: 0.8009991}
+  m_LocalPosition: {x: 0, y: 0, z: 0.9289}
   m_LocalScale: {x: 0.0022, y: 0.0049309563, z: 0.0049309563}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4698,8 +4698,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 60.056, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1.754, y: 1.303}
-  m_SizeDelta: {x: 1468.32, y: 376.4845}
+  m_AnchoredPosition: {x: 1.6803, y: 1.7405}
+  m_SizeDelta: {x: 1334.1259, y: 199.0336}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &209506193
 MonoBehaviour:
@@ -9424,16 +9424,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490970607}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -3.8426e-11}
   m_LocalScale: {x: 1.4339831, y: 0.75251, z: 0.75251}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 209506192}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.002243, y: -0.000059128}
-  m_SizeDelta: {x: 717.02, y: 602.12}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.001159668, y: -0.00019073486}
+  m_SizeDelta: {x: -403.76, y: 65.46}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &490970609
 MonoBehaviour:
@@ -9455,7 +9455,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Please sit straight up on your chair and look straight forward. Please
+  m_text: Please sit straight up on your chair and look straight forward. Then please
     press B with your right hand thumb.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9490,8 +9490,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -9519,7 +9519,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -52.12494, y: 131.89264, z: -67.0564, w: 117.3616}
+  m_margin: {x: 29.862885, y: 10.312798, z: 37.00003, w: 9.015366}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -11339,10 +11339,11 @@ MonoBehaviour:
   gender: 0
   thirdPersonPerspective: 1
   record: 1
-  phaseOneInstructions: 25
+  phaseOneInstructions: 3
   phaseTwoInstructions: 25
   deviatePercentage: 40
   deviationDuration: 1.5
+  deviationDuration2: 1.8
   pauseAtGoal: 0.2
   waitTimeLowerLimit: 0
   waitTimeUpperLimit: 1.5
