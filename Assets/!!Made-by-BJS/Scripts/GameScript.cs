@@ -34,6 +34,9 @@ public class GameScript : MonoBehaviour
     public float waitTimeUpperLimit = 2.0f;
     public float closerDeviationCutoff = 0.2f;
     public float fartherDeviationCutoff = 0.4f;
+    public float closerDeviationCutoffDeg;
+    public float fartherDeviationCutoffDeg;
+
     [SerializeField] private Vector3 thirdPersonPerspectiveOffsetPosition = new Vector3();
     public enum DeviationType { sineWave, forthPauseBack }
     public DeviationType deviationType;
@@ -191,7 +194,7 @@ public class GameScript : MonoBehaviour
     private float angle; // head position angle
     private float angularVelocitySum = 0.0f;
     private float averageAngularVelocity;
-
+    private float absDegreesDifference;
     void Start()
     {
         thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
@@ -346,6 +349,8 @@ public class GameScript : MonoBehaviour
             // if (goalRotation != 0) // if (currentGoal != topGoal)
 
             angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, headY - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // degrees
+            absDegreesDifference = Math.Abs(angle - goalRotation);
+            totalScoreScript.ChangeTextFcn("abs deg diff: " + absDegreesDifference);
             float progress = angle / goalRotation;
             if (progress > overshoot)
             {
@@ -359,7 +364,8 @@ public class GameScript : MonoBehaviour
             //totalScoreScript.ChangeTextFcn("currentGoal: "+ currentGoal + "\nangle: " + Math.Round(angle, 1) + "\ngoalRotation: " + Math.Round(goalRotation,1) + "\ndegreesDifference: " + degreesDifference + "\novershoot: " + Math.Round(overshoot,2));
             if (thisTrialContainsDeviation)
             {
-                if (progress >= deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
+                if (absDegreesDifference < deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
+                //if (progress >= deviationCutoff || gameState == "Sudden deviation SLOW" || gameState == "Sudden deviation FAST")
                 {
                     if (!animationTriggered && gameState != "Waiting for user to sit straight")
                     {
@@ -462,10 +468,12 @@ public class GameScript : MonoBehaviour
                 if (deviationDirection == 1)
                 {
                     deviationDurationLocal = deviationDuration2;
+                    //deviationDurationLocal = deviationDuration2 * averageAngularVelocity / 0.07f;
                 }
                 else
                 {
                     deviationDurationLocal = deviationDuration;
+                    //deviationDurationLocal = deviationDuration * averageAngularVelocity / 0.07f;
                 }
                 deviationTypeLocal = deviationType;
                 
@@ -720,8 +728,29 @@ public class GameScript : MonoBehaviour
         {
             string log;
             float angularVelocity = timeToReachGoal / Math.Abs(goalRotation);
-            angularVelocitySum += angularVelocity;
-            averageAngularVelocity = angularVelocitySum / instructionCounter;
+
+
+
+            angularVelocitySum += angularVelocity; ////
+
+            // as soon as you are ... degrees from the goal, ... NO DONT FIX WHAT AINT BROKE
+
+            ////
+            //if (instructionCounter > 5)
+            //{
+            //    angularVelocitySum += angularVelocity;
+            //}
+            //if (instructionCounter <= phaseOneInstructions)
+            //{
+            //    averageAngularVelocity = angularVelocitySum / (instructionCounter - 5);
+            //}
+            ////
+            averageAngularVelocity = angularVelocitySum / instructionCounter; ////
+
+
+
+
+
             print("angularVelocity: " + angularVelocity);
             print("averageAngularVelocity: " + averageAngularVelocity);
             float overshootDeg = Math.Sign(overshoot-1) * Math.Abs(degreesDifference);
@@ -836,7 +865,7 @@ public class GameScript : MonoBehaviour
         float elapsedTime = 0f;
 
         // Continue waiting until the elapsed time reaches the wait time
-        while (elapsedTime < (deviationDuration*0.5f)+pauseAtGoal)
+        while (elapsedTime < (deviationDuration*0.5f))
         {
             // Increment the elapsed time using Time.deltaTime
             elapsedTime += Time.deltaTime;
@@ -979,6 +1008,7 @@ public class GameScript : MonoBehaviour
             if (deviationDirection == 0) // closer
             {
                 deviationCutoff = closerDeviationCutoff;
+                deviationCutoff = closerDeviationCutoffDeg;
                 try { deviationGoal = goals[randomIndex - 1]; }
                 catch (IndexOutOfRangeException e)
                 {
@@ -989,6 +1019,7 @@ public class GameScript : MonoBehaviour
             else if (deviationDirection == 1) // farther
             {
                 deviationCutoff = fartherDeviationCutoff;
+                deviationCutoff = fartherDeviationCutoffDeg;
                 try { deviationGoal = goals[randomIndex + 1]; }
                 catch (IndexOutOfRangeException e)
                 {
