@@ -78,3 +78,4 @@ crashlytics-build.properties
 # /[Aa]ssets/Samples/* # 4.65 MB
 # /[Aa]ssets/Simple garage/* # 118 MB
 /[Aa]ssets/XR/Settings/*
+/[Aa]ssets/RecordingLogs/*
