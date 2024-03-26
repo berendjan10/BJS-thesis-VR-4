@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
-// tweak middle deviation timing
+// 
 
 public class GameScript : MonoBehaviour
 {
