@@ -11422,6 +11422,19 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: -4928370872940462309, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
+  thumbButtonX:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Thumb Button X
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 9611fcec-fdcc-4140-8aa8-309325a8560a
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -7431075769893668024, guid: c348712bda248c246b8c49b3db54643f,
+      type: 3}
   MainCamera: {fileID: 8315415}
   mainCamera: {fileID: 8315416}
   mainCameraCamera: {fileID: 8315419}
@@ -11436,6 +11449,8 @@ MonoBehaviour:
   closeGoalLeft: {fileID: 1097811587}
   closeGoalRight: {fileID: 1591757172}
   waitForCenterDeviation: 2
+  controllerOnChairReference: {fileID: 1444044041}
+  rightController: {fileID: 953524543}
 --- !u!65 &595502770
 BoxCollider:
   m_ObjectHideFlags: 0

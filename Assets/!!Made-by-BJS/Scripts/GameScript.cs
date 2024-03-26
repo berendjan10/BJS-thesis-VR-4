@@ -12,7 +12,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
-// 
+// DONE  maak stoelpoten langer
+
+// bouw een functie die:
+// A (ref) verplaatst, aligned met de Y-component van de rechter controller 
 
 public class GameScript : MonoBehaviour
 {
@@ -119,6 +122,7 @@ public class GameScript : MonoBehaviour
 
     public InputActionProperty thumbButtonA;
     public InputActionProperty thumbButtonB;
+    public InputActionProperty thumbButtonX;
 
     //[SerializeField] private GameObject CameraOffsetRef;
 
@@ -195,6 +199,10 @@ public class GameScript : MonoBehaviour
     private float angularVelocitySum = 0.0f;
     private float averageAngularVelocity;
     private float absDegreesDifference;
+
+    public GameObject controllerOnChairReference;
+    public Transform rightController;
+
     void Start()
     {
         thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
@@ -243,6 +251,7 @@ public class GameScript : MonoBehaviour
 
         thumbButtonB.action.performed += OnThumbB;
         thumbButtonA.action.performed += OnThumbA;
+        thumbButtonX.action.performed += OnThumbX;
 
         if (!useGhost) { ghost.SetActive(false); }
 
@@ -350,7 +359,7 @@ public class GameScript : MonoBehaviour
 
             angle = (float)(Mathf.Atan2(hmdTarget.position.x - myMeasuredPivotPoint.position.x, headY - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); // degrees
             absDegreesDifference = Math.Abs(angle - goalRotation);
-            totalScoreScript.ChangeTextFcn("abs deg diff: " + absDegreesDifference);
+            //totalScoreScript.ChangeTextFcn("abs deg diff: " + absDegreesDifference);
             float progress = angle / goalRotation;
             if (progress > overshoot)
             {
@@ -647,6 +656,13 @@ public class GameScript : MonoBehaviour
         //}
     }
 
+    // scale chair.
+    void OnThumbX(InputAction.CallbackContext context)
+    {
+        // A (ref) verplaatst, aligned met de Y-component van de rechter controller 
+        controllerOnChairReference.transform.position = new Vector3(0.0f, rightController.position.y, 0.0f);
+        print("controller on chair height: " + rightController.position.y);
+    }
     private void InstructionInFrontOfCamera()
     {
         if (mainCamera != null)
