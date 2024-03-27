@@ -25,7 +25,7 @@ public class inFronOfCamera : MonoBehaviour
         textScript.ChangeTextFcn("NOT READY");
 
         // recenter 
-        OnThumbX(default);
+        OnThumbB(default);
     }
 
     private void Update()

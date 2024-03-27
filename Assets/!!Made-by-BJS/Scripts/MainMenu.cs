@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,15 +13,21 @@ public class MainMenu : MonoBehaviour
     private inFronOfCamera instruction0script;
     public TextMeshProUGUI textMeshProToChange;
     public GameObject playerIsNotReady;
+    public GameObject chairHeightSet;
     public GameObject NO;
     public GameObject YES;
-
+    public InputActionProperty thumbButtonY;
+    public Transform rightController;
 
     private void Start()
     {
         instruction0script = instruction0.GetComponent<inFronOfCamera>();
         textMeshProToChange.color = Color.red;
         playerIsNotReady.SetActive(false);
+        chairHeightSet.SetActive(false);
+
+        thumbButtonY.action.performed += OnThumbY;
+
     }
     public void Update()
     {
@@ -32,7 +39,7 @@ public class MainMenu : MonoBehaviour
     {
         if (!instruction0script.ready)
         {
-            StartCoroutine(notReady());
+            StartCoroutine(flashText(playerIsNotReady));
         }
         else
         {
@@ -62,16 +69,23 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    IEnumerator notReady()
+    IEnumerator flashText(GameObject txt)
     {
         float clock = 0.0f;
-        playerIsNotReady.SetActive(true);
+        txt.SetActive(true);
         while (clock < 0.5f)
         {
             clock += Time.deltaTime;
             yield return null;
         }
-        playerIsNotReady.SetActive(false);
+        txt.SetActive(false);
     }
+
+    void OnThumbY(InputAction.CallbackContext context)
+    {
+        PlayerPrefs.SetFloat("chair", rightController.localPosition.y);
+        chairHeightSet.SetActive(true);
+    }
+
 
 }

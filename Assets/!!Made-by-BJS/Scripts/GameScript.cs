@@ -207,6 +207,8 @@ public class GameScript : MonoBehaviour
     {
         thirdPersonPerspective = Convert.ToBoolean(PlayerPrefs.GetInt("3PP"));
         bool genderInt = Convert.ToBoolean(PlayerPrefs.GetInt("gender"));
+        controllerOnChairReference.transform.position = new Vector3(0.0f, PlayerPrefs.GetFloat("chair"), 0.0f);
+
         if (genderInt)
         {
             gender = Gender.female;
@@ -251,7 +253,7 @@ public class GameScript : MonoBehaviour
 
         thumbButtonB.action.performed += OnThumbB;
         thumbButtonA.action.performed += OnThumbA;
-        thumbButtonX.action.performed += OnThumbX;
+        //thumbButtonX.action.performed += OnThumbX;
 
         if (!useGhost) { ghost.SetActive(false); }
 
@@ -657,12 +659,13 @@ public class GameScript : MonoBehaviour
     }
 
     // scale chair.
-    void OnThumbX(InputAction.CallbackContext context)
-    {
-        // A (ref) verplaatst, aligned met de Y-component van de rechter controller 
-        controllerOnChairReference.transform.position = new Vector3(0.0f, rightController.position.y, 0.0f);
-        print("controller on chair height: " + rightController.position.y);
-    }
+    //void OnThumbX(InputAction.CallbackContext context)
+    //{
+    //    // A (ref) verplaatst, aligned met de Y-component van de rechter controller 
+    //    controllerOnChairReference.transform.position = new Vector3(0.0f, rightController.position.y, 0.0f);
+    //    print("controller on chair height: " + rightController.position.y);
+    //}
+
     private void InstructionInFrontOfCamera()
     {
         if (mainCamera != null)
