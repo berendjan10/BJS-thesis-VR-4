@@ -279,6 +279,10 @@ public class GameScript : MonoBehaviour
                 "x; y; z; " +
                 "rx; ry; rz; " +
                 "current head position (rotational, [angle]); " +
+                "avatar x; avatar y; avatar z; " +
+                "avatar rx; avatar ry; avatar rz; " +
+                "avatar current head position (rotational, [angle]); " +
+                "currently deviating" +
                 "";
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
@@ -395,12 +399,14 @@ public class GameScript : MonoBehaviour
             currentlyDeviating = false;
         }
 
-        //// controller trigger button press
-        //float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
 
 
-        /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
-        currentTime += Time.deltaTime;
+            //// controller trigger button press
+            //float triggerValue = thumbButtonA.action.ReadValue<float>(); // 0 or 1
+
+
+            /////////////////////////////////////////////////////////////////////////////////// HeadMovement ///////////////////////////////////////////////////////////////////////////////////
+            currentTime += Time.deltaTime;
 
         // Match head & hand target rotations with controllers (same for 1PP & 3PP)
         if (!currentlyDeviating) { transform.rotation = hmdTarget.rotation; }
@@ -568,22 +574,24 @@ public class GameScript : MonoBehaviour
         // Store headset movement
         if (record)
         {
-            //    string log = 
-            //        System.DateTime.Now.ToString() + ";" + 
-            //        hmdTarget.position.x + ";" + headY + ";" + headZ
-            //        + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" + 
-            //        instructionCounter + ";" + 
-            //        gameState;
-
+            float avatarAngle; // head position angle
+            if (!currentlyDeviating) { avatarAngle = angle; }
+            else { avatarAngle = (float)(Mathf.Atan2(transform.position.x - myMeasuredPivotPoint.position.x, transform.position.y - myMeasuredPivotPoint.position.y) * 360 / (2 * Math.PI) * (-1)); }
+            int currentlyDeviatingInt = currentlyDeviating ? 1 : 0;
             string log =
-                System.DateTime.Now.ToString() + ";" +
+                DateTime.Now.ToString() + ";" +
                 instructionCounter + ";" +
                 gameState + ";" +
-                hmdTarget.position.x + ";" + headY + ";" + headZ
-                + ";" + mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" +
+                hmdTarget.position.x + ";" + headY + ";" + headZ + ";" +
+                mainCamera.transform.eulerAngles.x + ";" + mainCamera.transform.eulerAngles.y + ";" + mainCamera.transform.eulerAngles.z + ";" +
                 angle + ";" +
+                transform.position.x + ";" + transform.position.y + ";" + transform.position.z + ";" +
+                transform.eulerAngles.x + ";" + transform.eulerAngles.y + ";" + transform.eulerAngles.z + ";" +
+                avatarAngle + ";" +
+                currentlyDeviatingInt + 
                 "";
-            // Create folder "RecordingLogs"
+            
+
             Directory.CreateDirectory(UnityEngine.Application.dataPath + "/RecordingLogs");
             string filePath = Path.Combine(UnityEngine.Application.dataPath + "/RecordingLogs", "Headset_tracking_log_" + startGameTimestamp + ".csv");
             using (StreamWriter writer = new StreamWriter(filePath, true))
